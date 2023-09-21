@@ -40,9 +40,6 @@ const mymongo = require('./db/mongo.js');
 
 
 
-
-
-
 /* ========================== */
 /*                            */
 /*  EXPRESS CONFIG & ROUTES   */
@@ -101,6 +98,18 @@ const info = async function (req, res) {
 app.get('/info', info)
 app.post('/info', info)
 
+/** API */
+app.get("/api/account", async function(req, res) {
+	res.json({
+		"username": "admin",
+		"password": "admin"
+	})
+})
+
+/* 404 */
+app.use(function(req, res, next) {
+	res.status(404).sendFile(path.join(__dirname, "public","html", "404.html"));
+})
 
 /* ========================== */
 /*                            */
