@@ -1,0 +1,29 @@
+{
+    "persone": [
+        {
+            "nome": "Alice",
+            "cognome": "Rossi",
+            "età": 32
+        },
+        {
+            "nome": "Luca",
+            "cognome": "Bianchi",
+            "età": 28
+        },
+        {
+            "nome": "Elena",
+            "cognome": "Ferrari",
+            "età": 45
+        },
+        {
+            "nome": "Marco",
+            "cognome": "Russo",
+            "età": 22
+        },
+        {
+            "nome": "Giulia",
+            "cognome": "Romano",
+            "età": 37
+        }
+    ]
+}
