@@ -106,23 +106,6 @@ app.get("/api/account", async function(req, res) {
 	})
 })
 
-/* 404 */
-app.use(function(req, res, next) {
-	res.status(404).sendFile(path.join(__dirname, "public","html", "404.html"));
-})
-
-/* ========================== */
-/*                            */
-/*    ACTIVATE NODE SERVER    */
-/*                            */
-/* ========================== */
-
-app.listen(8000, function () {
-	global.startDate = new Date();
-	console.log(`App listening on port 8000 started ${global.startDate.toLocaleString()}`)
-})
-
-
 /* ========================== */
 /*                            */
 /*           MONGODB          */
@@ -148,17 +131,24 @@ app.get('/db/connect', async function (req, res) {
 	res.send(await mymongo.connect(mongoCredentials))
 });
 
-const { MongoClient } = require('mongodb');
+
+/* 404 */
+
+app.use(function(req, res, next) {
+	res.status(404).sendFile(path.join(__dirname, "public","html", "404.html"));
+})
 
 
+/* ========================== */
+/*                            */
+/*    ACTIVATE NODE SERVER    */
+/*                            */
+/* ========================== */
 
 
-app.get('/connect', (req, res) => {
-	res.send('<h1>testandooo</h1>');
-});
-
-app.listen(3000, () => {
-	console.log('listening on 3000');
-});
+app.listen(8000, function () {
+	global.startDate = new Date();
+	console.log(`App listening on port 8000 started ${global.startDate.toLocaleString()}`)
+})
 
 /*       END OF SCRIPT        */
