@@ -21,6 +21,7 @@ Copyright (c) 2021 by Fabio Vitali
  
 */
 
+const { query } = require('express');
 const fs = require('fs');
 const { MongoClient } = require("mongodb");
 const mongoose = require('mongoose');
@@ -28,6 +29,12 @@ const mongoose = require('mongoose');
 //read json file
 let jsonData = JSON.parse(fs.readFileSync('./db/people.json'));
 
+// Definizione dello schema per le persone
+const personaSchema = new mongoose.Schema({
+    nome: String,
+    cognome: String,
+    età: Number
+});
 
 //const fs = require('fs').promises;
 
@@ -56,17 +63,7 @@ exports.create = async function (credentials) {
             db.dropCollection('users'); // Elimina la collezione esistente se presente
             console.log('Collection eliminata');
 
-            // Definizione dello schema per le persone
-            const personaSchema = new mongoose.Schema({
-                nome: String,
-                cognome: String,
-                età: Number
-            });
-
             const Persona = mongoose.model('Persona', personaSchema);
-
-
-
 
             try {
                 await db.dropCollection('personas'); // Elimina la collezione esistente se presente
@@ -79,46 +76,47 @@ exports.create = async function (credentials) {
             }
         })
         .catch(err => console.error('Could not connect to MongoDB', err));
-
 }
 
 
 exports.search = async function (q, credentials) {
-    const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}?writeConcern=majority`;
+    let uri = `mongodb://${credentials.site}/db`;
 
-    let query = {}
-    let debug = []
-    let data = { query: q[fieldname], result: null }
-    try {
-        debug.push(`Trying to connect to MongoDB with user: '${credentials.user}' and site: '${credentials.site}' and a ${credentials.pwd.length}-character long password...`)
-        const mongo = new MongoClient(mongouri);
-        await mongo.connect();
-        debug.push("... managed to connect to MongoDB.")
+    mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+        .then(async () => {
+            console.log('Connected to MongoDB')
+            const db = mongoose.connection;
 
-        debug.push(`Trying to query MongoDB with query '${q[fieldname]}'... `)
-        let result = []
-        query[fieldname] = { $regex: q[fieldname], $options: 'i' }
-        await mongo.db(dbname)
-            .collection(collection)
-            .find(query)
-            .forEach((r) => {
-                result.push(r)
-            });
-        debug.push(`... managed to query MongoDB. Found ${result.length} results.`)
+            const Persona = mongoose.model('Persona', personaSchema);
 
-        data.result = result
-        await mongo.close();
-        debug.push("Managed to close connection to MongoDB.")
+            let query = {};
 
-        data.debug = debug
-        if (q.ajax) {
-            return data
-        } else {
-            return out
-        }
-    }
-    catch (e) {
-        e.debug = debug
-        return e
-    }
+            //cerco i campi che mi sono stati passati, se li trovo li aggiungo alla query
+            if (q.nome) {
+                query.nome = q.nome;
+            }
+            if (q.cognome) {
+                query.cognome = q.cognome;
+            }
+            if (q.età) {
+                query.età = q.età;
+            }
+
+            try {
+                const persone = await Persona.find(query);
+                console.log(persone);
+                return persone;
+            } catch (err) {
+                console.error('Errore durante la ricerca:', err);
+            } finally {
+                mongoose.disconnect(); // Chiudi la connessione al database
+            }
+
+            console.log(query);
+
+        })
+
+
+        .catch(err => console.error('Could not connect to MongoDB', err));
+
 }
