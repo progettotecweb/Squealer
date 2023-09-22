@@ -30,10 +30,85 @@ const mongoose = require('mongoose');
 let jsonData = JSON.parse(fs.readFileSync('./db/people.json'));
 
 // Definizione dello schema per le persone
-const personaSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     nome: String,
-    cognome: String,
-    età: Number
+    password: String,
+    ruolo: String,
+    quota_msg: {
+        giorno: Number,
+        settimana: Number,
+        mensile: Number,
+        extra: Number,
+    },
+    popolarità: Number,
+    post: [
+        {
+            post_id: Number,
+            visibility: String,
+            destinatari: {
+                canale_id: [String],
+                user_id: [Number],
+                keyword: [String],
+            },
+            reactions: {
+                '-2': Number,
+                '-1': Number,
+                '+1': Number,
+                '+2': Number,
+            },
+            contains: {
+                text: {
+                    exist: Boolean,
+                    descrizione: String,
+                    length: Number,
+                },
+                img: [
+                    {
+                        exist: Boolean,
+                        blob: String, 
+                        descrizione: String,
+                    },
+                ],
+                video: [
+                    {
+                        exist: Boolean,
+                        blob: String, 
+                        descrizione: String,
+                    },
+                ],
+                geo: {
+                    exist: Boolean,
+                    coordinates: {
+                        x: Number,
+                        y: Number,
+                    },
+                },
+            },
+            impression: Number,
+            CM: {
+                'R+': Number,
+                'R-': Number,
+                label: {
+                    popolare: Boolean,
+                    impopolare: Boolean,
+                },
+            },
+            datetime: {
+                year: Number,
+                month: Number,
+                day: Number,
+                time: {
+                    $numberLong: String,
+                },
+            },
+            controverso: Boolean,
+            automatico: Boolean,
+            risposte: {
+                user_id: Number,
+                text: String,
+            },
+        },
+    ],
 });
 
 //const fs = require('fs').promises;
@@ -60,14 +135,11 @@ exports.create = async function (credentials) {
             console.log('Connected to MongoDB')
             const db = mongoose.connection;
 
-            db.dropCollection('users'); // Elimina la collezione esistente se presente
-            console.log('Collection eliminata');
-
-            const Persona = mongoose.model('Persona', personaSchema);
+            const User = mongoose.model('User', userSchema);
 
             try {
-                await db.dropCollection('personas'); // Elimina la collezione esistente se presente
-                await Persona.insertMany(jsonData.persone); // Inserisce i dati dal JSON
+                await db.dropCollection('users'); // Elimina la collezione esistente se presente
+                await User.insertMany(jsonData); // Inserisce i dati dal JSON
                 console.log('Database popolato con successo');
             } catch (err) {
                 console.error('Errore durante la popolazione del database:', err);
@@ -87,23 +159,15 @@ exports.search = async function (q, credentials) {
             console.log('Connected to MongoDB')
             const db = mongoose.connection;
 
-            const Persona = mongoose.model('Persona', personaSchema);
+            const User = mongoose.model('User', userSchema);
 
             let query = {};
 
             //cerco i campi che mi sono stati passati, se li trovo li aggiungo alla query
-            if (q.nome) {
-                query.nome = q.nome;
-            }
-            if (q.cognome) {
-                query.cognome = q.cognome;
-            }
-            if (q.età) {
-                query.età = q.età;
-            }
+            
 
             try {
-                const persone = await Persona.find(query);
+                const persone = await User.find(query);
                 console.log(persone);
                 return persone;
             } catch (err) {
