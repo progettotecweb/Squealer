@@ -38,6 +38,15 @@ const cors = require('cors')
 const path = require('path');
 const mymongo = require('./db/mongo.js');
 
+/* NEXT CONFIG */
+const next = require('next')
+const dev = process.env.NODE_ENV !== 'production'
+const config = require('./SquealerApp/next.config.js')
+const appNext = next({dev, customServer: true, conf: config, dir: './SquealerApp'})
+const handle = appNext.getRequestHandler()
+
+
+appNext.prepare().then(() => {
 
 
 /* ========================== */
@@ -55,7 +64,7 @@ app.use('/img', express.static(global.rootDir + '/public/media'));
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 
-app.use("/Home", express.static(path.join(__dirname, "SquealerApp", "dist")));
+//app.use("/Home", express.static(path.join(__dirname, "SquealerApp", "dist")));
 app.use("/SMM", express.static(path.join(__dirname, "SquealerSMMDashboard", "dist")));
 app.use("/Moderator", express.static(path.join(__dirname, "SquealerModeratorDashboard")));
 
@@ -64,11 +73,7 @@ app.enable('trust proxy');
 
 
 app.get('/', async function (req, res) {
-	res.sendFile(path.join(__dirname, "public", "html", "index.html"));
-})
-
-app.get("/Home/*", async function (req, res) {
-	res.sendFile(path.join(__dirname, "SquealerApp", "dist", "index.html"));
+	res.redirect('/Home')
 })
 
 app.get("/SMM/*", async function (req, res) {
@@ -131,6 +136,10 @@ app.get('/db/connect', async function (req, res) {
 	res.send(await mymongo.connect(mongoCredentials))
 });
 
+app.get('*', (req, res) => {
+	return handle(req, res)
+})
+
 
 /* 404 */
 
@@ -149,6 +158,11 @@ app.use(function(req, res, next) {
 app.listen(8000, function () {
 	global.startDate = new Date();
 	console.log(`App listening on port 8000 started ${global.startDate.toLocaleString()}`)
+})
+
+}).catch((ex) => {
+	console.error(ex.stack)
+	process.exit(1)
 })
 
 /*       END OF SCRIPT        */
