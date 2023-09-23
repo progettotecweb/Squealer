@@ -32,7 +32,9 @@ Copyright (c) 2021 by Fabio Vitali
 global.rootDir = __dirname;
 global.startDate = null;
 
+console.log("> starting server...")
 
+console.log("> loading modules...")
 const express = require('express');
 const cors = require('cors')
 const path = require('path');
@@ -42,10 +44,11 @@ const mymongo = require('./db/mongo.js');
 const next = require('next')
 const dev = process.env.NODE_ENV !== 'production'
 const config = require('./SquealerApp/next.config.js')
-const appNext = next({dev, customServer: true, conf: config, dir: './SquealerApp'})
+console.log("> next config: ", config)
+const appNext = next({dev, customServer: true, conf: config, dir: path.resolve(__dirname, 'SquealerApp')})
 const handle = appNext.getRequestHandler()
 
-
+console.log("> creating next app...")
 appNext.prepare().then(() => {
 
 

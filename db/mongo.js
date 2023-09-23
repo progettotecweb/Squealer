@@ -25,9 +25,10 @@ const { query } = require('express');
 const fs = require('fs');
 const { MongoClient } = require("mongodb");
 const mongoose = require('mongoose');
+const path = require('path');
 
 //read json file
-let jsonData = JSON.parse(fs.readFileSync('./db/people.json'));
+let jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'people.json')));
 
 // Definizione dello schema per le persone
 const userSchema = new mongoose.Schema({

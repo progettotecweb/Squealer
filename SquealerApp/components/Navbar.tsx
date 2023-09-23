@@ -23,9 +23,9 @@ const Navbar = () => {
         <h2>@username</h2>
         <Divider light />
 
-        <Container className="flex flex-col justify-center h-full">
+        <Container className="flex flex-col">
           {["Settings", "Account", "etc."].map((text, index) => (
-            <div className=" my-4" key={index}>
+            <div className=" mt-2" key={index}>
               <Link href={`/${text}`}>{text}</Link>
             </div>
           ))}

@@ -36,10 +36,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
       initial="initial"
       animate="animate"
       exit={{ opacity: 0 }}
-      style={{
-        overflow: "hidden",
-      }}
-      className={`bg-slate-700 h-screen flex flex-col justify-center items-center text-center text-w ${className} `}
+      className={`bg-slate-700 flex flex-col justify-center items-center text-center text-w ${className} `}
     >
         {children}
     </motion.main>

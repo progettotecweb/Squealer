@@ -1,8 +1,15 @@
 /** @type {import('tailwindcss').Config} */
+const path = require('path')
+
 export default {
   content: [
-    "./SquealerApp/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./SquealerApp/components/**/*.{js,ts,jsx,tsx,mdx}",
+	// dev
+    path.resolve("./SquealerApp/pages/**/*.{js,ts,jsx,tsx,mdx}"),
+    path.resolve("./SquealerApp/components/**/*.{js,ts,jsx,tsx,mdx}"),
+
+	// prod
+	path.resolve("./pages/**/*.{js,ts,jsx,tsx,mdx}"),
+	path.resolve("./components/**/*.{js,ts,jsx,tsx,mdx}"),
   ],
     theme: {
 		extend: {

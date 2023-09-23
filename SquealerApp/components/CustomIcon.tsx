@@ -7,7 +7,7 @@ interface CustomIconProps {
 }
 
 const CustomIcon: React.FC<CustomIconProps> = ({ icon, onClick }) => {
-    return <motion.div onTap={onClick} whileHover={{ scale: 1.3 }}>{icon}</motion.div>;
+    return <motion.div onClick={onClick} whileHover={{ scale: 1.3 }}>{icon}</motion.div>;
 };
 
 export default CustomIcon;
