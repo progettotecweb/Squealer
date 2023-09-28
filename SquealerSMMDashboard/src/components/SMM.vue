@@ -20,7 +20,7 @@ defineProps<{ msg: string }>()
             </div>
 
             <div class="card bg-success align-self-center h-25 w-25">
-                altre {{ msg }}
+                altre {{ count }}
             </div>
                 
 
