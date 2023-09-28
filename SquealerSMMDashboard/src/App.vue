@@ -3,10 +3,10 @@ import SMM from './components/SMM.vue'
 
 </script>
 
-<template>
+<template >
   <SMM msg="cose" />
 </template>
 
-<style scoped>
+<style >
 
 </style>

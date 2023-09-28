@@ -7,13 +7,14 @@ defineProps<{ msg: string }>()
 
 </script>
 
-<template >
-   <div class="card">
-    <button type="button" @click="count++">count is {{ count }}</button>
-    <p>
-      Edit
-    </p>
+<template>
+    <div class="bg-dark h-100">
+        <div class="d-flex justify-content-around  h-100">
+            <div class="card bg-success align-self-center h-25">
+                ciao {{ msg }}
+            </div>
+        </div>
     </div>
 </template>
 
-<style scoped></style>
+<style ></style>
