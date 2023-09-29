@@ -1,3 +1,5 @@
+"use client";
+
 import SearchIcon from "@/icons/SearchIcon";
 import IconAccountCircle from "@/icons/AccountIcon";
 import IconAdd from "@/icons/AddIcon";
@@ -12,7 +14,6 @@ import CustomIcon from "@/components/CustomIcon";
 import CustomLink from "@/components/CustomLink";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDebounce } from "use-debounce";
 
@@ -142,8 +143,6 @@ const Navbar = () => {
 
         const [results, setResults] = useState([]);
 
-        const router = useRouter();
-
         const SearchbarResults: React.FC<{ results: any[] }> = ({
             results,
         }) => {
@@ -186,7 +185,7 @@ const Navbar = () => {
 
         return (
             <motion.div className="flex flex-col justify-center items-center w-full px-5 py-10 bg-gray-500">
-                <form className="w-full" onSubmit={() => router.push("/")}>
+                <form className="w-full">
                     <input
                         onChange={(e) => setQuery(e.target.value)}
                         autoFocus

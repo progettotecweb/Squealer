@@ -1,5 +1,5 @@
 import PageContainer from "@/components/PageContainer";
-import React, { useState } from "react";
+import React from "react";
 
 const Settings = () => {
     return (
