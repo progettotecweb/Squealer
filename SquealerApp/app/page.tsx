@@ -6,7 +6,7 @@ import Squeal from "@/components/Squeal/Squeal";
 
 const squeals = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},{},{},{},{},];
 
-const Homepage: React.FC = () => {
+const Homepage: React.FC = async () => {
   return (
     <PageContainer>
       <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw]">
