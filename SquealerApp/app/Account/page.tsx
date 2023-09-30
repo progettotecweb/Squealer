@@ -1,11 +1,11 @@
 import PageContainer from "@/components/PageContainer";
 
-const Settings = () => {
+const AccountPage = async () => {
     return (
         <PageContainer>
-            <h1>Account Settings</h1>
+            <h1>Account Page</h1>
         </PageContainer>
     );
 };
 
-export default Settings;
+export default AccountPage;

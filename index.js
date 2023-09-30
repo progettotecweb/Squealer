@@ -4,6 +4,8 @@ const server_log = (msg, ...args) => {
     console.log("[SERVER]> " + msg, ...args);
 };
 
+const PORT = 8000;
+
 global.rootDir = __dirname;
 global.startDate = null;
 
@@ -25,6 +27,7 @@ const appNext = next({
     customServer: true,
     conf: config,
     dir: path.resolve(__dirname, "SquealerApp"),
+    port: PORT,
 });
 const handle = appNext.getRequestHandler();
 
@@ -188,10 +191,10 @@ appNext
         /*                            */
         /* ========================== */
 
-        app.listen(8000, function () {
+        app.listen(PORT, function () {
             global.startDate = new Date();
             server_log(
-                `App listening on port 8000 started ${global.startDate.toLocaleString()}`
+                `App listening on port ${PORT} started ${global.startDate.toLocaleString()}`
             );
         });
     })

@@ -4,18 +4,18 @@ import React from "react";
 import PageContainer from "@/components/PageContainer";
 import Squeal from "@/components/Squeal/Squeal";
 
-const squeals = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},{},{},{},{},];
+const squeals = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
 
 const Homepage: React.FC = async () => {
-  return (
-    <PageContainer>
-      <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw]">
-        {squeals.map((squeal, index) => (
-          <Squeal key={index}/>
-        ))}
-      </section>
-    </PageContainer>
-  );
+    return (
+        <PageContainer>
+            <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw]">
+                {squeals.map((squeal, index) => (
+                    <Squeal key={index} />
+                ))}
+            </section>
+        </PageContainer>
+    );
 };
 
 export default Homepage;
