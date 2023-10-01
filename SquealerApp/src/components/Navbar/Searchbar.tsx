@@ -29,8 +29,8 @@ const Searchbar: React.FC = () => {
 
     const fetcher: Fetcher<SearchResults, string > = (...args) => fetch(...args).then((res) => res.json())
     
-    const [query, setQuery] = useState<string>();
-    const {data, mutate, error} = useSWR<SearchResults>(`/api/search?q=${query}`, fetcher)
+    const [query, setQuery] = useState<string>("");
+    const {data, mutate, error} = useSWR<SearchResults>(() => query === "" ? null : `/api/search?q=${query}`, fetcher)
 
     if(error) {
         return <div className="flex flex-col items-center">Error</div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import CustomIcon from "@/components/CustomIcon";
 import CloseOutlined from "@mui/icons-material/CloseOutlined";
+import Tabs, { Tab, AnimatedTabContent } from "@/components/Tabs/Tabs";
 
 const MAX_LEN = 50;
 
@@ -44,26 +45,45 @@ const SquealCreator: React.FC<SquealCreatorProps> = ({ setOpenDialog }) => {
                 onClick={() => setOpenDialog(false)}
             />
             <Counter current_len={message.length} />
-            <form name="squeal-post">
-                <textarea
-                    maxLength={MAX_LEN}
-                    onChange={(e) => setMessage(e.target.value)}
-                    id="message"
-                    rows={4}
-                    className="block p-2.5 w-full text-sm bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="What's happening?"
-                ></textarea>
+            <Tabs>
+                <Tab
+                    label="Text"
+                    content={
+                        <AnimatedTabContent>
+                            <form name="squeal-post">
+                                <textarea
+                                    maxLength={MAX_LEN}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    id="message"
+                                    rows={4}
+                                    className="block p-2.5 w-full text-sm bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="What's happening?"
+                                ></textarea>
 
-                <div className="flex justify-between items-center mt-4">
-                    <button
-                        type="submit"
-                        className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                        onClick={submitSqueal}
-                    >
-                        Post
-                    </button>
-                </div>
-            </form>
+                                <div className="flex justify-between items-center mt-4">
+                                    <button
+                                        type="submit"
+                                        className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                                        onClick={submitSqueal}
+                                    >
+                                        Post
+                                    </button>
+                                </div>
+                            </form>
+                        </AnimatedTabContent>
+                    }
+                />
+                <Tab
+                    label="Image"
+                    content={<AnimatedTabContent><input accept="image/*" id="icon-button-file" type="file" capture="environment"/></AnimatedTabContent>}
+                />
+                <Tab
+                    label="Geolocation"
+                    content={
+                        <AnimatedTabContent>Geolocation</AnimatedTabContent>
+                    }
+                />
+            </Tabs>
         </div>
     );
 };

@@ -5,6 +5,7 @@ export const metadata = {
 
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar/Navbar";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 import "styles/globals.css";
 
@@ -17,7 +18,7 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <Header />
-                {children}
+                <LayoutWrapper>{children}</LayoutWrapper>
                 <Navbar />
             </body>
         </html>

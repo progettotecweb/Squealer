@@ -2,7 +2,7 @@ import PageContainer from "@/components/PageContainer";
 
 const AccountPage = async () => {
     return (
-        <PageContainer>
+        <PageContainer key="account">
             <h1>Account Page</h1>
         </PageContainer>
     );

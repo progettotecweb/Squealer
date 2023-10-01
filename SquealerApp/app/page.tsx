@@ -8,7 +8,7 @@ const squeals = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
 
 const Homepage: React.FC = async () => {
     return (
-        <PageContainer>
+        <PageContainer key="home">
             <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw]">
                 {squeals.map((squeal, index) => (
                     <Squeal key={index} />

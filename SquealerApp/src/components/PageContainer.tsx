@@ -4,7 +4,9 @@ import { motion } from "framer-motion";
 
 interface PageContainerProps {
     children: React.ReactNode;
+    key: string,
     className?: string;
+
 }
 
 let easing = [0.6, -0.05, 0.01, 0.99];
@@ -23,10 +25,19 @@ const fadeInUp = {
             ease: easing,
         },
     },
+    exit: {
+        y: -100,
+        opacity: 0,
+        transition: {
+            duration:2,
+            ease: easing,
+        },
+    },
 };
 
 const PageContainer: React.FC<PageContainerProps> = ({
     children,
+    key,
     className,
 }) => {
     return (
@@ -34,8 +45,9 @@ const PageContainer: React.FC<PageContainerProps> = ({
             variants={fadeInUp}
             initial="initial"
             animate="animate"
-            exit={{ opacity: 0 }}
+            exit="exit"
             className={`bg-[#111B21] flex flex-col justify-center items-center text-center text-w ${className} text-slate-50`}
+            key={key}
         >
             {children}
         </motion.main>

@@ -52,7 +52,8 @@ appNext
         app.use(cors());
         app.use(express.json());
 
-        //app.use("/Home", express.static(path.join(__dirname, "SquealerApp", "dist")));
+        // #TODO-gianlo: separate routes in different files, maybe create a server directory?
+
         app.use(
             "/SMM",
             express.static(path.join(__dirname, "SquealerSMMDashboard", "dist"))
