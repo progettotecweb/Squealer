@@ -5,7 +5,7 @@
 
 :root {
     --tw-bg-opacity: 1;
-    background-color: rgb(51 65 85 / var(--tw-bg-opacity));
+    background-color: rgb(17 27 33 / var(--tw-bg-opacity));
 }
 
 .MuiCardHeader-content {

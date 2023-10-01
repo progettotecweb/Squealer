@@ -4,12 +4,12 @@ const path = require('path')
 export default {
   content: [
 	// dev
-    path.resolve("./SquealerApp/pages/**/*.{js,ts,jsx,tsx,mdx}"),
-    path.resolve("./SquealerApp/components/**/*.{js,ts,jsx,tsx,mdx}"),
+    path.resolve("./SquealerApp/app/**/*.{js,ts,jsx,tsx,mdx}"),
+    path.resolve("./SquealerApp/src/**/*.{js,ts,jsx,tsx,mdx}"),
 
 	// prod
-	path.resolve("./pages/**/*.{js,ts,jsx,tsx,mdx}"),
-	path.resolve("./components/**/*.{js,ts,jsx,tsx,mdx}"),
+	path.resolve("./app/**/*.{js,ts,jsx,tsx,mdx}"),
+	path.resolve("./src/**/*.{js,ts,jsx,tsx,mdx}"),
   ],
     theme: {
 		extend: {
