@@ -42,7 +42,7 @@ const Squeal: React.FC<SquealProps> = ({}) => {
                 <IconButton aria-label="share">
                     <ThumbDownOffAltOutlinedIcon className="text-slate-50" />
                 </IconButton>
-                <IconButton aria-label="share" className="ml-auto">
+                <IconButton aria-label="share" className="ml-auto"  >
                     <ReplyOutlinedIcon className="text-slate-50" />
                 </IconButton>
             </CardActions>
