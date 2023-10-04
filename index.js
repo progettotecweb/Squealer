@@ -1,10 +1,9 @@
 ﻿/* Utils */
+require("dotenv").config();
 
-const server_log = (msg, ...args) => {
-    console.log("[SERVER]> " + msg, ...args);
-};
+const { server_log } = require("./utils/utils.js");
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 global.rootDir = __dirname;
 global.startDate = null;
@@ -19,16 +18,16 @@ const mymongo = require("./db/mongo.js");
 
 /* NEXT CONFIG */
 const next = require("next");
-const dev = process.env.NODE_ENV !== "production";
-const config = require("./SquealerApp/next.config.js");
-server_log("next config: ", config);
-const appNext = next({
-    dev,
+const appNextOptions = {
+    dev: process.env.NODE_ENV !== "production",
     customServer: true,
-    conf: config,
+    conf: require("./SquealerApp/next.config.js"),
     dir: path.resolve(__dirname, "SquealerApp"),
     port: PORT,
-});
+};
+server_log("next options: ", appNextOptions);
+
+const appNext = next(appNextOptions);
 const handle = appNext.getRequestHandler();
 
 server_log("preparing next app...");
@@ -53,6 +52,9 @@ appNext
         app.use(express.json());
 
         // #TODO-gianlo: separate routes in different files, maybe create a server directory?
+        
+        //for nextjs static images
+        app.use(express.static(path.join(__dirname, "SquealerApp", "public")))
 
         app.use(
             "/SMM",
@@ -67,8 +69,12 @@ appNext
         app.enable("trust proxy");
 
         app.get("/", async function (req, res) {
-            res.redirect("/Home");
+            res.sendFile(path.join(__dirname, "public", "html", "index.html"));
         });
+
+        app.get("/Home", async function (req, res) {
+            appNext.render(req, res, "/Home", req.query);
+        })
 
         app.get("/SMM/*", async function (req, res) {
             res.sendFile(
@@ -85,33 +91,6 @@ appNext
             res.sendFile(
                 path.join(__dirname, "SquealerModeratorDashboard", "index.html")
             );
-        });
-
-        const info = async function (req, res) {
-            let data = {
-                startDate: global.startDate.toLocaleString(),
-                requestDate: new Date().toLocaleString(),
-                request: {
-                    host: req.hostname,
-                    method: req.method,
-                    path: req.path,
-                    protocol: req.protocol,
-                },
-                query: req.query,
-                body: req.body,
-            };
-            res.send(await template.generate("info.html", data));
-        };
-
-        app.get("/info", info);
-        app.post("/info", info);
-
-        /** API */
-        app.get("/api/account", async function (req, res) {
-            res.json({
-                username: "admin",
-                password: "admin",
-            });
         });
 
         const mock_data = [
@@ -174,7 +153,7 @@ appNext
             res.send(await mymongo.connect(mongoCredentials));
         });
 
-        app.get("*", (req, res) => {
+        app.get("/Home/*", (req, res) => {
             return handle(req, res);
         });
 

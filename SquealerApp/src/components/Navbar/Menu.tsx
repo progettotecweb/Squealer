@@ -3,6 +3,7 @@ import Divider from "@mui/material/Divider";
 import Container from "@mui/material/Container";
 
 import CustomLink from "@/components/CustomLink";
+import Image from "next/image";
 
 interface MenuProps {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,7 +18,7 @@ const Menu: React.FC<MenuProps> = ({ setOpen }) => {
             onKeyDown={() => setOpen(false)}
             className="bg-slate-800 text-slate-50 h-screen p-4 flex flex-col"
         >
-            <img
+            <Image
                 src="/img/squealer.png"
                 alt="Squealer"
                 height={150}
