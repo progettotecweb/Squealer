@@ -1,0 +1,54 @@
+[
+    {
+        "_id": "651fde352bbfe43586614824",
+        "nome": "fv",
+        "password": "12345678",
+        "ruolo": "Utente",
+        "quota_msg": {
+            "giorno": 50,
+            "settimana": 500,
+            "mensile": 7500,
+            "extra": 0
+        },
+        "popolarità": 2
+    },
+    {
+        "_id": "651fde68c4ab75a75bd6c1b1",
+        "nome": "fvPro",
+        "password": "12345678",
+        "ruolo": "Utente",
+        "quota_msg": {
+            "giorno": 60,
+            "settimana": 600,
+            "mensile": 9000,
+            "extra": 0
+        },
+        "popolarità": 1
+    },
+    {
+        "_id": "651fde888a066ec0334dabb3",
+        "nome": "fvSMM",
+        "password": "12345678",
+        "ruolo": "Utente",
+        "quota_msg": {
+            "giorno": 70,
+            "settimana": 700,
+            "mensile": 10500,
+            "extra": 0
+        },
+        "popolarità": 3
+    },
+    {
+        "_id": "651fdeac5d2ccd45a330b15d",
+        "nome": "fvMod",
+        "password": "12345678",
+        "ruolo": "Mod",
+        "quota_msg": {
+            "giorno": 100,
+            "settimana": 1000,
+            "mensile": 15000,
+            "extra": 0
+        },
+        "popolarità": 3
+    }
+]

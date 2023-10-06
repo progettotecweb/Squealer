@@ -28,7 +28,11 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 //read json file
-let jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'people.json')));
+
+function readJsonData(fileName) {
+    return jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, fileName)));
+}
+
 
 // Definizione dello schema per le persone
 const userSchema = new mongoose.Schema({
@@ -41,75 +45,87 @@ const userSchema = new mongoose.Schema({
         mensile: Number,
         extra: Number,
     },
-    popolarità: Number,
-    post: [
-        {
-            post_id: Number,
-            visibility: String,
-            destinatari: {
-                canale_id: [String],
-                user_id: [Number],
-                keyword: [String],
-            },
-            reactions: {
-                '-2': Number,
-                '-1': Number,
-                '+1': Number,
-                '+2': Number,
-            },
-            contains: {
-                text: {
-                    exist: Boolean,
-                    descrizione: String,
-                    length: Number,
-                },
-                img: [
-                    {
-                        exist: Boolean,
-                        blob: String, 
-                        descrizione: String,
-                    },
-                ],
-                video: [
-                    {
-                        exist: Boolean,
-                        blob: String, 
-                        descrizione: String,
-                    },
-                ],
-                geo: {
-                    exist: Boolean,
-                    coordinates: {
-                        x: Number,
-                        y: Number,
-                    },
-                },
-            },
-            impression: Number,
-            CM: {
-                'R+': Number,
-                'R-': Number,
-                label: {
-                    popolare: Boolean,
-                    impopolare: Boolean,
-                },
-            },
-            datetime: {
-                year: Number,
-                month: Number,
-                day: Number,
-                time: {
-                    $numberLong: String,
-                },
-            },
-            controverso: Boolean,
-            automatico: Boolean,
-            risposte: {
-                user_id: Number,
-                text: String,
-            },
+    popolarità: Number
+});
+
+//collezione post schema
+const postSchema = new mongoose.Schema({
+    owner_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    visibility: String,
+    destinatari: {
+        canale_id: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Channel'
+        }],
+        user_id: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }],
+        keyword: [String]
+    },
+    reactions: {
+        '-2': Number,
+        '-1': Number,
+        '+1': Number,
+        '+2': Number
+    },
+    contains: {
+        text: {
+            exist: Boolean,
+            descrizione: String,
+            length: Number
         },
-    ],
+        img: [{
+            exist: Boolean,
+            blob: String,
+            descrizione: String
+        }],
+        video: [{
+            exist: Boolean,
+            blob: String,
+            descrizione: String
+        }],
+        geo: {
+            exist: Boolean,
+            coordinates: {
+                x: Number,
+                y: Number
+            }
+        }
+    },
+    impression: Number,
+    CM: {
+        'R+': Number,
+        'R-': Number,
+        label: {
+            popolare: Boolean,
+            impopolare: Boolean
+        }
+    },
+    datetime: {
+        year: Number,
+        month: Number,
+        day: Number,
+        time: {
+            type: Number
+            /*
+            get: v => Math.round(v), // Arrotonda il valore
+            set: v => Math.round(v)
+            */
+        }
+    },
+    controverso: Boolean,
+    automatico: Boolean,
+    risposte: [{
+        user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        text: String
+    }]
 });
 
 //const fs = require('fs').promises;
@@ -137,10 +153,20 @@ exports.create = async function (credentials) {
             const db = mongoose.connection;
 
             const User = mongoose.model('User', userSchema);
+            const Post = mongoose.model('Post', postSchema);
 
             try {
-                await db.dropCollection('users'); // Elimina la collezione esistente se presente
-                await User.insertMany(jsonData); // Inserisce i dati dal JSON
+                // Elimino le collezione esistenti
+                await db.dropCollection('users');
+                await db.dropCollection('posts');
+
+                //leggo le collezioni
+                let usersData = readJsonData('users.json');
+                let postsData = readJsonData('posts.json');
+
+                // Inserisco le collezioni lette
+                await User.insertMany(usersData);
+                await Post.insertMany(postsData);
                 console.log('Database popolato con successo');
             } catch (err) {
                 console.error('Errore durante la popolazione del database:', err);
@@ -165,7 +191,7 @@ exports.search = async function (q, credentials) {
             let query = {};
 
             //cerco i campi che mi sono stati passati, se li trovo li aggiungo alla query
-            
+
 
             try {
                 const persone = await User.find(query);

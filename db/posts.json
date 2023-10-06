@@ -1,0 +1,229 @@
+[
+    {
+        "_id": "651fdec598276fdf3085b0c6",
+        "owner_id": "651fde352bbfe43586614824",
+        "visibility": "public",
+        "destinatari": {
+            "canale_id": [
+                "651fdef05f694e048b9fd526",
+                "651fdefd5e092163b6cb7922"
+            ],
+            "user_id": [
+                "651fde68c4ab75a75bd6c1b1",
+                "651fde888a066ec0334dabb3"
+            ],
+            "keyword": [
+                "interessante",
+                "divertente"
+            ]
+        },
+        "reactions": {
+            "-2": 0,
+            "-1": 1,
+            "+1": 2,
+            "+2": 1
+        },
+        "contains": {
+            "text": {
+                "exist": true,
+                "descrizione": "Questo è un post interessante!",
+                "length": 29
+            },
+            "img": [
+                {
+                    "exist": false,
+                    "blob": null,
+                    "descrizione": null
+                }
+            ],
+            "video": [
+                {
+                    "exist": true,
+                    "blob": "video_blob",
+                    "descrizione": "Un video divertente"
+                }
+            ],
+            "geo": {
+                "exist": false,
+                "coordinates": {
+                    "x": null,
+                    "y": null
+                }
+            }
+        },
+        "impression": 500,
+        "CM": {
+            "R+": 3,
+            "R-": 1,
+            "label": {
+                "popolare": true,
+                "impopolare": false
+            }
+        },
+        "datetime": {
+            "year": 2023,
+            "month": 9,
+            "day": 22,
+            "time": 1695392677259
+        },
+        "controverso": true,
+        "automatico": false,
+        "risposte": [
+            {
+                "user_id": "651fde68c4ab75a75bd6c1b1",
+                "text": "RISPOSTA AL POST"
+            }
+        ]
+    },
+    {
+        "_id": "651fdedc3687c29e24277c49",
+        "owner_id": "651fde68c4ab75a75bd6c1b1",
+        "visibility": "public",
+        "destinatari": {
+            "canale_id": [
+                "651fdf05effb6642c59ad618",
+                "651fdf0fd4aaec459b2f7e30"
+            ],
+            "user_id": [
+                "651fde888a066ec0334dabb3",
+                "651fdeac5d2ccd45a330b15d"
+            ],
+            "keyword": [
+                "interessante",
+                "notizie"
+            ]
+        },
+        "reactions": {
+            "-2": 0,
+            "-1": 1,
+            "+1": 1,
+            "+2": 0
+        },
+        "contains": {
+            "text": {
+                "exist": true,
+                "descrizione": "Condivido questa notizia interessante!",
+                "length": 36
+            },
+            "img": [
+                {
+                    "exist": false,
+                    "blob": null,
+                    "descrizione": null
+                }
+            ],
+            "video": [
+                {
+                    "exist": false,
+                    "blob": null,
+                    "descrizione": null
+                }
+            ],
+            "geo": {
+                "exist": false,
+                "coordinates": {
+                    "x": null,
+                    "y": null
+                }
+            }
+        },
+        "impression": 200,
+        "CM": {
+            "R+": 1,
+            "R-": 1,
+            "label": {
+                "popolare": false,
+                "impopolare": false
+            }
+        },
+        "datetime": {
+            "year": 2023,
+            "month": 9,
+            "day": 22,
+            "time": 1695392677259
+        },
+        "controverso": false,
+        "automatico": false,
+        "risposte": [
+            {
+                "user_id": "651fde888a066ec0334dabb3",
+                "text": "Grazie per la condivisione!"
+            }
+        ]
+    },
+    {
+        "_id": "651fdee7fb1540f2717bdc88",
+        "owner_id": "651fde888a066ec0334dabb3",
+        "visibility": "private",
+        "destinatari": {
+            "canale_id": [
+                "651fdf0fd4aaec459b2f7e30",
+                "651fdf05effb6642c59ad618"
+            ],
+            "user_id": [
+                null
+            ],
+            "keyword": [
+                "parolachiave",
+                null
+            ]
+        },
+        "reactions": {
+            "-2": 1,
+            "-1": 0,
+            "+1": 1,
+            "+2": 2
+        },
+        "contains": {
+            "text": {
+                "exist": true,
+                "descrizione": "ciao amici è il mio primo squeal",
+                "length": 32
+            },
+            "img": [
+                {
+                    "exist": false,
+                    "blob": null,
+                    "descrizione": null
+                }
+            ],
+            "video": [
+                {
+                    "exist": false,
+                    "blob": null,
+                    "descrizione": null
+                }
+            ],
+            "geo": {
+                "exist": false,
+                "coordinates": {
+                    "x": null,
+                    "y": null
+                }
+            }
+        },
+        "impression": 0,
+        "CM": {
+            "R+": 2,
+            "R-": 1,
+            "label": {
+                "popolare": false,
+                "impopolare": false
+            }
+        },
+        "datetime": {
+            "year": 2023,
+            "month": 9,
+            "day": 22,
+            "time": 1695392677259
+        },
+        "controverso": false,
+        "automatico": false,
+        "risposte": [
+            {
+                "user_id": "651fdeac5d2ccd45a330b15d",
+                "text": "RISPOSTA AL POST"
+            }
+        ]
+    }
+]
