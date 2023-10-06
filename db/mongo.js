@@ -45,7 +45,11 @@ const userSchema = new mongoose.Schema({
         mensile: Number,
         extra: Number,
     },
-    popolarità: Number
+    popolarità: Number,
+    img: {
+        format: String,
+        blob: String
+    }
 });
 
 //collezione post schema
@@ -80,11 +84,13 @@ const postSchema = new mongoose.Schema({
         },
         img: [{
             exist: Boolean,
+            format: String,
             blob: String,
             descrizione: String
         }],
         video: [{
             exist: Boolean,
+            format:String,
             blob: String,
             descrizione: String
         }],

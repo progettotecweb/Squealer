@@ -32,6 +32,7 @@
             "img": [
                 {
                     "exist": false,
+                    "format": null,
                     "blob": null,
                     "descrizione": null
                 }
@@ -39,6 +40,7 @@
             "video": [
                 {
                     "exist": true,
+                    "format": "mp4",
                     "blob": "video_blob",
                     "descrizione": "Un video divertente"
                 }
@@ -108,6 +110,7 @@
             "img": [
                 {
                     "exist": false,
+                    "format": null,
                     "blob": null,
                     "descrizione": null
                 }
@@ -115,6 +118,7 @@
             "video": [
                 {
                     "exist": false,
+                    "format": null,
                     "blob": null,
                     "descrizione": null
                 }
@@ -183,6 +187,7 @@
             "img": [
                 {
                     "exist": false,
+                    "format": null,
                     "blob": null,
                     "descrizione": null
                 }
@@ -190,6 +195,7 @@
             "video": [
                 {
                     "exist": false,
+                    "format": null,
                     "blob": null,
                     "descrizione": null
                 }
