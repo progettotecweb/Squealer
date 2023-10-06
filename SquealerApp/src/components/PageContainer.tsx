@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 
 interface PageContainerProps {
     children: React.ReactNode;
-    key: string,
     className?: string;
 
 }
@@ -37,7 +36,6 @@ const fadeInUp = {
 
 const PageContainer: React.FC<PageContainerProps> = ({
     children,
-    key,
     className,
 }) => {
     return (
@@ -47,7 +45,6 @@ const PageContainer: React.FC<PageContainerProps> = ({
             animate="animate"
             exit="exit"
             className={`bg-[#111B21] flex flex-col justify-center items-center text-center text-w ${className} text-slate-50`}
-            key={key}
         >
             {children}
         </motion.main>
