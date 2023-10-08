@@ -6,7 +6,7 @@ import Container from "@mui/material/Container";
 
 import CustomLink from "@/components/CustomLink";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 interface MenuProps {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -36,6 +36,9 @@ const Menu: React.FC<MenuProps> = ({ setOpen }) => {
                 <h1>
                     @{session && session.user ? session.user.name : "username"}
                 </h1>
+                {session && session.user ? <button onClick={() => signOut({callbackUrl: "/Home/Login"})}>
+                    Sign Out
+                </button> : <CustomLink href="/Login">Sign In</CustomLink>}
             </section>
             <Divider />
 

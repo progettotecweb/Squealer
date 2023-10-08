@@ -24,7 +24,7 @@ export const Tab: React.FC<TabProps> = ({
                     ? " border-b-blue-500"
                     : "border-transparent"
             }`}
-            onClick={() => setActiveTab(index)}
+            onClick={() => setActiveTab?.(index ? index : 0)}
         >
             {label}
         </button>

@@ -8,17 +8,12 @@ export const authOptions: NextAuthOptions = {
     },
 
     pages: {
-        //signIn: "/Home/Login",
-        signOut: "/auth/signout",
-        error: "/auth/error", // Error code passed in query string as ?error=
-        verifyRequest: "/auth/verify-request", // (used for check email message)
-        newUser: null, // If set, new users will be directed here on first sign in
+        signIn: "/Home/Login",
     },
 
     callbacks: {
         async jwt({ token, user, session }) {
             // the processing of JWT occurs before handling sessions.
-            console.log("jwt callback ", { token, user, session });
 
             if (user) {
                 token.accessToken = user.accessToken;
@@ -33,7 +28,6 @@ export const authOptions: NextAuthOptions = {
 
         //  The session receives the token from JWT
         async session({ session, token, user }) {
-            console.log("session callback ", { token, user, session });
 
             return {
                 ...session,
@@ -62,10 +56,9 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "password", type: "password" },
             },
             async authorize(credentials, req) {
-                console.log("authorize callback ", { credentials });
 
                 
-                const authResponse = await fetch("/api/user-login", {
+                const authResponse = await fetch("http://127.0.0.1:8000/api/user-login", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -78,7 +71,6 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 const user = authResponse.json();
-                console.log("User: " + user);
 
                 return user;
             },

@@ -49,7 +49,7 @@ appNext
         app.use("/img", express.static(global.rootDir + "/public/media"));
         app.use(express.urlencoded({ extended: true }));
         app.use(cors());
-        //app.use(express.json());
+        app.use(express.json());
 
         // #TODO-gianlo: separate routes in different files, maybe create a server directory?
 
@@ -69,6 +69,9 @@ appNext
         app.enable("trust proxy");
 
         app.get("/", async function (req, res) {
+            if (req.session?.user) {
+                res.redirect("/Home");
+            }
             res.redirect("/Home/Login");
         });
 
@@ -130,8 +133,6 @@ appNext
         });
 
         app.post("/api/user-login", async function (req, res) {
-            console.log("user-login", req.body);
-
             res.json({
                 id: 1,
                 email: "test@test.it",
@@ -167,13 +168,7 @@ appNext
         /* APP SSR */
 
         app.post("/Home/api/*", async (req, res) => {
-            console.log(req.url);
-            console.log(req.body);
-            try {
-                await handle(req, res);
-            } catch (error) {
-                console.log("Error occurred: " + error);
-            }
+            await handle(req, res);
         });
 
         app.get("/Home/*", (req, res) => {
