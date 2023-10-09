@@ -1,8 +1,7 @@
 ﻿/* Utils */
 require("dotenv").config();
 const bcrypt = require("bcrypt");
-const crypto = require("crypto");
-
+const mongoose = require("mongoose");
 
 const { server_log } = require("./utils/utils.js");
 
@@ -54,6 +53,15 @@ appNext
         app.use(cors());
         app.use(express.json());
 
+        let uri = `mongodb://${process.env.MONGO_SITE}/db`;
+
+        mongoose
+            .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+            .then(() => server_log("Connected to MongoDB..."))
+            .catch((err) =>
+                console.error("Could not connect to MongoDB...", err)
+            );
+
         // #TODO-gianlo: separate routes in different files, maybe create a server directory?
 
         //for nextjs static images
@@ -96,19 +104,6 @@ appNext
             );
         });
 
-        const mock_data = [
-            "@squealer",
-            "§TOP 100",
-            "§TOP 1000",
-            "§CONTROVERSIAL",
-            "§NEW",
-            "@gianlo",
-            "@fen",
-            "@crazytimes",
-            "#JFK",
-            "#JFKJr",
-        ];
-
         app.post("/api/squeal", async function (req, res) {
             console.log("squeal", req.body);
 
@@ -123,11 +118,22 @@ appNext
                 res.status(200).json({ results: [] });
                 return;
             }
-            const re = new RegExp(req.query.q, "i");
 
-            const results = mock_data.filter((item) => {
-                return item.match(re);
-            });
+            const results = await mymongo
+                .search(
+                    { nome: new RegExp(req.query.q, "i") },
+                    mongoCredentials
+                )
+                .then((data) =>
+                    data.map((user) => {
+                        return {
+                            _id: user._id,
+                            nome: user.nome,
+                            ruolo: user.ruolo,
+                            img: user.img,
+                        };
+                    })
+                );
 
             res.status(200).json({ results });
         });
@@ -150,7 +156,6 @@ appNext
             //hash password with salt and bcrypt
             const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-
             const newUser = {
                 nome: req.body.username,
                 password: hashedPassword,
@@ -160,20 +165,20 @@ appNext
                     giorno: 1000,
                     settimana: 6000,
                     mensile: 24000,
-                    extra: 0
+                    extra: 0,
                 },
                 popolarità: 0,
                 img: null,
             };
 
-            console.log(newUser)
+            console.log(newUser);
 
             await mymongo.addUser(newUser, mongoCredentials);
 
             res.status(200).json({
                 ok: true,
             });
-        })
+        });
 
         app.post("/api/user-login", async function (req, res) {
             const user = await mymongo.searchByUsername(
@@ -189,7 +194,10 @@ appNext
                 return;
             }
 
-            const right = await bcrypt.compare(req.body.password, user.password);
+            const right = await bcrypt.compare(
+                req.body.password,
+                user.password
+            );
 
             if (!right) {
                 res.status(401).json({
@@ -206,7 +214,6 @@ appNext
             };
             res.status(200).json(actualUser);
         });
-
 
         /* ========================== */
         /*                            */
@@ -266,6 +273,6 @@ appNext
     .catch((ex) => {
         console.error(ex.stack);
         process.exit(1);
-    });
+    })
 
 /*       END OF SCRIPT        */
