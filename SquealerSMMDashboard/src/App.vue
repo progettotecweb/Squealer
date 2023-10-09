@@ -10,17 +10,25 @@ import SMM_main from './components/SMM_main.vue'
   <div class="container-fluid ">
     <div class="row flex-xl-nowrap">
       <div class="col-12 col-md-3 col-xl-2 bd-sidebar">
-        colonnna sinistra 
+        <p>colonnna sinistra</p> 
+        <p>contenuti di qualita e altri link</p>
       </div>
       <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content bg-secondary flex flex-col justify-center items-center text-center text-w undefined text-slate-50" role="main">
         <h1 class="bd-title" id="content">Dashboard</h1>
         <div>
           <SMM_main />
         </div>
-        fine main
       </main>
+      <div class="d-none d-xl-block col-xl-2 bd-toc">
+        colonnna destra
+      </div>
     </div>
   </div>
+  <footer class="bd-footer py-4 py-md-4 bg-dark">
+    <div class="container py-4 py-md-4 px-4 px-md-3">
+
+    </div>
+  </footer>
   
 </template>
 
