@@ -1,6 +1,6 @@
 "use client";
 
-import {  useState } from "react";
+import { useState } from "react";
 
 import SearchIcon from "@/icons/SearchIcon";
 import IconAccountCircle from "@/icons/AccountIcon";
@@ -13,6 +13,7 @@ import CustomIcon from "@/components/CustomIcon";
 import Menu from "@/components/Navbar/Menu";
 import SquealCreator from "@/components/Navbar/SquealCreator";
 import Searchbar from "@/components/Navbar/Searchbar";
+import Drawer from "@/components/Drawer/Drawer";
 
 const Navbar = () => {
     const [open, setOpen] = useState(false);
@@ -37,34 +38,35 @@ const Navbar = () => {
                     onClick={() => setOpen(!open)}
                 />
             </nav>
-            <SwipeableDrawer
-                anchor="left"
-                open={open}
-                onOpen={() => setOpen(true)}
-                onClose={() => setOpen(false)}
-            >
+
+            
+            <Drawer open={open} anchor="left" onClose={() => setOpen(false)}>
                 <Menu setOpen={setOpen} />
-            </SwipeableDrawer>
-            <SwipeableDrawer
+            </Drawer>
+            <Drawer
                 open={openDialog}
                 anchor="bottom"
-                onOpen={() => setOpenDialog(true)}
                 onClose={() => setOpenDialog(false)}
             >
                 <Box className="bg-[#111B21] h-[70vh] rounded-lg">
                     <SquealCreator setOpenDialog={setOpenDialog} />
                 </Box>
-            </SwipeableDrawer>
-            <SwipeableDrawer
+            </Drawer>
+            {/**<SwipeableDrawer
                 open={openSearch}
                 anchor="top"
                 onOpen={() => setOpenSearch(true)}
                 onClose={() => setOpenSearch(false)}
             >
-                <Box className="bg-[#111B21] text-slate-50 flex flex-column">
-                    <Searchbar />
-                </Box>
-            </SwipeableDrawer>
+                <Searchbar />
+                </SwipeableDrawer>*/}
+            <Drawer
+                open={openSearch}
+                anchor="top"
+                onClose={() => setOpenSearch(false)}
+            >
+                <Searchbar />
+            </Drawer>
         </>
     );
 };
