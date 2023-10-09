@@ -194,7 +194,7 @@ exports.search = async function (q, credentials) {
 
             const User = mongoose.model('User', userSchema);
 
-            let query = {q};
+            let query = {};
 
             //cerco i campi che mi sono stati passati, se li trovo li aggiungo alla query
 
