@@ -217,3 +217,21 @@ exports.search = async function (q, credentials) {
         .catch(err => console.error('Could not connect to MongoDB', err));
 
 }
+
+const User = mongoose.model('User', userSchema);
+
+exports.searchByUsername = async function (username, role,  credentials) {
+    let uri = `mongodb://${credentials.site}/db`;
+
+    try {
+        await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+        const user = await User.findOne({ nome: username, ruolo: role });
+        return user;
+    } catch (err) {
+        console.error('Error during search:', err);
+    } finally {
+        mongoose.disconnect(); // Close the database connection
+    }
+}
+

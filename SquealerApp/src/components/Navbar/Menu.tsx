@@ -34,7 +34,7 @@ const Menu: React.FC<MenuProps> = ({ setOpen }) => {
 
             <section className="m-3">
                 <h1>
-                    @{session && session.user ? session.user.name : "username"}
+                    {session && session.user ? "@" + session.user.name : "Welcome guest!"}
                 </h1>
                 {session && session.user ? <button onClick={() => signOut({callbackUrl: "/Home/Login"})}>
                     Sign Out

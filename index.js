@@ -69,10 +69,7 @@ appNext
         app.enable("trust proxy");
 
         app.get("/", async function (req, res) {
-            if (req.session?.user) {
-                res.redirect("/Home");
-            }
-            res.redirect("/Home/Login");
+            res.redirect("/Home")
         });
 
         app.get("/Home", async function (req, res) {
@@ -133,12 +130,27 @@ appNext
         });
 
         app.post("/api/user-login", async function (req, res) {
-            res.json({
-                id: 1,
-                email: "test@test.it",
-                name: "gianlo",
-                role: "user",
-            });
+            
+            const user = await mymongo.searchByUsername(req.body.username, "Utente", mongoCredentials);
+
+            if (!user) {
+                res.status(401).json({
+                    ok: false,
+                    error: "Username not found",
+                });
+                return;
+            }
+
+            if (user.password !== req.body.password) {
+                res.status(401).json({
+                    ok: false,
+                    error: "Wrong password",
+                });
+                return;
+            }
+
+            const actualUser = {name: user.nome, id: user._id};
+            res.status(200).json(actualUser);
         });
 
         /* ========================== */
