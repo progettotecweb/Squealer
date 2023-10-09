@@ -10,6 +10,7 @@ const AccountPage = async () => {
         <PageContainer key="account">
             <h1>Account Page</h1>
 
+
             {session && session.user && <pre className="text-left">{JSON.stringify(session.user, null, 2)}</pre>}
         </PageContainer>
     );

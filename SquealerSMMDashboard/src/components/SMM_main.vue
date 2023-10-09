@@ -16,6 +16,14 @@ function removeAccount(id: {}){
     followed_accounts.value = followed_accounts.value.filter( (account) => account !== id)
 }
 
+function getUser() {
+    fetch("/Home/api/user")
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+        })
+}
+
 
 </script>
 
@@ -34,6 +42,7 @@ function removeAccount(id: {}){
             </div> 
 
         </div>
+        <button @click="getUser">Get user</button>
     </div>
 </template>
 

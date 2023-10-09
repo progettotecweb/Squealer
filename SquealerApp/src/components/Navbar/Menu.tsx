@@ -13,8 +13,7 @@ interface MenuProps {
 }
 
 const Menu: React.FC<MenuProps> = ({ setOpen }) => {
-
-    const {data : session } = useSession()
+    const { data: session } = useSession();
 
     return (
         <Box
@@ -34,11 +33,19 @@ const Menu: React.FC<MenuProps> = ({ setOpen }) => {
 
             <section className="m-3">
                 <h1>
-                    {session && session.user ? "@" + session.user.name : "Welcome guest!"}
+                    {session && session.user
+                        ? "@" + session.user.name
+                        : "Welcome guest!"}
                 </h1>
-                {session && session.user ? <button onClick={() => signOut({callbackUrl: "/Home/Login"})}>
-                    Sign Out
-                </button> : <CustomLink href="/Login">Sign In</CustomLink>}
+                {session && session.user ? (
+                    <button
+                        onClick={() => signOut({ callbackUrl: "/Home/Login" })}
+                    >
+                        Sign Out
+                    </button>
+                ) : (
+                    <CustomLink href="/Login">Sign In</CustomLink>
+                )}
             </section>
             <Divider />
 
@@ -62,16 +69,20 @@ const Menu: React.FC<MenuProps> = ({ setOpen }) => {
                         </CustomLink>
                     )
                 )}
+                {session?.user && session.user.role == "Mod" && (
+                    <CustomLink type="a" href="/Moderator" className="mt-3 text-xl">
+                        Moderator Dashboard
+                    </CustomLink>
+                )}
+                {session?.user && session.user.role == "SMM" && (
+                    <Container className="flex flex-col mt-auto">
+                        <CustomLink type="a" href="/SMM" className="mt-3 text-xl">
+                            SMM Dashboard
+                        </CustomLink>
+                    </Container>
+                )}
             </Container>
             <Divider />
-            <Container className="flex flex-col mt-auto">
-                <CustomLink type="a" href="/SMM" className="mt-2">
-                    Switch to SMM
-                </CustomLink>
-                <CustomLink type="a" href="/Moderator" className="mt-2">
-                    Switch to Moderator
-                </CustomLink>
-            </Container>
         </Box>
     );
 };

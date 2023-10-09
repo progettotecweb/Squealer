@@ -38,6 +38,7 @@ function readJsonData(fileName) {
 const userSchema = new mongoose.Schema({
     nome: String,
     password: String,
+    salt: String,
     ruolo: String,
     quota_msg: {
         giorno: Number,
@@ -220,13 +221,13 @@ exports.search = async function (q, credentials) {
 
 const User = mongoose.model('User', userSchema);
 
-exports.searchByUsername = async function (username, role,  credentials) {
+exports.searchByUsername = async function (username,  credentials) {
     let uri = `mongodb://${credentials.site}/db`;
 
     try {
         await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-        const user = await User.findOne({ nome: username, ruolo: role });
+        const user = await User.findOne({ nome: username });
         return user;
     } catch (err) {
         console.error('Error during search:', err);
@@ -235,3 +236,18 @@ exports.searchByUsername = async function (username, role,  credentials) {
     }
 }
 
+
+exports.addUser = async function (newUser, credentials) {
+    let uri = `mongodb://${credentials.site}/db`;
+
+    try {
+        await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+        const user = new User(newUser);
+        await user.save();
+    } catch (err) {
+        console.error('Error during search:', err);
+    } finally {
+        mongoose.disconnect(); // Close the database connection
+    }
+}

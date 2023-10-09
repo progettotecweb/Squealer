@@ -1,5 +1,8 @@
 ﻿/* Utils */
 require("dotenv").config();
+const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+
 
 const { server_log } = require("./utils/utils.js");
 
@@ -69,7 +72,7 @@ appNext
         app.enable("trust proxy");
 
         app.get("/", async function (req, res) {
-            res.redirect("/Home")
+            res.redirect("/Home");
         });
 
         app.get("/Home", async function (req, res) {
@@ -129,9 +132,53 @@ appNext
             res.status(200).json({ results });
         });
 
+        app.post("/api/register", async function (req, res) {
+            const user = await mymongo.searchByUsername(
+                req.body.username,
+                mongoCredentials
+            );
+
+            if (user) {
+                res.status(401).json({
+                    ok: false,
+                    error: "Username already in use",
+                });
+                return;
+            }
+
+            const salt = crypto.randomBytes(16).toString('hex')
+            //hash password with salt and bcrypt
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+
+            const newUser = {
+                nome: req.body.username,
+                password: hashedPassword,
+                ruolo: "Utente",
+                quota_msg: {
+                    giorno: 1000,
+                    settimana: 6000,
+                    mensile: 24000,
+                    extra: 0
+                },
+                popolarità: 0,
+                img: null,
+            };
+
+            console.log(newUser)
+
+            await mymongo.addUser(newUser, mongoCredentials);
+
+            res.status(200).json({
+                ok: true,
+            });
+        })
+
         app.post("/api/user-login", async function (req, res) {
-            
-            const user = await mymongo.searchByUsername(req.body.username, "Utente", mongoCredentials);
+            const user = await mymongo.searchByUsername(
+                req.body.username,
+                mongoCredentials
+            );
 
             if (!user) {
                 res.status(401).json({
@@ -141,7 +188,10 @@ appNext
                 return;
             }
 
-            if (user.password !== req.body.password) {
+            const hashedPassword = await bcrypt.hash(req.body.password, user.salt);
+            console.log(hashedPassword)
+
+            if (user.password !== hashedPassword) {
                 res.status(401).json({
                     ok: false,
                     error: "Wrong password",
@@ -149,9 +199,14 @@ appNext
                 return;
             }
 
-            const actualUser = {name: user.nome, id: user._id};
+            const actualUser = {
+                name: user.nome,
+                id: user._id,
+                role: user.ruolo,
+            };
             res.status(200).json(actualUser);
         });
+
 
         /* ========================== */
         /*                            */
