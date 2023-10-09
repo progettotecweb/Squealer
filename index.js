@@ -2,8 +2,9 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 
-const { server_log } = require("./utils/utils.js");
+const { server_log, checkRole, auth } = require("./utils/utils.js");
 
 const PORT = process.env.PORT || 8000;
 
@@ -52,6 +53,7 @@ appNext
         app.use(express.urlencoded({ extended: true }));
         app.use(cors());
         app.use(express.json());
+        app.use(cookieParser());
 
         let uri = `mongodb://${process.env.MONGO_SITE}/db`;
 
@@ -71,16 +73,16 @@ appNext
             "/SMM",
             express.static(path.join(__dirname, "SquealerSMMDashboard", "dist"))
         );
-        app.use(
-            "/Moderator",
-            express.static(path.join(__dirname, "SquealerModeratorDashboard"))
-        );
 
         // https://stackoverflow.com/questions/40459511/in-express-js-req-protocol-is-not-picking-up-https-for-my-secure-link-it-alwa
         app.enable("trust proxy");
 
         app.get("/", async function (req, res) {
-            res.redirect("/Home");
+            appNext.render(req, res, "/Home");
+        });
+
+        app.get("/Login", async function (req, res) {
+            appNext.render(req, res, "/Home/Login");
         });
 
         app.get("/Home", async function (req, res) {
@@ -98,7 +100,7 @@ appNext
             );
         });
 
-        app.get("/Moderator/*", async function (req, res) {
+        app.get("/Moderator", auth, checkRole(["Mod"]), async function (req, res) {
             res.sendFile(
                 path.join(__dirname, "SquealerModeratorDashboard", "index.html")
             );
@@ -273,6 +275,6 @@ appNext
     .catch((ex) => {
         console.error(ex.stack);
         process.exit(1);
-    })
+    });
 
 /*       END OF SCRIPT        */

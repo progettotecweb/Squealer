@@ -65,7 +65,6 @@ const Drawer = ({ children, open, anchor, onClose }: DrawerProps) => {
                         duration: duration,
                     }}
                 >
-                    Hello
                 </motion.div>
             )}
             {open && (
