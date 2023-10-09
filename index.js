@@ -146,7 +146,7 @@ appNext
                 return;
             }
 
-            const salt = crypto.randomBytes(16).toString('hex')
+            const salt = await bcrypt.genSalt(10);
             //hash password with salt and bcrypt
             const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
@@ -154,6 +154,7 @@ appNext
             const newUser = {
                 nome: req.body.username,
                 password: hashedPassword,
+                salt: salt,
                 ruolo: "Utente",
                 quota_msg: {
                     giorno: 1000,
@@ -188,10 +189,9 @@ appNext
                 return;
             }
 
-            const hashedPassword = await bcrypt.hash(req.body.password, user.salt);
-            console.log(hashedPassword)
+            const right = await bcrypt.compare(req.body.password, user.password);
 
-            if (user.password !== hashedPassword) {
+            if (!right) {
                 res.status(401).json({
                     ok: false,
                     error: "Wrong password",
