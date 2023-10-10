@@ -6,10 +6,12 @@ export const metadata = {
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar/Navbar";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import Menu from "@/components/Navbar/Menu";
 
 import "styles/globals.css";
 
 import NextAuthProvider from "@/components/Auth/NextAuthProvider";
+import { Box } from "@mui/material";
 
 export default function RootLayout({
     children,
@@ -19,9 +21,16 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <NextAuthProvider >
-                    <Header />
-                    <LayoutWrapper>{children}</LayoutWrapper>
+                <NextAuthProvider>
+                    <div className="md:grid md:grid-cols-4">
+                        <Box className="hidden md:block md:h-screen md:z-[1001] md:sticky md:top-0 md:col-span-1">
+                            <Menu />
+                        </Box>
+                        <main className="md:col-span-3">
+                            <Header />
+                            <LayoutWrapper>{children}</LayoutWrapper>
+                        </main>
+                    </div>
                     <Navbar />
                 </NextAuthProvider>
             </body>

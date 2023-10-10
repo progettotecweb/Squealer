@@ -41,7 +41,7 @@ const Navbar = () => {
 
             
             <Drawer open={open} anchor="left" onClose={() => setOpen(false)}>
-                <Menu setOpen={setOpen} />
+                <Menu />
             </Drawer>
             <Drawer
                 open={openDialog}
@@ -52,14 +52,6 @@ const Navbar = () => {
                     <SquealCreator setOpenDialog={setOpenDialog} />
                 </Box>
             </Drawer>
-            {/**<SwipeableDrawer
-                open={openSearch}
-                anchor="top"
-                onOpen={() => setOpenSearch(true)}
-                onClose={() => setOpenSearch(false)}
-            >
-                <Searchbar />
-                </SwipeableDrawer>*/}
             <Drawer
                 open={openSearch}
                 anchor="top"

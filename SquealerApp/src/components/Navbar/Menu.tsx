@@ -8,19 +8,12 @@ import CustomLink from "@/components/CustomLink";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 
-interface MenuProps {
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const Menu: React.FC<MenuProps> = ({ setOpen }) => {
+const Menu = () => {
     const { data: session } = useSession();
 
     return (
         <Box
-            sx={{ width: 250 }}
             role="presentation"
-            onClick={() => setOpen(false)}
-            onKeyDown={() => setOpen(false)}
             className="bg-slate-800 text-slate-50 h-full p-2 flex flex-col"
         >
             <Image
@@ -70,13 +63,21 @@ const Menu: React.FC<MenuProps> = ({ setOpen }) => {
                     )
                 )}
                 {session?.user && session.user.role == "Mod" && (
-                    <CustomLink type="a" href="/Moderator" className="mt-3 text-xl">
+                    <CustomLink
+                        type="a"
+                        href="/Moderator"
+                        className="mt-3 text-xl"
+                    >
                         Moderator Dashboard
                     </CustomLink>
                 )}
                 {session?.user && session.user.role == "SMM" && (
                     <Container className="flex flex-col mt-auto">
-                        <CustomLink type="a" href="/SMM" className="mt-3 text-xl">
+                        <CustomLink
+                            type="a"
+                            href="/SMM"
+                            className="mt-3 text-xl"
+                        >
                             SMM Dashboard
                         </CustomLink>
                     </Container>

@@ -24,7 +24,7 @@ const CustomLink: React.FC<CustomLinkProps> = ({
     const LinkComponent = type === "Link" ? Link : "a";
 
     return (
-        <div className={className}>
+        <div className={`hover:text-slate-300 ${className}`}>
             <LinkComponent href={href}>{children}</LinkComponent>
         </div>
     );

@@ -8,6 +8,8 @@ interface DrawerProps {
     anchor: AnchorType;
     children: React.ReactNode;
     onClose: () => void;
+    rootClassName?: string,
+    backdropClassName?: string,
 }
 
 const duration = 0.15;
@@ -38,7 +40,7 @@ const variants = (anchor : AnchorType) => {
     };
 }
 
-const Drawer = ({ children, open, anchor, onClose }: DrawerProps) => {
+const Drawer = ({ children, open, anchor, onClose, rootClassName, backdropClassName }: DrawerProps) => {
     let anchorStyle = "";
 
     if (anchor === "top") {
@@ -57,7 +59,7 @@ const Drawer = ({ children, open, anchor, onClose }: DrawerProps) => {
                 <motion.div
                     onTap={onClose}
                     key="backdrop"
-                    className="fixed top-0 left-0 w-screen h-screen bg-[rgba(0,0,0,0.5);] z-[5990]"
+                    className={`fixed top-0 left-0 w-screen h-screen bg-[rgba(0,0,0,0.5);] z-[5990] ${backdropClassName}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 0.5 }}
                     exit={{ opacity: 0 }}
@@ -69,7 +71,7 @@ const Drawer = ({ children, open, anchor, onClose }: DrawerProps) => {
             )}
             {open && (
                 <motion.div
-                    className={`fixed ${anchorStyle} z-[6000]`}
+                    className={`fixed ${anchorStyle} z-[6000] ${rootClassName}`}
                     variants={variants(anchor)}
                     initial="hidden"
                     animate="visible"
