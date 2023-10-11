@@ -22,16 +22,7 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <NextAuthProvider>
-                    <div className="md:grid md:grid-cols-4">
-                        <Box className="hidden md:block md:h-screen md:z-[1001] md:sticky md:top-0 md:col-span-1">
-                            <Menu />
-                        </Box>
-                        <main className="md:col-span-3">
-                            <Header />
-                            <LayoutWrapper>{children}</LayoutWrapper>
-                        </main>
-                    </div>
-                    <Navbar />
+                    {children}
                 </NextAuthProvider>
             </body>
         </html>

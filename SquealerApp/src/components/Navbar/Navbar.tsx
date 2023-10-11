@@ -6,7 +6,6 @@ import SearchIcon from "@/icons/SearchIcon";
 import IconAccountCircle from "@/icons/AccountIcon";
 import IconAdd from "@/icons/AddIcon";
 
-import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import Box from "@mui/material/Box";
 
 import CustomIcon from "@/components/CustomIcon";
@@ -49,7 +48,7 @@ const Navbar = () => {
                 onClose={() => setOpenDialog(false)}
             >
                 <Box className="bg-[#111B21] h-[70vh] rounded-lg">
-                    <SquealCreator setOpenDialog={setOpenDialog} />
+                    <SquealCreator />
                 </Box>
             </Drawer>
             <Drawer

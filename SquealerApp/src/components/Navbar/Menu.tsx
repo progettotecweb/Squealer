@@ -1,54 +1,47 @@
 "use client";
 
-import Box from "@mui/material/Box";
 import Divider from "@/components/Divider";
 import Container from "@mui/material/Container";
 
 import CustomLink from "@/components/CustomLink";
 import Image from "next/image";
-import { signOut, useSession } from "next-auth/react";
+import {useUser} from "@/hooks/useUser";
+import ClientButton from "./ClientButton";
 
 const Menu = () => {
-    const { data: session } = useSession();
+    const {user} = useUser();
 
     return (
-        <Box
+        <div
             role="presentation"
-            className="bg-slate-800 text-slate-50 h-full p-2 flex flex-col"
+            className="bg-slate-800 text-slate-50 h-full p-2 flex flex-col md:bg-[#111B21]"
         >
             <Image
                 src="/squealer.png"
                 alt="Squealer"
                 height={150}
                 width={150}
-                className="m-auto"
+                className="m-auto w-auto"
+                priority
             />
 
             <section className="m-3">
                 <h1>
-                    {session && session.user
-                        ? "@" + session.user.name
+                    {user
+                        ? "@" + user.name
                         : "Welcome guest!"}
                 </h1>
-                {session && session.user ? (
-                    <button
-                        onClick={() => signOut({ callbackUrl: "/Home/Login" })}
-                    >
-                        Sign Out
-                    </button>
-                ) : (
-                    <CustomLink href="/Login">Sign In</CustomLink>
-                )}
+                <ClientButton user={user}/>
             </section>
             <Divider />
 
-            <section className="m-3">
-                <pre>Daily: 987/1000</pre>
-                <pre>Weekly: 4768/6000</pre>
-                <pre>Monthly: 12389/24000</pre>
+            {user && <><section className="m-3 flex flex-col gap-2">
+                <div>Daily: 987/1000</div>
+                <div>Weekly: 4768/6000</div>
+                <div>Monthly: 12389/24000</div>
             </section>
 
-            <Divider />
+            <Divider /></>}
 
             <Container className="flex flex-col flex-1">
                 {["Channels", "Settings", "Account", "Shop"].map(
@@ -62,7 +55,7 @@ const Menu = () => {
                         </CustomLink>
                     )
                 )}
-                {session?.user && session.user.role == "Mod" && (
+                {user && user.role == "Mod" && (
                     <CustomLink
                         type="a"
                         href="/Moderator"
@@ -71,7 +64,7 @@ const Menu = () => {
                         Moderator Dashboard
                     </CustomLink>
                 )}
-                {session?.user && session.user.role == "SMM" && (
+                {user && user.role == "SMM" && (
                     <Container className="flex flex-col mt-auto">
                         <CustomLink
                             type="a"
@@ -84,7 +77,7 @@ const Menu = () => {
                 )}
             </Container>
             <Divider />
-        </Box>
+        </div>
     );
 };
 

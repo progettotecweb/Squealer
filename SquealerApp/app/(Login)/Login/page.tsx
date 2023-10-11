@@ -64,7 +64,7 @@ const LoginPage = () => {
 
             <form className="flex flex-col gap-2">
                 <input
-                    className="text-slate-800"
+                    className="text-slate-800 p-2 rounded-md"
                     id="Username"
                     type="text"
                     name="Username"
@@ -72,7 +72,7 @@ const LoginPage = () => {
                     onChange={(e) => setUsername(e.target.value)}
                 />
                 <input
-                    className="text-slate-800"
+                    className="text-slate-800 p-2 rounded-md"
                     id="Password"
                     type="password"
                     name="Password"
@@ -87,7 +87,7 @@ const LoginPage = () => {
                 </button>
             </form>
 
-            <Container className="flex flex-col gap-2">
+            <Container className="flex flex-col gap-2 my-4">
                 {!register ? (
                     <button onClick={() => setRegister(true)}>Register</button>
                 ) : (

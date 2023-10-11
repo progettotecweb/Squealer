@@ -1,6 +1,6 @@
 import PageContainer from "@/components/PageContainer";
 
-const Settings = () => {
+const Settings = async () => {
     return (
         <PageContainer key="settings">
             <h1>Account Settings</h1>

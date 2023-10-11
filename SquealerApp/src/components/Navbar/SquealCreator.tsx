@@ -1,8 +1,7 @@
 import { useState } from "react";
 
-import CustomIcon from "@/components/CustomIcon";
-import CloseOutlined from "@mui/icons-material/CloseOutlined";
 import Tabs, { Tab, AnimatedTabContent } from "@/components/Tabs/Tabs";
+import { motion } from "framer-motion";
 
 const MAX_LEN = 50;
 
@@ -18,11 +17,7 @@ const Counter: React.FC<{ current_len: number }> = ({ current_len }) => {
     );
 };
 
-interface SquealCreatorProps {
-    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const SquealCreator: React.FC<SquealCreatorProps> = ({ setOpenDialog }) => {
+const SquealCreator = () => {
     const [message, setMessage] = useState("");
 
     const submitSqueal = async (e) => {
@@ -39,51 +34,58 @@ const SquealCreator: React.FC<SquealCreatorProps> = ({ setOpenDialog }) => {
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-gray-500 p-4">
-            <CustomIcon
-                icon={<CloseOutlined className="h-8 w-8 text-slate-50" />}
-                onClick={() => setOpenDialog(false)}
-            />
+        <div className="flex flex-col h-full w-full bg-grey-500 p-4 md:bg-[#111B21] md:rounded-lg md:mb-2">
             <Counter current_len={message.length} />
             <Tabs>
                 <Tab
                     label="Text"
                     content={
                         <AnimatedTabContent>
-                            <form name="squeal-post">
-                                <textarea
+                            <form name="squeal-post" className="md:h-[10vh]">
+                                <motion.textarea
                                     maxLength={MAX_LEN}
                                     onChange={(e) => setMessage(e.target.value)}
                                     id="message"
                                     rows={4}
-                                    className="block p-2.5 w-full text-sm bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    className="block p-2.5 w-full text-sm bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"
                                     placeholder="What's happening?"
-                                ></textarea>
-
-                                <div className="flex justify-between items-center mt-4">
-                                    <button
-                                        type="submit"
-                                        className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                                        onClick={submitSqueal}
-                                    >
-                                        Post
-                                    </button>
-                                </div>
+                                ></motion.textarea>
                             </form>
                         </AnimatedTabContent>
                     }
                 />
                 <Tab
                     label="Image"
-                    content={<AnimatedTabContent><input accept="image/*" id="icon-button-file" type="file" capture="environment"/></AnimatedTabContent>}
+                    content={
+                        <AnimatedTabContent>
+                            <input
+                                className="md:h-[10vh]"
+                                accept="image/*"
+                                id="icon-button-file"
+                                type="file"
+                                capture="environment"
+                            />
+                        </AnimatedTabContent>
+                    }
                 />
                 <Tab
                     label="Geolocation"
                     content={
-                        <AnimatedTabContent>Geolocation</AnimatedTabContent>
+                        <AnimatedTabContent>
+                            <div className="md:h-[10vh]">Geolocation</div>
+                        </AnimatedTabContent>
                     }
                 />
             </Tabs>
+            <div className="flex justify-between items-center mt-4">
+                <button
+                    type="submit"
+                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                    onClick={submitSqueal}
+                >
+                    Post
+                </button>
+            </div>
         </div>
     );
 };

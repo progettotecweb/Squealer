@@ -3,7 +3,7 @@
 import PageContainer from "@/components/PageContainer";
 import { useSession } from "next-auth/react";
 
-const AccountPage = async () => {
+const AccountPage = () => {
     const { data: session } = useSession();
     
     return (
