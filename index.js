@@ -106,7 +106,7 @@ appNext
             );
         });
 
-        app.post("/api/squeal", async function (req, res) {
+        app.post("/api/squeal",auth, async function (req, res) {
             console.log("squeal", req.body);
 
             res.json({

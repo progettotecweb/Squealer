@@ -6,15 +6,7 @@ Go to `/Login` or `/Home/Login` to log in or register.
 > Note: The login page is in a primal state and must be improved. We should add password validation for registering.
 
 ## Logout
-To logout, run a GET request to `/Home/api/signOut`, like this:
-```javascript
-fetch("/Home/api/signOut", {
-    method: "GET",
-    headers: {
-        "Content-Type": "application/json"
-    }
-})
-```
+To logout, import the `signOut` function from `SquealerApp/auth` and call it.
 this removes the session cookie and should redirect to the login page.
 > # Note
 > I have not yet tested this as in Next i can directly use the `signOut` function from `next-auth/client`. This should however work.
@@ -55,7 +47,7 @@ Furthermore, we can also check if the user has a specific role, like this:
 app.get("/protectedRoute", auth, checkRole(["Mod"]), (req, res) => {
     ...
 })
-
+V
 // example: all of the moderator dashboard routes should be protected.
 ```
 As before, if the user is not logged in or if the user does not have the role "Mod", a 401 error will be returned.

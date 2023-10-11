@@ -9,6 +9,4 @@ export async function GET() {
 
     else
         return Response.json({error: "you need to log in"})
-
-
 } 
