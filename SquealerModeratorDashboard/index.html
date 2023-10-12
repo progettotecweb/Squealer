@@ -16,14 +16,30 @@
 
     <script src="/js/moderator.js"></script>
 
-    <h1>Squealer Moderator Dashboard</h1>
-    <section class="">
-        <a href="/">Homepage </a>
-    </section>
-    <ul>
-        <button  onclick="getUserInfo()">Informazioni utente</button>
-        <button  onclick="signout()">SIGNOUT</button>
-    </ul>
+    <div class="hero">
+        <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+            <div class="container-fluid mx-5 d-flex justify-content-between ">
+                <div class="navbar-info navbar-div">
+                    <img id="user-img" alt="user-img" class="text-light" />
+                    <a class="navbar-brand" id="user-name">Nome</a>
+                </div>
+
+                <form class="d-flex navbar-div justify-content-center" role="search" id="searchDiv">
+                    <input class="form-control me-2 w-75" type="search" placeholder="Search user" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+
+                <div class="navbar-div text-end">
+                    <a href="/">Home</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content">
+            <h1 class="text-center mt-5 mytext">
+                Welcome to the Moderator Dashboard
+            </h1>
+        </div>
 </body>
 
 </html>
