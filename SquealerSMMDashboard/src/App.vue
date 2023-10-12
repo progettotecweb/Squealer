@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SMM_main from './components/SMM_main.vue'
 
+
 </script>
 
 <template >
@@ -20,7 +21,7 @@ import SMM_main from './components/SMM_main.vue'
         </div>
       </main>
       <div class="d-none d-xl-block col-xl-2 bd-toc">
-        colonnna destra
+        <p>colonnna destra</p>
       </div>
     </div>
   </div>

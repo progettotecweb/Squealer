@@ -1,3 +1,35 @@
 * {
     margin: 0;
 }
+
+
+
+.hero {
+    height: 100vh;
+    width: 100vw;
+    background-color: #1d2d44;
+}
+
+.navbar {
+    width: auto;
+    height: 5em;
+    min-height: 10vh;
+}
+
+#user-img {
+    width: 3em;
+    border-radius: 25%;
+    margin-right: .5em;
+}
+
+.navbar-div {
+    min-width: 33%;
+    max-width: 33%;
+}
+
+.content {}
+
+
+.mytext {
+    color: #f0ebd8;
+}

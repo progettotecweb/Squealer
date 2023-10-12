@@ -25,6 +25,7 @@ const fs = require("fs");
 const { MongoClient } = require("mongodb");
 const mongoose = require("mongoose");
 const path = require("path");
+const { identifierToKeywordKind } = require("typescript");
 
 //read json file
 
@@ -40,6 +41,15 @@ const userSchema = new mongoose.Schema({
     password: String,
     salt: String,
     ruolo: String,
+    SMM_id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    controls: {
+        user_id: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+    },
     quota_msg: {
         giorno: Number,
         settimana: Number,
@@ -48,9 +58,10 @@ const userSchema = new mongoose.Schema({
     },
     popolarità: Number,
     img: {
-        format: String,
+        mimetype: String,
         blob: String,
     },
+
 });
 
 //collezione post schema
@@ -216,10 +227,49 @@ exports.searchByUsername = async function (username) {
 };
 
 exports.addUser = async function (newUser) {
-    try{ 
+    try {
         const user = new User(newUser);
         await user.save();
     } catch (err) {
         console.error("Error during search:", err);
     }
 };
+
+
+exports.searchUserById = async function (id) {
+    try {
+        const user = await User.findById(id);
+        return user;
+    } catch (err) {
+        console.error("Error during search:", err);
+    }
+
+    try {
+        const id = req.query.id;
+
+        if (!id) {
+            res.status(400).json({
+                error: "No id provided",
+            });
+            return;
+        }
+
+        //cerco user
+        const user = await User.findById(id);
+
+        if (!user) {
+            res.status(404).json({
+                error: "User not found",
+            });
+            return;
+        }
+
+        res.json(user)
+    }
+    catch (error) {
+        console.error(error)
+        res.status(500).json({
+            error: "Internal server error",
+        });
+    }
+}

@@ -132,6 +132,42 @@ appNext
             });
         });
 
+
+        app.get("/api/searchUserById", async function (req, res) {
+            try {
+                const id = req.query.id;
+
+                if (!id || mongoose.Types.ObjectId.isValid(id) == false) {  //controllo la validità dell'id
+                    res.status(400).json({
+                        error: "Bad request",
+                    });
+                    return;
+                }
+
+                const user = await mymongo.searchUserById(
+                    id,
+                    mongoCredentials
+                );
+
+
+                if (!user) {
+                    res.status(404).json({
+                        error: "User not found",
+                    });
+                    return;
+                }
+
+                res.json(user)
+            }
+            catch (error) {
+                console.error(error)
+                res.status(500).json({
+                    error: "Internal server error",
+                });
+            }
+
+        });
+
         app.get("/api/search", async function (req, res) {
             const query = req.query.q;
             if (query === "") {
