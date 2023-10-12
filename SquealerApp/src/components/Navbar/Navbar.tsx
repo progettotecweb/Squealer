@@ -13,8 +13,12 @@ import Menu from "@/components/Navbar/Menu";
 import SquealCreator from "@/components/Navbar/SquealCreator";
 import Searchbar from "@/components/Navbar/Searchbar";
 import Drawer from "@/components/Drawer/Drawer";
+import { useUser } from "@/hooks/useUser";
+import { Drawer as MUIDrawer } from "@mui/material";
 
 const Navbar = () => {
+    const {user} = useUser();
+
     const [open, setOpen] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [openSearch, setOpenSearch] = useState(false);
@@ -39,9 +43,16 @@ const Navbar = () => {
             </nav>
 
             
-            <Drawer open={open} anchor="left" onClose={() => setOpen(false)}>
-                <Menu />
-            </Drawer>
+            {/*<Drawer open={open} anchor="left" onClose={() => setOpen(false)}>
+                <Menu user={user}/>
+            </Drawer>*/}
+            <MUIDrawer
+                anchor="left"
+                open={open}
+                onClose={() => setOpen(false)}
+            >
+                <Menu onOpen={() => setOpen(false)} />
+            </MUIDrawer>
             <Drawer
                 open={openDialog}
                 anchor="bottom"

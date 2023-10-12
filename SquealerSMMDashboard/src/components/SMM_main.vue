@@ -17,7 +17,7 @@ function removeAccount(id: {}){
 }
 
 function getUser() {
-    fetch("/Home/api/user")
+    fetch("/api/search")
         .then(response => response.json())
         .then(data => {
             console.log(data)
@@ -35,13 +35,12 @@ function getUser() {
                 <button>Add account</button>    
             </form>
         </div>
-        <div class="d-flex justify-content-around flex-wrap " style="height: 70svh;overflow-y: auto;">    
+        <div class="d-flex justify-content-around flex-wrap ">    
             <div v-for="account in followed_accounts" :key="account.id" style="width: 20vh;height: 30vh;text-overflow: ellipsis;" class="card bg-success m-5 mb-5">    
                     <button type="button" class="btn-close" aria-label="Close" @click="removeAccount(account)"></button>
-                    <p style="">{{ account.text }}</p>
-                    
-
+                    <p>{{ account.text }}</p>
             </div>
+
         </div>
         <button @click="getUser">Get user</button>
     </div>

@@ -41,6 +41,15 @@ const userSchema = new mongoose.Schema({
     password: String,
     salt: String,
     ruolo: String,
+    SMM_id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    controls: {
+        user_id: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+    },
     quota_msg: {
         giorno: Number,
         settimana: Number,
@@ -52,6 +61,7 @@ const userSchema = new mongoose.Schema({
         mimetype: String,
         blob: String,
     },
+
 });
 
 //collezione post schema
