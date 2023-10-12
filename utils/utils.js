@@ -12,8 +12,9 @@ const server_log = (msg, ...args) => {
 };
 
 const auth = async (req, res, next) => {
-
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+    
 
     if (token) {
         req.user = {"role": token.role};

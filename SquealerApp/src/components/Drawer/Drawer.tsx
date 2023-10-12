@@ -81,6 +81,7 @@ const Drawer = ({ children, open, anchor, onClose, rootClassName, backdropClassN
                     transition= {{
                         duration: duration
                     }}
+                    onTap={onClose}
                 >
                     {children}
                 </motion.div>

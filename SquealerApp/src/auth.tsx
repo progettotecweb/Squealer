@@ -74,7 +74,7 @@ const authOptions: NextAuthOptions = {
                 }
 
                 const authResponse = await fetch(
-                    "http://127.0.0.1:8000/api/user-login",
+                    "http://localhost:8000/api/user-login",
                     {
                         method: "POST",
                         headers: {

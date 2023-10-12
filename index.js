@@ -46,7 +46,10 @@ appNext
 
         let app = express();
         app.use("/js", express.static(global.rootDir + "/public/js"));
-        app.use("/bootstrap", express.static(global.rootDir + "/public/bootstrap"));
+        app.use(
+            "/bootstrap",
+            express.static(global.rootDir + "/public/bootstrap")
+        );
         app.use("/css", express.static(global.rootDir + "/public/css"));
         app.use("/data", express.static(global.rootDir + "/public/data"));
         app.use("/docs", express.static(global.rootDir + "/public/html"));
@@ -56,9 +59,12 @@ appNext
         app.use(express.json());
         app.use(cookieParser());
 
-        let uri = `mongodb://${process.env.MONGO_SITE}/db`;
-
-        mongoose
+        const uri =
+            process.env.NODE_ENV === "production"
+                ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_SITE}/db?writeConcern=majority`
+                : `mongodb://localhost:27017/db?writeConcern=majority`;
+        
+                mongoose
             .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
             .then(() => server_log("Connected to MongoDB..."))
             .catch((err) =>
@@ -72,6 +78,8 @@ appNext
 
         app.use(
             "/SMM",
+            auth,
+            checkRole(["SMM", "Mod"]),
             express.static(path.join(__dirname, "SquealerSMMDashboard", "dist"))
         );
 
@@ -101,13 +109,22 @@ appNext
             );
         });
 
-        app.get("/Moderator", auth, checkRole(["Mod"]), async function (req, res) {
-            res.sendFile(
-                path.join(__dirname, "SquealerModeratorDashboard", "index.html")
-            );
-        });
+        app.get(
+            "/Moderator",
+            auth,
+            checkRole(["Mod"]),
+            async function (req, res) {
+                res.sendFile(
+                    path.join(
+                        __dirname,
+                        "SquealerModeratorDashboard",
+                        "index.html"
+                    )
+                );
+            }
+        );
 
-        app.post("/api/squeal",auth, async function (req, res) {
+        app.post("/api/squeal", auth, async function (req, res) {
             console.log("squeal", req.body);
 
             res.json({
