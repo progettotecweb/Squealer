@@ -1,28 +1,35 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeMount, ref, toValue} from 'vue'
 // const count = ref(0)
 
 
-let id = 0
-const newAccount = ref('')
-const followed_accounts = ref([{id: id++, text: 'pippo'}])
+const newSearch = ref('')
+const accounts = ref([])
 
-function addAccount() {
-    followed_accounts.value.push({ id: id++ , text: newAccount.value})
-    newAccount.value = ''
+function search(){}
+
+
+async function fetchUser(){
+    accounts.value = []
+    const res = await fetch("/api/search")
+    accounts.value = await res.json()
+    
+
+
+    console.log(accounts.value)
+    console.log(accounts)
+
+    const unwrapped =  toValue(accounts)
+    console.log(unwrapped)
+    console.log(unwrapped.values)
+
+        
 }
 
-function removeAccount(id: {}){
-    followed_accounts.value = followed_accounts.value.filter( (account) => account !== id)
-}
 
-function getUser() {
-    fetch("/api/search")
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-        })
-}
+    onBeforeMount(() => {
+        fetchUser()
+    })
 
 
 </script>
@@ -30,19 +37,20 @@ function getUser() {
 <template>
     <div >
         <div>
-            <form @submit.prevent="addAccount">
-                <input v-model="newAccount">
-                <button>Add account</button>    
+            <form @submit.prevent="search">
+                <input v-model="newSearch">
+                <button>Search</button>    
             </form>
         </div>
-        <div class="d-flex justify-content-around flex-wrap ">    
-            <div v-for="account in followed_accounts" :key="account.id" style="width: 20vh;height: 30vh;text-overflow: ellipsis;" class="card bg-success m-5 mb-5">    
-                    <button type="button" class="btn-close" aria-label="Close" @click="removeAccount(account)"></button>
-                    <p>{{ account.text }}</p>
-            </div>
 
+
+        <div class="d-flex justify-content-around flex-wrap ">    
+            <div v-for="account in accounts"  style="width: 10vh;height: 5vh;" class="card bg-success m-5 mb-5">    
+                    <p>{{ account }}</p>
+            </div>
         </div>
-        <button @click="getUser">Get user</button>
+        
+        <button @click="fetchUser">fetch</button>
     </div>
 </template>
 

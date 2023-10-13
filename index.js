@@ -168,6 +168,22 @@ appNext
 
         });
 
+        app.get("/api/searchUserBySMM", async function (req,res){
+            try{
+                const smm = req.query.smm;
+
+                const user = await mymongo.searchUserBySMM(
+                    smm
+                );
+            }
+            catch (error) {
+                console.error(error)
+                res.status(500).json({
+                    error: "Internal server error",
+                });
+            }
+        });
+
         app.get("/api/search", async function (req, res) {
             const query = req.query.q;
             if (query === "") {

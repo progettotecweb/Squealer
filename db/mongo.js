@@ -273,3 +273,13 @@ exports.searchUserById = async function (id) {
         });
     }
 }
+
+exports.searchUserBySMM = async function (SMM_id) {
+    try {
+        const user = await User.find({ SMM_id: SMM_id });
+        return user;
+    } catch (err) {
+        User.
+        console.error("Error during search:", err);
+    }
+}
