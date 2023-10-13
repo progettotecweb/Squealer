@@ -62,7 +62,7 @@ appNext
         const uri =
             process.env.NODE_ENV === "production"
                 ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_SITE}/db?writeConcern=majority`
-                : `mongodb://localhost:27017/db?writeConcern=majority`;
+                : `mongodb://127.0.0.1:27017/db?writeConcern=majority`;
         
                 mongoose
             .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
