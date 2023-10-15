@@ -145,8 +145,7 @@ appNext
                 }
 
                 const user = await mymongo.searchUserById(
-                    id,
-                    mongoCredentials
+                    id
                 );
 
 
@@ -177,8 +176,7 @@ appNext
 
             const results = await mymongo
                 .search(
-                    { nome: new RegExp(req.query.q, "i") },
-                    mongoCredentials
+                    { nome: new RegExp(req.query.q, "i") }
                 )
                 .then((data) =>
                     data.map((user) => {
@@ -196,8 +194,7 @@ appNext
 
         app.post("/api/register", async function (req, res) {
             const user = await mymongo.searchByUsername(
-                req.body.username,
-                mongoCredentials
+                req.body.username
             );
 
             if (user) {
@@ -216,7 +213,7 @@ appNext
                 nome: req.body.username,
                 password: hashedPassword,
                 salt: salt,
-                ruolo: "Utente",
+                ruolo: "Mod",
                 quota_msg: {
                     giorno: 1000,
                     settimana: 6000,
@@ -224,7 +221,7 @@ appNext
                     extra: 0,
                 },
                 popolarità: 0,
-                img: null,
+                img: null
             };
 
             console.log(newUser);

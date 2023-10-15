@@ -22,10 +22,8 @@ Copyright (c) 2021 by Fabio Vitali
 */
 
 const fs = require("fs");
-const { MongoClient } = require("mongodb");
 const mongoose = require("mongoose");
 const path = require("path");
-const { identifierToKeywordKind } = require("typescript");
 
 //read json file
 
@@ -176,8 +174,6 @@ exports.create = async function (credentials) {
 
     console.log("Connected to MongoDB");
     const db = mongoose.connection;
-
-    const User = mongoose.model("User", userSchema);
     const Post = mongoose.model("Post", postSchema);
 
     try {
@@ -199,8 +195,6 @@ exports.create = async function (credentials) {
 };
 
 exports.search = async function (q) {
-
-    const User = mongoose.model("User", userSchema);
 
     let query = q;
 
@@ -239,6 +233,11 @@ exports.addUser = async function (newUser) {
 exports.searchUserById = async function (id) {
     try {
         const user = await User.findById(id);
+
+        if(!user) {
+            return null;
+        }
+
         return user;
     } catch (err) {
         console.error("Error during search:", err);
