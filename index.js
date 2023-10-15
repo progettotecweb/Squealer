@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 
 const { server_log, checkRole, auth } = require("./utils/utils.js");
+const default_img = require("./utils/default_image.json")
 
 const PORT = process.env.PORT || 8000;
 
@@ -62,9 +63,9 @@ appNext
         const uri =
             process.env.NODE_ENV === "production"
                 ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_SITE}/db?writeConcern=majority`
-                : `mongodb://localhost:27017/db?writeConcern=majority`;
-        
-                mongoose
+                : `mongodb://127.0.0.1:27017/db?writeConcern=majority`;
+
+        mongoose
             .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
             .then(() => server_log("Connected to MongoDB..."))
             .catch((err) =>
@@ -221,7 +222,7 @@ appNext
                     extra: 0,
                 },
                 popolarità: 0,
-                img: null
+                img: default_img,
             };
 
             console.log(newUser);
