@@ -40,7 +40,7 @@
         "nome": "fvSMM",
         "password": "$2b$10$tiwE1L5H7khIC/jdTpxQOeZKMShkYa7Fk9sQdENMYo9EBLi/.zLjO",
         "salt": "$2b$10$tiwE1L5H7khIC/jdTpxQOe",
-        "ruolo": "Utente",
+        "ruolo": "SMM",
         "controls": {
             "user_id":"65281e64841f0d79cdef751c"
         },

@@ -242,35 +242,6 @@ exports.searchUserById = async function (id) {
     } catch (err) {
         console.error("Error during search:", err);
     }
-
-    try {
-        const id = req.query.id;
-
-        if (!id) {
-            res.status(400).json({
-                error: "No id provided",
-            });
-            return;
-        }
-
-        //cerco user
-        const user = await User.findById(id);
-
-        if (!user) {
-            res.status(404).json({
-                error: "User not found",
-            });
-            return;
-        }
-
-        res.json(user)
-    }
-    catch (error) {
-        console.error(error)
-        res.status(500).json({
-            error: "Internal server error",
-        });
-    }
 }
 
 exports.searchUserBySMM = async function (SMM_id) {
