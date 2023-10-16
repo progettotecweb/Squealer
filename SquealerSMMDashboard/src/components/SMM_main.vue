@@ -8,10 +8,53 @@ const accounts = ref([])
 
 function search(){}
 
+async function signout() {
+    await fetch("/Home/api/auth/signout?callbackUrl=/Login", {
+        method: "POST",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+        body: await fetch("/Home/api/auth/csrf").then((rs) => rs.text()),
+    }).then((res) => {
+        res.ok
+            ? (window.location.href = "/Login")
+            : console.error("Error while signing out!");
+    });
+};
+
+const userSession = await fetch("/Home/api/user", {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json"
+    }
+}).then(res => res.json())
+    .then(data => {
+        return data;
+    })
+    .catch(err => {
+        console.log(err);
+    });
+
+
 
 async function fetchUser(){
     accounts.value = []
-    const res = await fetch("/api/search")
+    const res = await fetch("/api/searchUserBySMM?search=" + userSession.id, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(res => res.json())
+        .then(data => {
+            console.log(data);
+            return data;
+        })
+        .catch(err => {
+            console.log(err);
+            signout();
+        });
+
     accounts.value = await res.json()
     
 
