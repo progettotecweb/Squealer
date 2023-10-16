@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
     password: String,
     salt: String,
     ruolo: String,
-    SMM_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    SMM_id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     controls: {
         user_id: [
             {
@@ -234,12 +234,22 @@ exports.searchUserById = async function (id) {
     try {
         const user = await User.findById(id);
 
-        if (!user) {
+        if(!user) {
             return null;
         }
 
         return user;
     } catch (err) {
+        console.error("Error during search:", err);
+    }
+}
+
+exports.searchUserBySMM = async function (SMM_id) {
+    try {
+        const user = await User.find({ SMM_id: SMM_id });
+        return user;
+    } catch (err) {
+        User.
         console.error("Error during search:", err);
     }
 }

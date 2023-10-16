@@ -168,6 +168,38 @@ appNext
 
         });
 
+        app.get("/api/searchUserBySMM", async function (req,res){
+            try{
+                const smm = req.query.smm;
+                
+                if(!smm|| mongoose.Types.ObjectId.isValid(smm) == false){
+                    res.status(400).json({
+                        error: "Bad request",
+                    });
+                    return;
+                }
+
+
+                const user = await mymongo.searchUserBySMM(
+                    smm
+                );
+
+                if (!user) {
+                    res.status(404).json({
+                        error: "User not found",
+                    });
+                    return;
+                }
+                res.json(user)
+            }
+            catch (error) {
+                console.error(error)
+                res.status(500).json({
+                    error: "Internal server error",
+                });
+            }
+        });
+
         app.get("/api/search", async function (req, res) {
             const query = req.query.q;
             if (query === "") {
