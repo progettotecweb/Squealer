@@ -17,7 +17,9 @@ import SMM_main from './components/SMM_main.vue'
       <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content bg-secondary flex flex-col justify-center items-center text-center text-w undefined text-slate-50" role="main">
         <h1 class="bd-title" id="content">Dashboard</h1>
         <div>
+          <p>prima di SMM</p>
           <SMM_main />
+          <p>dopo di SMM</p>
         </div>
       </main>
       <div class="d-none d-xl-block col-xl-2 bd-toc">

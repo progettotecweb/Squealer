@@ -80,7 +80,7 @@ appNext
         app.use(
             "/SMM",
             auth,
-            checkRole(["SMM", "SMM"]),
+            checkRole(["SMM", "Mod"]),
             express.static(path.join(__dirname, "SquealerSMMDashboard", "dist"))
         );
 

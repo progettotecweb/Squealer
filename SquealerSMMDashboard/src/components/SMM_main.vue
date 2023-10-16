@@ -1,72 +1,34 @@
 <script setup lang="ts">
-import { onBeforeMount, ref, toValue} from 'vue'
+
+import { onBeforeMount, ref} from 'vue'
 // const count = ref(0)
 
 
+
 const newSearch = ref('')
-const accounts = ref([])
+
+
+
 
 function search(){}
 
-async function signout() {
-    await fetch("/Home/api/auth/signout?callbackUrl=/Login", {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-        body: await fetch("/Home/api/auth/csrf").then((rs) => rs.text()),
-    }).then((res) => {
-        res.ok
-            ? (window.location.href = "/Login")
-            : console.error("Error while signing out!");
-    });
-};
 
-const userSession = await fetch("/Home/api/user", {
-    method: "GET",
-    headers: {
-        "Content-Type": "application/json"
-    }
-}).then(res => res.json())
-    .then(data => {
-        return data;
-    })
-    .catch(err => {
-        console.log(err);
-    });
-
-
+const userid = '651fde888a066ec0334dabb3' 
+const url = ref("/api/searchUserById?id=" + userid)
+const data = ref<any>(null); // specificare il tipo di dato
+const error = ref<Error | null>(null); // specificare il tipo di errore
 
 async function fetchUser(){
-    accounts.value = []
-    const res = await fetch("/api/searchUserSMM?id=" + userSession.id, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(res => res.json())
-        .then(data => {
-            console.log(data);
-            return data;
+    fetch(url.value)
+        .then((res)=>res.json())// parsing json
+        .then((json)=>{     // f(json){data.value = json }
+            data.value=json;
+            console.log(json)
         })
-        .catch(err => {
-            console.log(err);
-            signout();
-        });
-
-    accounts.value = await res.json()
-    
-
-
-    console.log(accounts.value)
-    console.log(accounts)
-
-    const unwrapped =  toValue(accounts)
-    console.log(unwrapped)
-    console.log(unwrapped.values)
-
-        
+        .catch((err)=>{
+            error.value=err;
+            console.log(err)
+        })
 }
 
 
@@ -74,12 +36,12 @@ async function fetchUser(){
         fetchUser()
     })
 
-
 </script>
 
 <template>
     <div >
         <div>
+            <h1>{{ data.name }}</h1>
             <form @submit.prevent="search">
                 <input v-model="newSearch">
                 <button>Search</button>    
@@ -88,8 +50,8 @@ async function fetchUser(){
 
 
         <div class="d-flex justify-content-around flex-wrap ">    
-            <div v-for="account in accounts"  style="width: 10vh;height: 5vh;" class="card bg-success m-5 mb-5">    
-                    <p>{{ account }}</p>
+            <div v-for="account in data.controls"  style="width: 10vh;height: 5vh;" class="card bg-success m-5 mb-5">    
+                    <p>{{ account.name }}</p>
             </div>
         </div>
         
