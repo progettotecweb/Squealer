@@ -166,23 +166,23 @@ appNext
                 });
             }
 
-        });
+        }); 
 
-        app.get("/api/searchUserBySMM", async function (req,res){
-            try{
-                const smm = req.query.smm;
-                
-                if(!smm|| mongoose.Types.ObjectId.isValid(smm) == false){
+        app.get("/api/searchUserSMM", async function (req, res) {
+            try {
+                const id = req.query.id;
+
+                if (!id || mongoose.Types.ObjectId.isValid(id) == false) {  
                     res.status(400).json({
                         error: "Bad request",
                     });
                     return;
                 }
 
-
-                const user = await mymongo.searchUserBySMM(
-                    smm
+                const user = await mymongo.searchUserById(
+                    id
                 );
+
 
                 if (!user) {
                     res.status(404).json({
@@ -190,6 +190,7 @@ appNext
                     });
                     return;
                 }
+
                 res.json(user)
             }
             catch (error) {
@@ -198,7 +199,8 @@ appNext
                     error: "Internal server error",
                 });
             }
-        });
+
+        }); 
 
         app.get("/api/search", async function (req, res) {
             const query = req.query.q;

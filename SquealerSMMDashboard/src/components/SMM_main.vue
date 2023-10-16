@@ -40,7 +40,7 @@ const userSession = await fetch("/Home/api/user", {
 
 async function fetchUser(){
     accounts.value = []
-    const res = await fetch("/api/searchUserBySMM?search=" + userSession.id, {
+    const res = await fetch("/api/searchUserSMM?id=" + userSession.id, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
