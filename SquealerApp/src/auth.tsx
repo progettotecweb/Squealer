@@ -1,21 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const signOut = async () => {
-    await fetch("/Home/api/auth/signout?callbackUrl=/Login", {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-        body: await fetch("/Home/api/auth/csrf").then((rs) => rs.text()),
-    }).then((res) => {
-        res.ok
-            ? (window.location.href = "/Login")
-            : console.error("Error while signing out!");
-    });
-};
-
 const authOptions: NextAuthOptions = {
     session: {
         strategy: "jwt",
@@ -42,6 +27,7 @@ const authOptions: NextAuthOptions = {
 
         //  The session receives the token from JWT
         async session({ session, token, user }) {
+            
             return {
                 ...session,
                 user: {
@@ -95,7 +81,5 @@ const authOptions: NextAuthOptions = {
         }),
     ],
 };
-
-export { signOut }
 
 export default authOptions;
