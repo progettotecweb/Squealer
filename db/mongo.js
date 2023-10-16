@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
     password: String,
     salt: String,
     ruolo: String,
-    SMM_id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    SMM_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     controls: {
         user_id: [
             {
@@ -234,41 +234,12 @@ exports.searchUserById = async function (id) {
     try {
         const user = await User.findById(id);
 
-        if(!user) {
+        if (!user) {
             return null;
         }
 
         return user;
     } catch (err) {
         console.error("Error during search:", err);
-    }
-
-    try {
-        const id = req.query.id;
-
-        if (!id) {
-            res.status(400).json({
-                error: "No id provided",
-            });
-            return;
-        }
-
-        //cerco user
-        const user = await User.findById(id);
-
-        if (!user) {
-            res.status(404).json({
-                error: "User not found",
-            });
-            return;
-        }
-
-        res.json(user)
-    }
-    catch (error) {
-        console.error(error)
-        res.status(500).json({
-            error: "Internal server error",
-        });
     }
 }
