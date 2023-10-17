@@ -6,20 +6,30 @@ import { onBeforeMount, ref} from 'vue'
 
 
 const newSearch = ref('')
-
-
-
-
 function search(){}
 
 
-const userid = '651fde888a066ec0334dabb3' 
-const url = ref("/api/searchUserById?id=" + userid)
+ const userid = ref(''); // '651fde888a066ec0334dabb3' 
+// const url = ref("/api/searchUserById?id=" + userid.value)
 const data = ref<any>(null); // specificare il tipo di dato
 const error = ref<Error | null>(null); // specificare il tipo di errore
 
+
+async function getUserData() {
+    await fetch("/Home/api/user")
+        .then((res)=> res.json())
+        .then((json)=>{
+            userid.value = json.id;
+            console.log(userid.value)
+        })
+        .catch((err) => {
+            console.log(err)
+            userid.value = err;
+        })
+} 
+    
 async function fetchUser(){
-    fetch(url.value)
+   await fetch("/api/searchUserById?id=" + userid.value)
         .then((res)=>res.json())// parsing json
         .then((json)=>{     // f(json){data.value = json }
             data.value=json;
@@ -31,9 +41,14 @@ async function fetchUser(){
         })
 }
 
+async function async(){
+    await getUserData()
+    await fetchUser()
+}
 
-    onBeforeMount(() => {
-        fetchUser()
+
+     onBeforeMount(() => {
+        async()
     })
 
 </script>
