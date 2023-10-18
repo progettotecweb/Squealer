@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useUser } from "@/hooks/useUser";
 import ClientButton from "./ClientButton";
 
-const Menu = ({ onOpen }: {onOpen?: any}) => {
+const Menu = ({ onOpen }: { onOpen?: any }) => {
     const { user } = useUser();
 
     return (
@@ -17,8 +17,6 @@ const Menu = ({ onOpen }: {onOpen?: any}) => {
             className="bg-slate-800 text-slate-50 h-full p-2 flex flex-col md:bg-[#111B21]"
             onClick={onOpen}
         >
-            
-
             <section className="m-3">
                 <h1>{user ? "@" + user.name : "Welcome guest!"}</h1>
                 <ClientButton user={user} />
@@ -58,19 +56,21 @@ const Menu = ({ onOpen }: {onOpen?: any}) => {
                         Moderator Dashboard
                     </CustomLink>
                 )}
-                {user && user.role == "SMM" && (
-                    <Container className="flex flex-col mt-auto">
-                        <CustomLink
-                            type="a"
-                            href="/SMM"
-                            className="mt-3 text-xl"
-                        >
-                            SMM Dashboard
-                        </CustomLink>
-                    </Container>
+                {user && (user.role == "SMM" || user.role == "Mod") && (
+                    <CustomLink type="a" href="/SMM" className="mt-3 text-xl">
+                        SMM Dashboard
+                    </CustomLink>
                 )}
             </Container>
             <Divider />
+            <Container className="flex flex-col mb-1">
+                <CustomLink href="/About" className="mt-3 text-xl">
+                    About
+                </CustomLink>
+                <CustomLink href="/Contact" className="mt-3 text-xl">
+                    Contact us
+                </CustomLink>
+            </Container>
         </div>
     );
 };
