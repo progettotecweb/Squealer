@@ -5,6 +5,7 @@ interface CustomLinkProps {
     href: string;
     children?: React.ReactNode;
     className?: string;
+    newTab?: boolean;
 }
 
 /**
@@ -20,12 +21,13 @@ const CustomLink: React.FC<CustomLinkProps> = ({
     href,
     children,
     className,
+    newTab = false,
 }) => {
     const LinkComponent = type === "Link" ? Link : "a";
 
     return (
         <div className={`hover:text-slate-300 ${className}`}>
-            <LinkComponent href={href}>{children}</LinkComponent>
+            <LinkComponent href={href} target={newTab ? "_blank" : "_self"} rel={newTab ? "noreferrer noopener" : ""}>{children}</LinkComponent>
         </div>
     );
 };

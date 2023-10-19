@@ -19,6 +19,8 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const mymongo = require("./db/mongo.js");
+const mongoChannels = require("./db/channels.js");
+const channelRouter = require("./server/channelRouter.js");
 
 /* NEXT CONFIG */
 const next = require("next");
@@ -167,6 +169,8 @@ appNext
             }
 
         }); 
+
+        app.use("/api/channels", channelRouter);
 
         app.get("/api/searchUserSMM", async function (req, res) {
             try {

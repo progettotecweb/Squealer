@@ -59,6 +59,12 @@ const userSchema = new mongoose.Schema({
         mimetype: String,
         blob: String,
     },
+    following: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Channels"
+        }
+    ]
 
 });
 
