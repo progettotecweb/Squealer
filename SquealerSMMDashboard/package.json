@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/react-leaflet": "^3.0.0",
     "bootstrap": "^5.3.2",
     "vue": "^3.3.4"
   },

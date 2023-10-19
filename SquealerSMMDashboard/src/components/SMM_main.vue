@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import user_box from './user_box.vue'
 
 import { onBeforeMount, ref} from 'vue'
 // const count = ref(0)
@@ -9,7 +10,7 @@ const newSearch = ref('')
 function search(){}
 
 
- const userid = ref(''); // '651fde888a066ec0334dabb3' 
+const userid = ref(''); // '651fde888a066ec0334dabb3' 
 // const url = ref("/api/searchUserById?id=" + userid.value)
 const data = ref<any>(null); // specificare il tipo di dato
 const error = ref<Error | null>(null); // specificare il tipo di errore
@@ -47,7 +48,7 @@ async function async(){
 }
 
 
-     onBeforeMount(() => {
+    onBeforeMount(() => {
         async()
     })
 
@@ -61,6 +62,13 @@ async function async(){
                 <input v-model="newSearch">
                 <button>Search</button>    
             </form>
+        </div>
+        <div>
+            <user_box 
+                v-for="account in data.controls"
+                :key="account.index"
+                :id="account.id"
+            ></user_box>
         </div>
 
 
