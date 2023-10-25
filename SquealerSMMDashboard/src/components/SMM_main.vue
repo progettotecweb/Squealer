@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import user_box from './user_box.vue'
 
-import { onBeforeMount, ref} from 'vue'
+import { onBeforeMount, ref } from 'vue'
+import user_box from './user_box.vue'
 // const count = ref(0)
 
 

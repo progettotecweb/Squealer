@@ -2,7 +2,7 @@
 import SMM_main from './components/SMM_main.vue'
 
 import { onBeforeMount, ref } from 'vue'
-import { useFetch , idFetch } from './components/fetch.js'
+import { useFetch , idFetch } from './components/fetch.ts'
 
 
 const userid = ref(''); // '651fde888a066ec0334dabb3' 
@@ -43,7 +43,7 @@ async function async() {
   await getUserData()
   await fetchUser()
 
-  data2.value = await useFetch("/api/searchUserById?id=" + idFetch("/Home/api/user"))
+  data2.value = useFetch('/api/searchUserById?id=' + idFetch('/Home/api/user'))
 
 }
 
