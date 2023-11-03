@@ -35,34 +35,56 @@
 }
 
 #box {
-    min-width: 50vw;
-    border-radius: 3%;
-
-    /*Glass effect*/
-    background: rgba(57, 192, 204, 0.29);
+    min-width: 65vw;
     border-radius: 16px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(7.3px);
-    -webkit-backdrop-filter: blur(7.3px);
-    border: 1px solid rgba(57, 192, 204, 0.32);
+
+    background-color: #293858;
+
 }
 
 #box-content {
-    min-height: 500px;
+    min-height: 50vh;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1em;
+
+    background-color: #2E6079;
+    border-radius: 0 0 16px 16px;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 1.5em;
+    grid-row-gap: 1.5em;
 }
+
+.section-header {}
 
 .box-section {
     list-style-type: none;
     padding: 0 1vw;
     margin: 0 1vw;
     cursor: pointer;
+    user-select: none;
+    transition: .2s ease-in-out;
 }
 
-.box-section:hover {
+.box-section:hover:not(.active-section) {
     background-color: rgba(57, 192, 204, 0.29);
     border-radius: 15px;
 }
 
 .active-section {
+    position: relative;
+    /* Add this line */
     color: rgb(26, 210, 146) !important;
+    border-radius: 7px 7px 0 0;
+    background-color: #2E6079;
+    /*bottom shadow*/
+    box-shadow: 0px 10px 0px 0px #2E6079;
+}
+
+.myCard {
+    width: 15em;
+    border: 1px solid white;
 }
