@@ -60,3 +60,30 @@ async function getUserData() {
 
 getUserData();
 
+window.onload = function () {
+    const userSection = document.getElementById("userSection");
+    const channelSection = document.getElementById("channelSection");
+    const squealSection = document.getElementById("squealSection");
+
+    userSection.addEventListener("click", (e) => {
+        changeSectionClass(e.target);
+    });
+
+    channelSection.addEventListener("click", (e) => {
+        changeSectionClass(e.target);
+
+    });
+
+    squealSection.addEventListener("click", (e) => {
+        changeSectionClass(e.target);
+    });
+}
+
+function changeSectionClass(newSection) {
+    //before adding the new class i remove the old one
+    const activeSection = document.querySelector(".active-section");
+    activeSection.classList.remove("active-section");
+
+    //update the section
+    newSection.classList.add("active-section");
+}

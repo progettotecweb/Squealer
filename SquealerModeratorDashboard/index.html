@@ -25,7 +25,8 @@
                 </div>
 
                 <form class="d-flex navbar-div justify-content-center" role="search" id="searchDiv">
-                    <input class="form-control me-2 w-75" type="search" placeholder="Search user" aria-label="Search">
+                    <input class="form-control me-2 w-75" type="search" placeholder="@user, §channel or squeal"
+                        aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
 
@@ -35,10 +36,22 @@
             </div>
         </nav>
 
-        <div class="content">
-            <h1 class="text-center mt-5 mytext">
-                Welcome to the Moderator Dashboard
-            </h1>
+        <div class="content d-flex justify-content-center">
+            <div id="box" class="mt-3">
+                <ul class="list-group list-group-horizontal d-flex justify-content-center mt-2 mb-2">
+                    <li class="text-light box-section active-section" id="userSection">Users</li>
+                    <li class="text-light box-section" id="channelSection">Channels</li>
+                    <li class="text-light box-section" id="squealSection">Squeals</li>
+                </ul>
+                <div id="box-content">
+                    <ul class="text-light">
+                        <li>utente 1</li>
+                        <li>utente 2</li>
+                        <li>utente 3</li>
+                        <li>utente 4</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 </body>
 
