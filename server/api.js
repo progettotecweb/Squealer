@@ -11,19 +11,19 @@ router.get("/search", async (req, res) => {
 
     const type = query[0]
 
-    switch(type) {
+    switch (type) {
         case "@": {
             const users = await usersDB.searchUser("name", query.slice(1))
-            res.json({results: users.map(user => {return {name: user.name, id: user._id}})})
+            res.json({ results: users.map(user => { return { name: user.name, id: user._id } }) })
             break;
         }
         case "§": {
             const channels = await channelsDB.searchChannel("name", query.slice(1))
-            res.json({results: channels.map(channel => {return {name: channel.name, id: channel._id}})})
+            res.json({ results: channels.map(channel => { return { name: channel.name, id: channel._id } }) })
             break;
         }
         default: {
-            res.json({results: []})
+            res.json({ results: [] })
             break;
         }
     }
