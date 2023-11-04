@@ -52,9 +52,9 @@ async function getUserData() {
     }
 
     //riempio i campi 
-    document.getElementById("user-name").innerHTML = userInfo.name;
+    document.getElementById("master-user-name").innerHTML = userInfo.name;
     const blobsrc = "data:" + userInfo.img.mimetype + ";base64," + userInfo.img.blob;
-    document.getElementById("user-img").src = blobsrc;
+    document.getElementById("master-user-img").src = blobsrc;
 
 }
 
@@ -80,7 +80,7 @@ window.onload = function () {
     }
 
     async function loadUsers() {
-        const allUsers = await fetch("/api/users/all" , {
+        const allUsers = await fetch("/api/users/all", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -89,6 +89,28 @@ window.onload = function () {
             .then(res => res.json())
             .then(data => {
                 console.log(data);
+                const boxContent = document.getElementById("box-content");
+                //clear the box
+                boxContent.innerHTML = "";
+
+                //create the cards for every user
+                for (let i = 0; i < data.length; i++) {
+                    let mycard = "<div class='my-card'>";
+
+                    const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
+                    let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic'/>";
+                    mycard += img;
+                    mycard += '<div class="user-content">';
+                    let username = "<p class='user-name'>" + data[i].name + "</p>";
+
+                    mycard += username;
+                    mycard += "</div>";
+                    let btn = '<input type="button" class="btn btn-primary" value="View more" />';
+                    mycard += btn;
+                    mycard += "</div>";
+                    boxContent.innerHTML += mycard;
+                }
+
                 //return data;
             })
             .catch(err => {
