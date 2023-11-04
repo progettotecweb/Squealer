@@ -29,7 +29,7 @@ async function getUserData() {
             console.log(err);
         });
 
-    const userInfo = await fetch("/api/searchUserById?id=" + userSession.id, {
+    const userInfo = await fetch("/api/users/" + userSession.id, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -52,7 +52,7 @@ async function getUserData() {
     }
 
     //riempio i campi 
-    document.getElementById("user-name").innerHTML = userInfo.nome;
+    document.getElementById("user-name").innerHTML = userInfo.name;
     const blobsrc = "data:" + userInfo.img.mimetype + ";base64," + userInfo.img.blob;
     document.getElementById("user-img").src = blobsrc;
 
