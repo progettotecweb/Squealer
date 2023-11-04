@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     salt: String,
     role: {
         type: String,
-        enum: ["User", "Pro", "SMM", "Mod"],
+        enum: ["User", "Pro", "SMM", "Mod", "User"],
         default: "User",
     },
     msg_quota: {

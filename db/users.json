@@ -4,7 +4,7 @@
         "name": "fv",
         "password": "$2b$10$kjWN0zbjMKTyw5iFcO2Z.ujpRCUam/HP6H6.QZ4A6LSBlbCVZ89sm",
         "salt": "$2b$10$kjWN0zbjMKTyw5iFcO2Z.u",
-        "role": "Utente",
+        "role": "User",
         "quota_msg": {
             "giorno": 50,
             "settimana": 500,
@@ -22,7 +22,7 @@
         "name": "fvPro",
         "password": "$2b$10$v5/7eK.IVg00VHa8jHmu5eZo62qV4ISBwqRV1uVPNyCw1zoodTq3q",
         "salt": "$2b$10$tiwE1L5H7khIC/jdTpxQOe",
-        "role": "Utente",
+        "role": "User",
         "quota_msg": {
             "giorno": 60,
             "settimana": 600,
@@ -80,7 +80,7 @@
             "name": "user",
             "password": "$2b$10$3F5I.efwy5nOHDsG81oCk.a.7YB7nyus2Khp6U8m13BE2qPGSzkuO",
             "salt": "$2b$10$3F5I.efwy5nOHDsG81oCk.",
-            "role": "Utente",
+            "role": "User",
             "quota_msg": {
                 "giorno": 1000,
                 "settimana": 6000,
