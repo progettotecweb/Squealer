@@ -61,6 +61,29 @@ async function getUserData() {
 getUserData();
 
 window.onload = function () {
+    //load active section
+    const activeSection = document.querySelector(".active-section");
+    loadSection(activeSection);
+
+    function loadSection(section) {
+        switch (section.id) {
+            case "userSection":
+                loadUsers();
+                break;
+            case "channelSection":
+                loadChannels();
+                break;
+            case "squealSection":
+                loadSqueals();
+                break;
+        }
+    }
+
+    function loadUsers() {
+        
+    }
+
+    //change active section
     const userSection = document.getElementById("userSection");
     const channelSection = document.getElementById("channelSection");
     const squealSection = document.getElementById("squealSection");
