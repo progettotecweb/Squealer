@@ -1,10 +1,10 @@
 [
     {
         "_id": "651fde352bbfe43586614824",
-        "nome": "fv",
+        "name": "fv",
         "password": "$2b$10$kjWN0zbjMKTyw5iFcO2Z.ujpRCUam/HP6H6.QZ4A6LSBlbCVZ89sm",
         "salt": "$2b$10$kjWN0zbjMKTyw5iFcO2Z.u",
-        "ruolo": "Utente",
+        "role": "Utente",
         "quota_msg": {
             "giorno": 50,
             "settimana": 500,
@@ -19,10 +19,10 @@
     },
     {
         "_id": "651fde68c4ab75a75bd6c1b1",
-        "nome": "fvPro",
+        "name": "fvPro",
         "password": "$2b$10$v5/7eK.IVg00VHa8jHmu5eZo62qV4ISBwqRV1uVPNyCw1zoodTq3q",
         "salt": "$2b$10$tiwE1L5H7khIC/jdTpxQOe",
-        "ruolo": "Utente",
+        "role": "Utente",
         "quota_msg": {
             "giorno": 60,
             "settimana": 600,
@@ -37,10 +37,10 @@
     },
     {
         "_id": "651fde888a066ec0334dabb3",
-        "nome": "fvSMM",
+        "name": "fvSMM",
         "password": "$2b$10$tiwE1L5H7khIC/jdTpxQOeZKMShkYa7Fk9sQdENMYo9EBLi/.zLjO",
         "salt": "$2b$10$tiwE1L5H7khIC/jdTpxQOe",
-        "ruolo": "SMM",
+        "role": "SMM",
         "controls": {
             "user_id":"65281e64841f0d79cdef751c"
         },
@@ -58,10 +58,10 @@
     },
     {
         "_id": "651fdeac5d2ccd45a330b15d",
-        "nome": "fvMod",
+        "name": "fvMod",
         "password": "$2b$10$Dd8NUd3.yQYEDC6A3Ni4n.nyEF/WrRr8DEWacObzBW4bafOR.UiIm",
         "salt": "$2b$10$$2b$10$Dd8NUd3.yQYEDC6A3Ni4n.",
-        "ruolo": "Mod",
+        "role": "Mod",
         "quota_msg": {
             "giorno": 100,
             "settimana": 1000,
@@ -77,10 +77,10 @@
     
         {
             "_id": "65281e64841f0d79cdef751c",
-            "nome": "user",
+            "name": "user",
             "password": "$2b$10$3F5I.efwy5nOHDsG81oCk.a.7YB7nyus2Khp6U8m13BE2qPGSzkuO",
             "salt": "$2b$10$3F5I.efwy5nOHDsG81oCk.",
-            "ruolo": "Utente",
+            "role": "Utente",
             "quota_msg": {
                 "giorno": 1000,
                 "settimana": 6000,

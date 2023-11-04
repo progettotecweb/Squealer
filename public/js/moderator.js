@@ -79,8 +79,21 @@ window.onload = function () {
         }
     }
 
-    function loadUsers() {
-        
+    async function loadUsers() {
+        const allUsers = await fetch("/api/users/all" , {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                //return data;
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
     //change active section

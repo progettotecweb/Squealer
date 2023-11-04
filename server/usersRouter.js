@@ -64,6 +64,7 @@ router.post("/login", async (req, res) => {
     res.status(200).json(actualUser);
 });
 
+//get user from id
 router.get("/:id", async (req, res) => {
     const user = await usersDB.searchUserByID(req.params.id);
 
@@ -76,6 +77,21 @@ router.get("/:id", async (req, res) => {
     }
 
     res.status(200).json(user);
+});
+
+//get all users
+router.post("/all", async (req, res) => {
+    const users = await usersDB.getAllUsers();
+
+    if (!users) {
+        res.status(404).json({
+            ok: false,
+            error: "Users not found",
+        });
+        return;
+    }
+
+    res.status(200).json(users);
 });
 
 module.exports = router;

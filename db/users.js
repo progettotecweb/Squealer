@@ -66,3 +66,8 @@ exports.createNewUser = async function (user) {
     newUser.save();
     return newUser;
 };
+
+exports.getAllUsers = async function () {
+    const users = await User.find();
+    return users;
+};
