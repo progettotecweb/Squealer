@@ -72,3 +72,13 @@ exports.getAllUsers = async function () {
     const users = await User.find();
     return users;
 };
+
+//update user
+exports.updateUser = async function (id, updatedUserData) {
+    User.findByIdAndUpdate(id, updatedUserData, { new: true }).then((user) => {
+        return user;
+    })
+        .catch((err) => {
+            console.log(err);
+        });
+}

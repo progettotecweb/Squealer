@@ -94,4 +94,35 @@ router.post("/all", async (req, res) => {
     res.status(200).json(users);
 });
 
+//update user
+router.put("/:id", async (req, res) => {
+    const user = await usersDB.searchUserByID(req.params.id);
+    if (!user) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    const updatedUser = {
+        name: req.body.name,
+        password: req.body.password,
+        salt: req.body.salt,
+        img: req.body.img,
+        blocked: req.body.blocked,
+        role: req.body.role,
+        msg_quota: req.body.msg_quota,
+        popularity: req.body.popularity,
+        following: req.body.following,
+        squeals: req.body.squeals
+    };
+
+    await usersDB.updateUser(req.params.id, updatedUser);
+
+    res.status(200).json({
+        ok: true,
+    });
+});
+
 module.exports = router;

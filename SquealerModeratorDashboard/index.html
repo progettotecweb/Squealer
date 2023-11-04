@@ -43,7 +43,7 @@
                     <li class="text-light box-section" id="channelSection">Channels</li>
                     <li class="text-light box-section" id="squealSection">Squeals</li>
                 </ul>
-                <div id="box-content" class="" >
+                <div id="box-content" class="">
                     <div class="my-card">
                         <img src="" alt="foto" class="user-pic" />
                         <div class="user-content">
@@ -65,11 +65,14 @@
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                ...
+                                <p class="selected-user-info">
+
+                                </p>
+                                <button type="button" class="btn btn-block" id="btn-blockuser" data-bs-value_block="false">Block/Unblock</button>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-danger">Block user</button>
-                                <button type="button" class="btn btn-success">Unblock user</button>
+                                <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
                             </div>
                         </div>
                     </div>

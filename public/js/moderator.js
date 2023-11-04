@@ -146,13 +146,85 @@ window.onload = function () {
             // Update the modal's content.
             const modalTitle = userModal.querySelector('.modal-title')
             const modalImg = userModal.querySelector('.modal-img')
-            const modalBody = userModal.querySelector('.modal-body')
+            const modalBody = userModal.querySelector('.selected-user-info')
+            const btnBlock = userModal.querySelector("#btn-blockuser");
+            const btnSave = userModal.querySelector("#btn-savechanges");
+
+            if (databs.blocked === "false") {
+                //modalBody.innerHTML += btnBlock;
+                btnBlock.classList.remove("btn-secondary");
+                btnBlock.classList.add("btn-danger");
+                btnBlock.innerHTML = "Block user";
+            } else {
+                btnBlock.classList.remove("btn-danger");
+                btnBlock.classList.add("btn-secondary");
+                btnBlock.innerHTML = "Unblock user";
+            }
 
             modalTitle.textContent = databs.username
             modalImg.src = databs.img
-            modalBody.textContent = `Quota giornaliera: ${databs.quota.daily} Quota settimanale: ${databs.quota.weekly} \n Quota mensile: ${databs.quota.monthly} \n Quota extra: ${databs.quota.extra}`
+            let body = `Quota giornaliera: ${databs.quota.daily} <br> Quota settimanale: ${databs.quota.weekly} <br> Quota mensile: ${databs.quota.monthly} <br> Quota extra: ${databs.quota.extra}`
+            body += `<br> Blocked: ${databs.blocked}`
+            modalBody.innerHTML = body;
+
+            btnSave.setAttribute("data-bs-userId", databs.id);
         })
     }
+
+    const btnBlock = document.getElementById("btn-blockuser");
+    btnBlock.addEventListener("click", async () => {
+        btnBlock.disabled = true;
+        btnBlock.setAttribute("data-bs-value_block", "true");
+    });
+
+    //save changes if button is pressed
+    const btnSave = document.getElementById("btn-savechanges");
+    btnSave.addEventListener("click", async () => {
+        //retrieve user id
+        const userId = document.querySelector("#btn-savechanges").getAttribute("data-bs-userId");
+
+        let data = await fetch("/api/users/" + userId, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                return data;
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        //retrieve data to update from modal
+        const dataToUpdate = {
+            blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked
+        };
+
+        Object.keys(dataToUpdate).forEach(key => {
+            data[key] = dataToUpdate[key];
+        });
+
+        //update user
+        await fetch("/api/users/" + userId, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                if (res.ok) {
+                    //console.log("User updated!");
+                } else {
+                    console.log("Error while updating user!");
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    });
 
     //change active section
     const userSection = document.getElementById("userSection");
