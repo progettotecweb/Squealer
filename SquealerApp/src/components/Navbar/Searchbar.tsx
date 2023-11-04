@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import useSWR, { Fetcher } from "swr";
 
@@ -30,10 +30,26 @@ const Searchbar: React.FC = () => {
         fetch(...args).then((res) => res.json());
 
     const [query, setQuery] = useState<string>("");
+    const [debouncedQuery, setDebouncedQuery] = useState<string>("");
     const { data, isLoading, mutate, error } = useSWR<SearchResults>(
-        () => (query === "" ? null : `/api/search?q=${query}`),
+        () => (debouncedQuery === "" ? null : `/api/search?q=${debouncedQuery}`),
         fetcher
     );
+
+    const onChange = useCallback(({ target: { value } }) => {
+        setQuery(value);
+        mutate();
+    }, []);
+
+    useEffect(() => {
+        const timerId = setTimeout(() => {
+            setDebouncedQuery(query);
+        }, 250);
+
+        return () => {
+            clearTimeout(timerId);
+        };
+    }, [query]);
 
     if (error) {
         return <div className="flex flex-col items-center">Error</div>;
@@ -46,10 +62,7 @@ const Searchbar: React.FC = () => {
         >
             <form className="w-full" name="searchbar">
                 <input
-                    onChange={(e) => {
-                        setQuery(e.target.value);
-                        mutate();
-                    }}
+                    onChange={onChange}
                     autoFocus
                     type="search"
                     name="search"
@@ -67,7 +80,7 @@ const Searchbar: React.FC = () => {
                             animate="visible"
                             exit="exit"
                         >
-                            {result.nome}
+                            {result.name}
                         </motion.div>
                     );
                 })}

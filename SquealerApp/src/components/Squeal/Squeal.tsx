@@ -10,9 +10,13 @@ import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
 
-export interface SquealProps {}
+export interface SquealProps {
+    content?: string,
+    name?: string,
+    date: string,
+}
 
-const Squeal: React.FC<SquealProps> = ({}) => {
+const Squeal: React.FC<SquealProps> = ({content, name, date}) => {
     return (
         <Card className=" mx-2 bg-slate-800 text-slate-50">
             <CardHeader
@@ -25,14 +29,12 @@ const Squeal: React.FC<SquealProps> = ({}) => {
                         R
                     </Avatar>
                 }
-                title={<Typography className="mr-auto">@username</Typography>}
-                subheader={<Typography>time - place</Typography>}
+                title={<Typography className="mr-auto">@{name}</Typography>}
+                subheader={<Typography>{date}</Typography>}
             />
             <CardContent>
                 <Typography variant="body2">
-                    This impressive paella is a perfect party dish and a fun
-                    meal to cook together with your guests. Add 1 cup of frozen
-                    peas along with the mussels, if you like.
+                    {content}
                 </Typography>
             </CardContent>
             <CardActions className="text-slate-50 fill-slate-50" disableSpacing>

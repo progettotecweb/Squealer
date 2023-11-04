@@ -1,7 +1,7 @@
 const path = require("path");
-const jwt = require("jsonwebtoken");
 const { getToken } = require("../SquealerApp/node_modules/next-auth/jwt");
-const mymongo = require("../db/mongo")
+
+const usersDB = require("../db/users");
 
 /**
  * @brief Prints a message to the console with a prefix.
@@ -31,7 +31,7 @@ const auth = async (req, res, next) => {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
     if (token) {
-        const user = await mymongo.searchUserById(token.id);
+        const user = await usersDB.searchUserByID(token.id);
 
         if(!user) {
             signOut();
@@ -50,7 +50,7 @@ const auth = async (req, res, next) => {
 }
 
 const checkIfUserStillExists = async (id) => {
-    const user = await mymongo.searchUserById(id);
+    const user = await usersDB.searchUserByID(id);
 
     if(!user) {
         signOut();

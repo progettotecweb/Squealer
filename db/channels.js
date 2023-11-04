@@ -12,7 +12,6 @@ const channelSchema = new mongoose.Schema({
     owner_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        default: "Squealer"
     },
     administrators: [
         {

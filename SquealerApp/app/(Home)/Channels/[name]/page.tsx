@@ -2,10 +2,18 @@
 
 import CustomLink from "@/components/CustomLink";
 import PageContainer from "@/components/PageContainer";
-import useSWR from "swr";
+import Squeal from "@/components/Squeal/Squeal";
+import useSWR, { Fetcher } from "swr";
+
+interface Result {
+    name: string;
+    description: string;
+    id: string;
+    squeals: any[];
+}
 
 export default function Page({ params }: { params: { name: string } }) {
-    const fetcher = (...args) =>
+    const fetcher: Fetcher<Result, string> = (...args) =>
         fetch(...args).then((res) => {
             if (!res.ok) {
                 const error = new Error(
@@ -35,6 +43,20 @@ export default function Page({ params }: { params: { name: string } }) {
                     <p>{data.description}</p>
                 </div>
             )}
+
+            <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw]">
+                {data &&
+                    data?.squeals.map((squeal, index) => {
+                        return (
+                            <Squeal
+                                key={index}
+                                content={squeal.content}
+                                name={squeal?.userInfo?.name}
+                                date={squeal?.datetime}
+                            />
+                        );
+                    })}
+            </section>
         </PageContainer>
     );
 }

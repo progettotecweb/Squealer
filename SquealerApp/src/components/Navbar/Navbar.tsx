@@ -53,22 +53,22 @@ const Navbar = () => {
             >
                 <Menu onOpen={() => setOpen(false)} />
             </MUIDrawer>
-            <Drawer
+            <MUIDrawer
                 open={openDialog}
                 anchor="bottom"
                 onClose={() => setOpenDialog(false)}
             >
-                <Box className="bg-[#111B21] h-[70vh] rounded-lg">
+                <Box className="bg-[#111B21] h-[70vh]">
                     <SquealCreator />
                 </Box>
-            </Drawer>
-            <Drawer
+            </MUIDrawer>
+            <MUIDrawer
                 open={openSearch}
                 anchor="top"
                 onClose={() => setOpenSearch(false)}
             >
                 <Searchbar />
-            </Drawer>
+            </MUIDrawer>
         </>
     );
 };

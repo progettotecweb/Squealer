@@ -9,4 +9,6 @@ export async function GET() {
 
     else
         return Response.json({error: "you need to log in"})
-} 
+}
+
+// fetch("/Home/api/user", {method: "GET", headers: {"Content-Type": "application/json"}}).then(res => res.json()).then(data => {console.log(data))

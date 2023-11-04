@@ -3,12 +3,10 @@
 import CustomLink from "@/components/CustomLink";
 import PageContainer from "@/components/PageContainer";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "@mui/material";
-
-const LoginForm = () => {};
 
 const LoginPage = () => {
     const [username, setUsername] = useState("");
@@ -16,7 +14,6 @@ const LoginPage = () => {
     const [error, setError] = useState("");
     const [register, setRegister] = useState(false);
 
-    const router = useRouter();
 
     const requestLogin = async (e) => {
         e.preventDefault();
@@ -28,14 +25,14 @@ const LoginPage = () => {
         }).then((data) => {
             data?.error
                 ? setError("Credentials do not match!")
-                : router.push("/");
+                : redirect("/");
         });
     };
 
     const requestRegister = async (e) => {
         e.preventDefault();
 
-        await fetch("/api/register", {
+        await fetch("/api/users/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -54,7 +51,7 @@ const LoginPage = () => {
     const { data: session } = useSession();
     useEffect(() => {
         if (session) {
-            router.push("/");
+            redirect("/");
         }
     }, [session]);
 
