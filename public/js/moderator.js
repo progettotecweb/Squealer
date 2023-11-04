@@ -79,6 +79,8 @@ window.onload = function () {
         }
     }
 
+
+
     async function loadUsers() {
         const allUsers = await fetch("/api/users/all", {
             method: "POST",
@@ -88,7 +90,7 @@ window.onload = function () {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
+                //console.log(data);
                 const boxContent = document.getElementById("box-content");
                 //clear the box
                 boxContent.innerHTML = "";
@@ -105,7 +107,11 @@ window.onload = function () {
 
                     mycard += username;
                     mycard += "</div>";
-                    let btn = '<input type="button" class="btn btn-primary" value="View more" />';
+                    let userInfoDataBs = 'data-bs-userId="' + data[i]._id + '" data-bs-toggle="modal" data-bs-target="#userModal" data-bs-username="'
+                        + data[i].name + '" data-bs-userimg="' + blobsrc + '" data-bs-quota_daily="' + data[i].msg_quota.daily
+                        + '"data-bs-quota_monthly="' + data[i].msg_quota.monthly + '" data-bs-quota_weekly="' + data[i].msg_quota.weekly
+                        + '" data-bs-quota_extra="' + data[i].msg_quota.extra + '"' + 'data-bs-blocked="' + data[i].blocked + '"';
+                    let btn = '<input type="button" class="user-btn btn btn-primary"' + userInfoDataBs + ' value="View more" />';
                     mycard += btn;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;
@@ -116,6 +122,36 @@ window.onload = function () {
             .catch(err => {
                 console.log(err);
             });
+    }
+
+    const userModal = document.getElementById('userModal')
+    if (userModal) {
+        userModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget
+            // Extract info from data-bs-* attributes
+            const databs = {
+                id: button.getAttribute('data-bs-userId'),
+                username: button.getAttribute('data-bs-username'),
+                img: button.getAttribute('data-bs-userimg'),
+                quota: {
+                    daily: button.getAttribute('data-bs-quota_daily'),
+                    weekly: button.getAttribute('data-bs-quota_weekly'),
+                    monthly: button.getAttribute('data-bs-quota_monthly'),
+                    extra: button.getAttribute('data-bs-quota_extra')
+                },
+                blocked: button.getAttribute('data-bs-blocked')
+            }
+
+            // Update the modal's content.
+            const modalTitle = userModal.querySelector('.modal-title')
+            const modalImg = userModal.querySelector('.modal-img')
+            const modalBody = userModal.querySelector('.modal-body')
+
+            modalTitle.textContent = databs.username
+            modalImg.src = databs.img
+            modalBody.textContent = `Quota giornaliera: ${databs.quota.daily} Quota settimanale: ${databs.quota.weekly} \n Quota mensile: ${databs.quota.monthly} \n Quota extra: ${databs.quota.extra}`
+        })
     }
 
     //change active section

@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
         extra: { type: Number, default: 0 },
     },
     popularity: { type: Number, default: 0 },
+    blocked: { type: Boolean, default: false },
     img: {
         mimetype: String,
         blob: String,

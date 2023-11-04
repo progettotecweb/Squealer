@@ -43,7 +43,7 @@
                     <li class="text-light box-section" id="channelSection">Channels</li>
                     <li class="text-light box-section" id="squealSection">Squeals</li>
                 </ul>
-                <div id="box-content" class="">
+                <div id="box-content" class="" >
                     <div class="my-card">
                         <img src="" alt="foto" class="user-pic" />
                         <div class="user-content">
@@ -51,7 +51,28 @@
                         </div>
                         <input type="button" class="btn btn-primary" value="View more" />
                     </div>
-                    
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <img src="" alt="pic" class="modal-img" />
+                                <h1 class="modal-title fs-5" id="userModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                ...
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger">Block user</button>
+                                <button type="button" class="btn btn-success">Unblock user</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
