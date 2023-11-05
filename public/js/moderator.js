@@ -279,7 +279,7 @@ window.onload = function () {
             });
 
         //reload users
-        loadUsers();
+        loadUsers(document.getElementById("select-orderby").value);
     });
 
     //event listener for the order by select
