@@ -121,3 +121,12 @@
     font-size: small;
     padding: 0.25em 0.7em;
 }
+
+.section-list{
+    width: 100%;
+}
+
+.sort-select{
+    position: initial;
+    width: 15%;
+}

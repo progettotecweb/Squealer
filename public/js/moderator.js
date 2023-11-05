@@ -1,4 +1,3 @@
-
 async function signout() {
     await fetch("/Home/api/auth/signout?callbackUrl=/Login", {
         method: "POST",
@@ -55,7 +54,6 @@ async function getUserData() {
     document.getElementById("master-user-name").innerHTML = userInfo.name;
     const blobsrc = "data:" + userInfo.img.mimetype + ";base64," + userInfo.img.blob;
     document.getElementById("master-user-img").src = blobsrc;
-
 }
 
 getUserData();
@@ -81,7 +79,7 @@ window.onload = function () {
 
 
 
-    async function loadUsers() {
+    async function loadUsers(orderBy = "alphabetical", showSelf = true) {
         const allUsers = await fetch("/api/users/all", {
             method: "POST",
             headers: {
@@ -95,8 +93,35 @@ window.onload = function () {
                 //clear the box
                 boxContent.innerHTML = "";
 
+                //sort the users
+                switch (orderBy) {
+                    case "alphabetical":
+                        data.sort((a, b) => {
+                            if (a.name < b.name) {
+                                return -1;
+                            }
+                            if (a.name > b.name) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        break;
+                    case "popularity":
+                        data.sort((a, b) => {
+                            if (a.popularity < b.followers) {
+                                return 1;
+                            }
+                            if (a.popularity > b.popularity) {
+                                return -1;
+                            }
+                            return 0;
+                        });
+                        break;
+                }
+
                 //create the cards for every user
                 for (let i = 0; i < data.length; i++) {
+                    //check if the user is the moderator and if he wants to see himself
                     let mycard = "<div class='my-card'>";
 
                     const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
@@ -257,6 +282,13 @@ window.onload = function () {
         loadUsers();
     });
 
+    //event listener for the order by select
+    const selectOrderBy = document.getElementById("select-orderby");
+    selectOrderBy.addEventListener("change", (e) => {
+        const value = e.target.value;
+        loadUsers(value);
+    });
+
     //change active section
     const userSection = document.getElementById("userSection");
     const channelSection = document.getElementById("channelSection");
@@ -284,3 +316,4 @@ function changeSectionClass(newSection) {
     //update the section
     newSection.classList.add("active-section");
 }
+

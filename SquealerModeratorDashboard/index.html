@@ -38,11 +38,19 @@
 
         <div class="content d-flex justify-content-center">
             <div id="box" class="mt-3">
-                <ul class="list-group list-group-horizontal d-flex justify-content-center mt-2 mb-2 section-header">
-                    <li class="text-light box-section active-section" id="userSection">Users</li>
-                    <li class="text-light box-section" id="channelSection">Channels</li>
-                    <li class="text-light box-section" id="squealSection">Squeals</li>
-                </ul>
+                <div class="section-header d-flex">
+                    <ul class="section-list list-group list-group-horizontal d-flex justify-content-center mt-2 mb-2">
+                        <li class="text-light box-section active-section" id="userSection">Users</li>
+                        <li class="text-light box-section" id="channelSection">Channels</li>
+                        <li class="text-light box-section" id="squealSection">Squeals</li>
+                    </ul>
+
+                    <select class="form-select sort-select" id="select-orderby">
+                        <option value="alphabetical" selected>Sort by</option>
+                        <option value="alphabetical">Username</option>
+                        <option value="popularity">Popularity</option>
+                    </select>
+                </div>
                 <div id="box-content" class="">
                     <div class="my-card">
                         <img src="" alt="foto" class="user-pic" />
@@ -79,7 +87,6 @@
                                     <span class="label">Extra</span>
                                     <input type="number" class="form-number" id="user-quota-extra"
                                         data-bs-value_quota_extra="0">
-
                                 </p>
                                 <span class="">User is <span id="blocked-text" class="h6"></span></span>
                                 <button type="button" class="btn btn-block" id="btn-blockuser"
