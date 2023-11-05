@@ -66,9 +66,24 @@
                             </div>
                             <div class="modal-body">
                                 <p class="selected-user-info">
+                                    <span class="h6">Message quota</span><br>
+                                    <span class="label">Daily</span>
+                                    <input type="number" class="form-number" id="user-quota-daily"
+                                        data-bs-value_quota_daily="0"><br>
+                                    <span class="label">Weekly</span>
+                                    <input type="number" class="form-number" id="user-quota-weekly"
+                                        data-bs-value_quota_weekly="0"><br>
+                                    <span class="label">Monthly</span>
+                                    <input type="number" class="form-number" id="user-quota-monthly"
+                                        data-bs-value_quota_monthly="0"><br>
+                                    <span class="label">Extra</span>
+                                    <input type="number" class="form-number" id="user-quota-extra"
+                                        data-bs-value_quota_extra="0">
 
                                 </p>
-                                <button type="button" class="btn btn-block" id="btn-blockuser" data-bs-value_block="false">Block/Unblock</button>
+                                <span class="">User is <span id="blocked-text" class="h6"></span></span>
+                                <button type="button" class="btn btn-block" id="btn-blockuser"
+                                    data-bs-value_block="false">Block/Unblock</button>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-success" data-bs-dismiss="modal"

@@ -148,24 +148,37 @@ window.onload = function () {
             const modalImg = userModal.querySelector('.modal-img')
             const modalBody = userModal.querySelector('.selected-user-info')
             const btnBlock = userModal.querySelector("#btn-blockuser");
+            const blockText = userModal.querySelector("#blocked-text");
             const btnSave = userModal.querySelector("#btn-savechanges");
+            const inputQuotaDaily = userModal.querySelector("#user-quota-daily");
+            const inputQuotaWeekly = userModal.querySelector("#user-quota-weekly");
+            const inputQuotaMonthly = userModal.querySelector("#user-quota-monthly");
+            const inputQuotaExtra = userModal.querySelector("#user-quota-extra");
 
+            //set input values
+            //msg quota
+            inputQuotaDaily.value = databs.quota.daily;
+            inputQuotaWeekly.value = databs.quota.weekly;
+            inputQuotaMonthly.value = databs.quota.monthly;
+            inputQuotaExtra.value = databs.quota.extra;
+
+            //blocked
             if (databs.blocked === "false") {
                 //modalBody.innerHTML += btnBlock;
                 btnBlock.classList.remove("btn-secondary");
                 btnBlock.classList.add("btn-danger");
                 btnBlock.innerHTML = "Block user";
+                blockText.innerHTML = "unblocked";
+
             } else {
                 btnBlock.classList.remove("btn-danger");
                 btnBlock.classList.add("btn-secondary");
                 btnBlock.innerHTML = "Unblock user";
+                blockText.innerHTML = "blocked";
             }
 
             modalTitle.textContent = databs.username
             modalImg.src = databs.img
-            let body = `Quota giornaliera: ${databs.quota.daily} <br> Quota settimanale: ${databs.quota.weekly} <br> Quota mensile: ${databs.quota.monthly} <br> Quota extra: ${databs.quota.extra}`
-            body += `<br> Blocked: ${databs.blocked}`
-            modalBody.innerHTML = body;
 
             btnSave.setAttribute("data-bs-userId", databs.id);
         })
@@ -208,7 +221,13 @@ window.onload = function () {
 
         //retrieve data to update from modal
         const dataToUpdate = {
-            blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked
+            blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
+            msg_quota: {
+                daily: document.querySelector("#user-quota-daily").value,
+                weekly: document.querySelector("#user-quota-weekly").value,
+                monthly: document.querySelector("#user-quota-monthly").value,
+                extra: document.querySelector("#user-quota-extra").value
+            }
         };
 
         Object.keys(dataToUpdate).forEach(key => {
