@@ -171,6 +171,15 @@ window.onload = function () {
         })
     }
 
+    //reset values when modal is closed
+    userModal.addEventListener('hidden.bs.modal', () => {
+        //reset btn
+        const btnBlock = userModal.querySelector("#btn-blockuser");
+        btnBlock.disabled = false;
+        btnBlock.setAttribute("data-bs-value_block", "false");
+    });
+
+    //change btn value when clicked
     const btnBlock = document.getElementById("btn-blockuser");
     btnBlock.addEventListener("click", async () => {
         btnBlock.disabled = true;
@@ -224,6 +233,9 @@ window.onload = function () {
             .catch(err => {
                 console.log(err);
             });
+
+        //reload users
+        loadUsers();
     });
 
     //change active section
