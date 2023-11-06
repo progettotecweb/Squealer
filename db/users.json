@@ -11,7 +11,7 @@
             "mensile": 7500,
             "extra": 0
         },
-        "popolarità": 2,
+        "popularity": 2,
         "blocked": false,
         "img": {
             "mimetype": "image/jpeg",
@@ -30,7 +30,7 @@
             "mensile": 9000,
             "extra": 0
         },
-        "popolarità": 1,
+        "popularity": 1,
         "blocked": false,
         "img": {
             "mimetype": "image/jpeg",
@@ -52,7 +52,7 @@
             "mensile": 10500,
             "extra": 0
         },
-        "popolarità": 3,
+        "popularity": 3,
         "blocked": false,
         "img": {
             "mimetype": "image/png",
@@ -71,7 +71,7 @@
             "mensile": 15000,
             "extra": 0
         },
-        "popolarità": 3,
+        "popularity": 3,
         "blocked": false,
         "img": {
             "mimetype": "image/png",
@@ -90,7 +90,7 @@
             "mensile": 24000,
             "extra": 0
         },
-        "popolarità": 0,
+        "popularity": 0,
         "__v": 0,
         "SMM_id": "651fde888a066ec0334dabb3",
         "blocked": false,
