@@ -10,9 +10,6 @@ import Menu from "@/components/Navbar/Menu";
 
 import "styles/globals.css";
 
-import NextAuthProvider from "@/components/Auth/NextAuthProvider";
-import { Box } from "@mui/material";
-
 export default function GeneralLayout({
     children,
 }: {

@@ -4,6 +4,7 @@ const router = express.Router();
 const usersDB = require("../db/users");
 const channelsDB = require("../db/channels");
 const squealsDB = require("../db/squeals");
+const keywordsDB = require("../db/keywords");
 
 router.get("/:id", async (req, res) => {
     const squeals = await squealsDB.getAllSquealsByOwnerID(req.params.id);
@@ -23,6 +24,19 @@ router.post("/post", async (req, res) => {
 
     // Squeal creation
     const newSqueal = await squealsDB.createNewSqueal(squeal);
+
+    const message = newSqueal.content;
+    // keywords begin with #
+    const regexp = /#\w+/g;
+    const keywords = message.match(regexp);
+    console.log(keywords);
+
+    if(keywords) {
+        keywords.forEach(async (keyword) => {
+            const keywordName = keyword.slice(1);
+            await keywordsDB.addSquealToKeyword(keywordName, newSqueal._id);
+        });
+    }
 
     const owner = await usersDB.searchUserByID(squeal.ownerID);
     owner.squeals.push(newSqueal._id);

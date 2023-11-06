@@ -32,7 +32,7 @@ const Searchbar: React.FC = () => {
     const [query, setQuery] = useState<string>("");
     const [debouncedQuery, setDebouncedQuery] = useState<string>("");
     const { data, isLoading, mutate, error } = useSWR<SearchResults>(
-        () => (debouncedQuery === "" ? null : `/api/search?q=${debouncedQuery}`),
+        () => (debouncedQuery === "" ? null : `/api/search?q=${debouncedQuery.replace(/#/g, "%23")}`),
         fetcher
     );
 

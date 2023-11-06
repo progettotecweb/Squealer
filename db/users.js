@@ -9,7 +9,7 @@ const WEEKLY_MSG_QUOTA = DAILY_MSG_QUOTA * 6;
 const MONTHLY_MSG_QUOTA = DAILY_MSG_QUOTA * 24;
 
 const userSchema = new mongoose.Schema({
-    name: String,
+    name: {type:String, unique: true},
     password: String,
     salt: String,
     role: {

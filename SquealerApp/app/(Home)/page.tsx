@@ -17,7 +17,7 @@ const Homepage = () => {
         userInfo: {
             name: string;
         }
-        datetime: Date,
+        datetime: string,
     }
 
     interface Res {

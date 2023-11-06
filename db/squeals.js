@@ -14,12 +14,22 @@ const squealSchema = new mongoose.Schema({
             },
             id: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            }
+                refPath: "type",
+            },
         },
     ],
     content: String,
-    visibility: { type: String, enum: ["public", "private"], default: "private" },
+    keywords: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Keywords",
+        },
+    ],
+    visibility: {
+        type: String,
+        enum: ["public", "private"],
+        default: "private",
+    },
     reactions: {
         "-2": { type: Number, default: 0 },
         "-1": { type: Number, default: 0 },
@@ -33,15 +43,15 @@ const squealSchema = new mongoose.Schema({
             type: {
                 type: String,
                 enum: ["popular", "impopular", "spam", "offensive", "neutral"],
-                default: "neutral"
+                default: "neutral",
             },
             //description: { type: String, default: ""},
-        }
+        },
     },
     impressions: { type: Number, default: 0 },
     datetime: { type: Date, default: Date.now },
-    controversial: { type: Boolean, default: false},
-    automatic: { type: Boolean, default: false},
+    controversial: { type: Boolean, default: false },
+    automatic: { type: Boolean, default: false },
     replies: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -65,9 +75,11 @@ exports.getAllSquealsByOwnerID = async function (ownerID) {
 };
 
 exports.getAllSquealsByRecipientID = function (type, recipientID) {
-    const res = Squeal.find({ recipients: { $elemMatch: { type: type, id: recipientID } } });
+    const res = Squeal.find({
+        recipients: { $elemMatch: { type: type, id: recipientID } },
+    });
     return res;
-}
+};
 
 exports.transformSqueal = async (dbSqueal) => {
     const user = await usersDB.searchUserByID(dbSqueal.ownerID);
