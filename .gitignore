@@ -26,4 +26,3 @@ dist-ssr
 # Misc
 /.env
 *.sh
-resetdb.js
