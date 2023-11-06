@@ -7,7 +7,7 @@ const WEEKLY_MSG_QUOTA = DAILY_MSG_QUOTA * 6;
 const MONTHLY_MSG_QUOTA = DAILY_MSG_QUOTA * 24;
 
 const userSchema = new mongoose.Schema({
-    name: String,
+    name: { type: String, unique: true },
     password: String,
     salt: String,
     role: {
@@ -22,6 +22,19 @@ const userSchema = new mongoose.Schema({
         extra: { type: Number, default: 0 },
     },
     popularity: { type: Number, default: 0 },
+    blocked: { type: Boolean, default: false },
+    controls: {
+        user_id: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+    },
+    controlled_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
     img: {
         mimetype: String,
         blob: String,
@@ -85,7 +98,7 @@ async function create() {
 
         // Inserisco le collezioni lette
         await User.insertMany(usersData);
-       // await Post.insertMany(postsData);
+        // await Post.insertMany(postsData);
         console.log("Database popolato con successo");
     } catch (err) {
         console.error("Errore durante la popolazione del database:", err);
