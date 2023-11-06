@@ -108,7 +108,7 @@ window.onload = function () {
                         break;
                     case "popularity":
                         data.sort((a, b) => {
-                            if (a.popularity < b.followers) {
+                            if (a.popularity < b.popularity) {
                                 return 1;
                             }
                             if (a.popularity > b.popularity) {
