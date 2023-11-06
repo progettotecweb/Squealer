@@ -73,7 +73,7 @@ onBeforeMount(() => {
         <div>
           <p>prima di SMM</p>
           <SMM_main data: data />
-          <p>dopo di SMM</p>
+          <p>dopo SMM</p>
         </div>
       </main>
       <div class="d-none d-xl-block col-xl-2 bd-toc">
