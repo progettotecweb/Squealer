@@ -32,5 +32,25 @@ export async function getUserData() {
             console.log(err);
             //signout();
         });
-        console.log(userInfo)
+    return userInfo;
+}
+
+
+export async function getMyData(url: string) {
+    const userInfo = await fetch("/api/users/" + url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            //console.log(data); 
+            return data;
+        })
+        .catch(err => {
+            console.log(err);
+            //signout();
+        });
+    return userInfo;
 }

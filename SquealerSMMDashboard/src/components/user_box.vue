@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import { ref } from 'vue'
+import { getMyData } from './fetch';
 // import { useFetch } from '/js/fetch.js'
 
 const user = ref<any>(null)
-defineProps(['id'])
+const id = defineProps(['id'])
 
 
-// user.value = useFetch("/api/searchUserById?id=" + id)
-
-onBeforeMount(() => {
-    user.value = 'ciao'
-
-})
+user.value = getMyData(id.id)
+console.log(user.value)
 
 </script>
 
 
 <template>
-    <h1>{{ id }}</h1>
+    <div>
+        <h1>{{ id }}</h1>
+        <h1>{{ user }}</h1>
+    </div>
 </template>
 
 <style></style>
