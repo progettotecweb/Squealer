@@ -44,7 +44,9 @@
         "salt": "$2b$10$tiwE1L5H7khIC/jdTpxQOe",
         "role": "SMM",
         "controls": {
-            "user_id": "65281e64841f0d79cdef751c"
+            "user_id": [
+                "65281e64841f0d79cdef751c"
+            ]
         },
         "quota_msg": {
             "giorno": 70,

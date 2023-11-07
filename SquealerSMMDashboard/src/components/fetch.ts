@@ -1,24 +1,36 @@
 // fetch.js
-import { ref } from 'vue'
+//import { ref } from 'vue'
 
 
 
-export function useFetch(url: string) {
-    const data = ref(null)
+export async function getUserData() {
+    const userSession = await fetch("/Home/api/user", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(res => res.json())
+        .then(data => {
+            return data;
+        })
+        .catch(err => {
+            console.log(err);
+        });
 
-    fetch(url)
-        .then((res) => res.json())
-        .then((json) => (data.value = json))
-        .catch((err) => (data.value = err))
-    return { data }
-}
-
-export function idFetch(url: string) {
-    const data = ref(null)
-
-    fetch(url)
-        .then((res) => res.json())
-        .then((json) => (data.value = json.id))
-        .catch((err) => (data.value = err))
-    return { data }
+    const userInfo = await fetch("/api/users/" + userSession.id, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            //console.log(data); 
+            return data;
+        })
+        .catch(err => {
+            console.log(err);
+            //signout();
+        });
+        console.log(userInfo)
 }

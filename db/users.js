@@ -25,6 +25,15 @@ const userSchema = new mongoose.Schema({
     },
     popularity: { type: Number, default: 0 },
     blocked: { type: Boolean, default: false },
+    SMM_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    controls: {
+        user_id: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+    },
     img: {
         mimetype: String,
         blob: String,

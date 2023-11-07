@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { onBeforeMount, ref } from 'vue'
+import { ref } from 'vue'
 import user_box from './user_box.vue'
 // const count = ref(0)
 
@@ -10,47 +10,10 @@ const newSearch = ref('')
 function search() { }
 
 
-const userid = ref(''); // '651fde888a066ec0334dabb3' 
-// const url = ref("/api/searchUserById?id=" + userid.value)
+
 const data = ref<any>(null); // specificare il tipo di dato
-const error = ref<Error | null>(null); // specificare il tipo di errore
 
 
-async function getUserData() {
-    await fetch("/Home/api/user")
-        .then((res) => res.json())
-        .then((json) => {
-            userid.value = json.id;
-            console.log(userid.value)
-        })
-        .catch((err) => {
-            console.log(err)
-            userid.value = err;
-        })
-}
-
-async function fetchUser() {
-    await fetch("/api/searchUserById?id=" + userid.value)
-        .then((res) => res.json())// parsing json
-        .then((json) => {     // f(json){data.value = json }
-            data.value = json;
-            console.log(json)
-        })
-        .catch((err) => {
-            error.value = err;
-            console.log(err)
-        })
-}
-
-async function async() {
-    await getUserData()
-    await fetchUser()
-}
-
-
-onBeforeMount(() => {
-    async()
-})
 
 </script>
 
@@ -74,7 +37,7 @@ onBeforeMount(() => {
             </div>
         </div>
 
-        <button @click="fetchUser">fetch</button>
+        
     </div>
 </template>
 
