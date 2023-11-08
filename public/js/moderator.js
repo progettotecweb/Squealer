@@ -128,16 +128,17 @@ window.onload = function () {
                     let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic'/>";
                     mycard += img;
                     mycard += '<div class="user-content">';
-                    let username = "<p class='user-name'>" + data[i].name + "</p>";
-
-                    mycard += username;
+                    let content = "<p class='user-name'>" + data[i].name + "</p>";
+                    content += "<p class='user-popularity'>⭐" + data[i].popularity + "</p>";
+                    mycard += content;
                     mycard += "</div>";
                     let userInfoDataBs = 'data-bs-userId="' + data[i]._id + '" data-bs-toggle="modal" data-bs-target="#userModal" data-bs-username="'
                         + data[i].name + '" data-bs-userimg="' + blobsrc + '" data-bs-quota_daily="' + data[i].msg_quota.daily
                         + '"data-bs-quota_monthly="' + data[i].msg_quota.monthly + '" data-bs-quota_weekly="' + data[i].msg_quota.weekly
                         + '" data-bs-quota_extra="' + data[i].msg_quota.extra + '"' + 'data-bs-blocked="' + data[i].blocked + '"';
-                    let btn = '<input type="button" class="user-btn btn btn-primary"' + userInfoDataBs + ' value="View more" />';
-                    mycard += btn;
+                    let btn = '<input type="button" class="user-btn btn btn-primary align-self-center"' + userInfoDataBs + ' value="View more" />';
+                    let footer ='<div class="card-user-footer d-flex justify-content-center">' + btn + '</div>';
+                    mycard += footer;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;
                 }
