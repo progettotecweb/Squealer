@@ -3,6 +3,41 @@
         "name": "TOP 1000",
         "description": "Top 1000 weekly squeals",
         "squeals": [],
-        "followes": []
+        "followers": [],
+        "official": true
+    },
+    {
+        "name": "canale di user",
+        "description": "descrizion del mio canale",
+        "owner_id": "65281e64841f0d79cdef751c",
+        "administrators":[],
+        "visibility": "public",
+        "can_user_post": true,
+        "squeals": [],
+        "followers": [],
+        "official": false
+    },
+    {
+        "name": "CANALE UFFICIALE DI SQUEALER",
+        "description": "descrizion del mio canale di squealer",
+        "owner_id": null,
+        "administrators":[],
+        "visibility": "public",
+        "can_user_post": true,
+        "squeals": [],
+        "followers": [],
+        "official": true
+    },
+    {
+        "name": "canale privato di fvPro",
+        "description": "privatissimo",
+        "owner_id": "651fde68c4ab75a75bd6c1b1",
+        "administrators":[],
+        "visibility": "private",
+        "can_user_post": false,
+        "squeals": [],
+        "followers": [],
+        "official": false,
+        "blocked": true
     }
 ]

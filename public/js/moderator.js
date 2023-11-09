@@ -63,6 +63,28 @@ window.onload = function () {
     const activeSection = document.querySelector(".active-section");
     loadSection(activeSection);
 
+    const boxContentDiv = document.querySelector("#box-content");
+    boxContentDiv.addEventListener("scroll", (e) => {
+        const activeSection = document.querySelector(".active-section");
+
+        //check if the scroll is at the top
+        if (boxContentDiv.scrollTop === 0) {
+            //aggiungo la mia classe
+            activeSection.classList.add("active-section-not-scrolled");
+        }
+        else {
+            activeSection.classList.remove("active-section-not-scrolled");
+        }
+    });
+
+    const sectionList = document.querySelector(".section-list");
+    sectionList.addEventListener("click", (e) => {
+        if (e.target.classList.contains("box-section")) {
+            loadSection(e.target);
+        }
+    });
+
+
     function loadSection(section) {
         switch (section.id) {
             case "userSection":
@@ -125,24 +147,108 @@ window.onload = function () {
                     let mycard = "<div class='my-card'>";
 
                     const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
-                    let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic'/>";
+                    let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic my-card-grid-tl'/>";
                     mycard += img;
-                    mycard += '<div class="user-content">';
-                    let username = "<p class='user-name'>" + data[i].name + "</p>";
-
-                    mycard += username;
+                    mycard += '<div class="user-content my-card-grid-tr">';
+                    let content = "<p class='user-name'>" + data[i].name + "</p>";
+                    content += "<p class='user-popularity'>⭐" + data[i].popularity + "</p>";
+                    mycard += content;
                     mycard += "</div>";
                     let userInfoDataBs = 'data-bs-userId="' + data[i]._id + '" data-bs-toggle="modal" data-bs-target="#userModal" data-bs-username="'
                         + data[i].name + '" data-bs-userimg="' + blobsrc + '" data-bs-quota_daily="' + data[i].msg_quota.daily
                         + '"data-bs-quota_monthly="' + data[i].msg_quota.monthly + '" data-bs-quota_weekly="' + data[i].msg_quota.weekly
                         + '" data-bs-quota_extra="' + data[i].msg_quota.extra + '"' + 'data-bs-blocked="' + data[i].blocked + '"';
-                    let btn = '<input type="button" class="user-btn btn btn-primary"' + userInfoDataBs + ' value="View more" />';
-                    mycard += btn;
+                    let btn = '<input type="button" class="user-btn btn btn-primary align-self-center"' + userInfoDataBs + ' value="View more" />';
+                    let footer = '<div class="card-user-footer my-card-grid-b d-flex justify-content-center">' + btn + '</div>';
+                    mycard += footer;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;
                 }
 
                 //return data;
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+
+    async function loadChannels(orderBy = "alphabetical") {
+        const allChannels = await fetch("/api/channels/allChannels", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                //console.log(data);
+                const boxContent = document.getElementById("box-content");
+                //clear the box
+                boxContent.innerHTML = "";
+
+                /*//sort the users
+                switch (orderBy) {
+                    case "alphabetical":
+                        data.sort((a, b) => {
+                            if (a.name < b.name) {
+                                return -1;
+                            }
+                            if (a.name > b.name) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        break;
+                    case "popularity":
+                        data.sort((a, b) => {
+                            if (a.popularity < b.popularity) {
+                                return 1;
+                            }
+                            if (a.popularity > b.popularity) {
+                                return -1;
+                            }
+                            return 0;
+                        });
+                        break;
+                }*/
+
+                //create the cards for every channel
+                for (let i = 0; i < data.length; i++) {
+                    let mycard = "<div class='my-card'>";
+
+                    //const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
+                    //let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic'/>";
+                    //mycard += img;
+                    mycard += '<div class="channel-content my-card-grid-tl">';
+                    let content = "<p class='channel-name'>" + data[i].name + "</p>";
+                    content += "<p class='channel-description'>" + data[i].description + "</p>";
+                    mycard += content;
+                    mycard += "</div>";
+                    mycard += '<div class="my-card-grid-tr">';
+                    let official = data[i].official === true ? "Official" : "Unofficial"
+                    mycard += '<p class = "channel-official-card">' + official + '</p>';
+                    mycard += '</div>';
+                    let channelInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
+                        + 'data-bs-toggle="modal"'
+                        + 'data-bs-target="#channelModal"'
+                        + 'data-bs-channelName="' + data[i].name + '"'
+                        + 'data-bs-channelDescription="' + data[i].description + '"'
+                        + 'data-bs-channelVisibility="' + data[i].visibility + '"'
+                        + 'data-bs-channelOwner="' + data[i].owner + '"'
+                        + 'data-bs-channelFollowers="' + data[i].followers + '"'
+                        + 'data-bs-channelSqueals="' + data[i].squeals + '"'
+                        + 'data-bs-administrators="' + data[i].administrators + '"'
+                        + 'data-bs-canUserPost="' + data[i].can_user_post + '"'
+                        + 'data-bs-official="' + data[i].official + '"'
+                        + 'data-bs-blocked="' + data[i].blocked + '"';
+
+                    let btn = '<input type="button" class="channel-btn btn btn-primary align-self-center"' + channelInfoDataBs + ' value="View more" />';
+                    let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + '</div>';
+                    mycard += footer;
+                    mycard += "</div>";
+                    boxContent.innerHTML += mycard;
+                }
             })
             .catch(err => {
                 console.log(err);
@@ -206,6 +312,7 @@ window.onload = function () {
             modalImg.src = databs.img
 
             btnSave.setAttribute("data-bs-userId", databs.id);
+            btnSave.setAttribute("data-bs-operation", "users")
         })
     }
 
@@ -218,19 +325,144 @@ window.onload = function () {
     });
 
     //change btn value when clicked
-    const btnBlock = document.getElementById("btn-blockuser");
-    btnBlock.addEventListener("click", async () => {
-        btnBlock.disabled = true;
-        btnBlock.setAttribute("data-bs-value_block", "true");
+    const btnBlockUser = document.getElementById("btn-blockuser");
+    btnBlockUser.addEventListener("click", async () => {
+        btnBlockUser.disabled = true;
+        btnBlockUser.setAttribute("data-bs-value_block", "true");
     });
 
-    //save changes if button is pressed
-    const btnSave = document.getElementById("btn-savechanges");
-    btnSave.addEventListener("click", async () => {
-        //retrieve user id
-        const userId = document.querySelector("#btn-savechanges").getAttribute("data-bs-userId");
+    const channelModal = document.getElementById('channelModal')
+    if (channelModal) {
+        channelModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget
+            // Extract info from data-bs-* attributes
+            const databs = {
+                id: button.getAttribute('data-bs-channelId'),
+                name: button.getAttribute('data-bs-channelName'),
+                description: button.getAttribute('data-bs-channelDescription'),
+                visibility: button.getAttribute('data-bs-channelVisibility'),
+                owner: button.getAttribute('data-bs-channelOwner'),
+                followers: button.getAttribute('data-bs-channelFollowers'),
+                squeals: button.getAttribute('data-bs-channelSqueals'),
+                administrators: button.getAttribute('data-bs-administrators'),
+                canUserPost: button.getAttribute('data-bs-canUserPost'),
+                official: button.getAttribute('data-bs-official'),
+                blocked: button.getAttribute('data-bs-blocked')
+            }
 
-        let data = await fetch("/api/users/" + userId, {
+            // Update the modal's content.
+            const modalTitle = channelModal.querySelector('.modal-title')
+            //const modalImg = userModal.querySelector('.modal-img')
+            const modalBody = channelModal.querySelector('.selected-channel-info')
+            const btnBlock = channelModal.querySelector("#btn-blockChannel");
+            const blockText = channelModal.querySelector("#blocked-text");
+            const btnVisible = channelModal.querySelector("#btn-visibilityChannel");
+            const visibleText = channelModal.querySelector("#visibility-text");
+            const btnSave = channelModal.querySelector("#btn-savechanges");
+            const inputName = channelModal.querySelector("#channel-name");
+            const inputDescription = channelModal.querySelector("#channel-description");
+            const inputAdmins = channelModal.querySelector("#channel-administrators");
+            const officialText = channelModal.querySelector("#channel-official");
+
+            //set input values
+            inputName.value = databs.name;
+            inputDescription.value = databs.description;
+            inputAdmins.value = databs.administrators;
+            officialText.textContent = databs.official === "true" ? "Official" : "Unofficial";
+
+            //blocked
+            if (databs.blocked === "false") {
+                //modalBody.innerHTML += btnBlock;
+                btnBlock.classList.remove("btn-secondary");
+                btnBlock.classList.add("btn-danger");
+                btnBlock.innerHTML = "Block channel";
+                blockText.innerHTML = "unblocked";
+
+            } else {
+                btnBlock.classList.remove("btn-danger");
+                btnBlock.classList.add("btn-secondary");
+                btnBlock.innerHTML = "Unblock channel";
+                blockText.innerHTML = "blocked";
+            }
+
+            //visibility
+            if (databs.visibility === "public") {
+                btnVisible.classList.remove("btn-secondary");
+                btnVisible.classList.add("btn-danger");
+                btnVisible.innerHTML = "Make private";
+                visibleText.innerHTML = "public";
+            } else {
+                btnVisible.classList.remove("btn-danger");
+                btnVisible.classList.add("btn-secondary");
+                btnVisible.innerHTML = "Make public";
+                visibleText.innerHTML = "private";
+            }
+
+            modalTitle.textContent = databs.name
+            //modalImg.src = databs.img
+
+            btnSave.setAttribute("data-bs-channelId", databs.id);
+            btnSave.setAttribute("data-bs-operation", "channels")
+        })
+    }
+
+    //reset values when modal is closed
+    channelModal.addEventListener('hidden.bs.modal', () => {
+        //reset btn block
+        const btnBlock = channelModal.querySelector("#btn-blockChannel");
+        btnBlock.disabled = false;
+        btnBlock.setAttribute("data-bs-value_block", "false");
+
+        //reset btn visibility
+        const btnVisible = channelModal.querySelector("#btn-visibilityChannel");
+        btnVisible.disabled = false;
+        btnVisible.setAttribute("data-bs-value_visibility", "false");
+    });
+
+    //change btn value when clicked
+    const btnblockChannel = document.getElementById("btn-blockChannel");
+    btnblockChannel.addEventListener("click", async () => {
+        btnblockChannel.disabled = true;
+        btnblockChannel.setAttribute("data-bs-value_block", "true");
+    });
+    const btnVisibilityChannel = document.getElementById("btn-visibilityChannel");
+    btnVisibilityChannel.addEventListener("click", async () => {
+        btnVisibilityChannel.disabled = true;
+        btnVisibilityChannel.setAttribute("data-bs-value_visibility", "true");
+    });
+
+    //save changes if button is pressed, add event listener to every button
+    const btnSave = document.getElementsByClassName("btn-savechanges");
+    for (let i = 0; i < btnSave.length; i++) {
+        btnSave[i].addEventListener("click", (e) => {
+            //console.log(e.target)
+            updateDBandSection(e.target);
+        });
+    }
+
+    //update the db and reload the section
+    async function updateDBandSection(btn) {
+        //retrieve operation type
+        const operationUpdate = btn.getAttribute("data-bs-operation");
+        let id;
+        let table;
+
+        switch (operationUpdate) {
+            case "users":
+                id = btn.getAttribute("data-bs-userId");
+                table = "users";
+                break;
+            case "channels":
+                id = btn.getAttribute("data-bs-channelId");
+                table = "channels";
+                break;
+            case "squeals":
+                break;
+        }
+
+
+        let data = await fetch("/api/" + table + "/" + id, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -245,22 +477,40 @@ window.onload = function () {
             });
 
         //retrieve data to update from modal
-        const dataToUpdate = {
-            blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
-            msg_quota: {
-                daily: document.querySelector("#user-quota-daily").value,
-                weekly: document.querySelector("#user-quota-weekly").value,
-                monthly: document.querySelector("#user-quota-monthly").value,
-                extra: document.querySelector("#user-quota-extra").value
-            }
+        let dataToUpdate;
+        switch (operationUpdate) {
+            case "users":
+                dataToUpdate = {
+                    blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
+                    msg_quota: {
+                        daily: document.querySelector("#user-quota-daily").value,
+                        weekly: document.querySelector("#user-quota-weekly").value,
+                        monthly: document.querySelector("#user-quota-monthly").value,
+                        extra: document.querySelector("#user-quota-extra").value
+                    }
+                }
+                break;
+            case "channels":
+                dataToUpdate = {
+                    blocked: document.querySelector("#btn-blockChannel").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
+                    visibility: document.querySelector("#btn-visibilityChannel").getAttribute("data-bs-value_visibility") === "true" ? data.visibility === "public" ? "private" : "public" : data.visibility,
+                    name: document.querySelector("#channel-name").value,
+                    description: document.querySelector("#channel-description").value,
+                    //administrators: document.querySelector("#channel-administrators").value
+                    administrators: []
+                }
+                break;
+
+            case "squeals":
+                break;
         };
 
         Object.keys(dataToUpdate).forEach(key => {
             data[key] = dataToUpdate[key];
         });
 
-        //update user
-        await fetch("/api/users/" + userId, {
+        //update table
+        await fetch("/api/" + table + "/" + id, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -269,18 +519,28 @@ window.onload = function () {
         })
             .then(res => {
                 if (res.ok) {
-                    //console.log("User updated!");
+                    //console.log("Data updated!");
                 } else {
-                    console.log("Error while updating user!");
+                    console.log("Error while updating data!");
                 }
             })
             .catch(err => {
                 console.log(err);
             });
 
-        //reload users
-        loadUsers(document.getElementById("select-orderby").value);
-    });
+
+        //reload the section
+        switch (operationUpdate) {
+            case "users":
+                loadUsers(document.getElementById("select-orderby").value);
+                break;
+            case "channels":
+                loadChannels();
+                break;
+            case "squeals":
+                break;
+        }
+    }
 
     //event listener for the order by select
     const selectOrderBy = document.getElementById("select-orderby");
@@ -309,11 +569,12 @@ window.onload = function () {
 }
 
 function changeSectionClass(newSection) {
-    //before adding the new class i remove the old one
+    //before adding the new class, remove the old one
     const activeSection = document.querySelector(".active-section");
     activeSection.classList.remove("active-section");
+    activeSection.classList.remove("active-section-not-scrolled");
 
     //update the section
     newSection.classList.add("active-section");
+    newSection.classList.add("active-section-not-scrolled");
 }
-

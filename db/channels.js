@@ -19,8 +19,8 @@ const channelSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
-    visibility: {type: String, default: "public"},
-    can_user_post: {type: Boolean, default: false},
+    visibility: { type: String, default: "public" },
+    can_user_post: { type: Boolean, default: false },
     squeals: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -33,6 +33,8 @@ const channelSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
+    official: { type: Boolean, default: false },
+    blocked: { type: Boolean, default: false }
 });
 
 const Channel = mongoose.model("Channel", channelSchema);
@@ -68,4 +70,18 @@ exports.createNewChannel = async function (channel) {
     const newChannel = new Channel(channel);
     await newChannel.save();
     return newChannel;
+}
+
+exports.updateChannel = async function (id, channel) {
+    Channel.findByIdAndUpdate(id, channel, { new: true }).then((channel) => {
+        return channel;
+    })
+        .catch((err) => {
+            console.log(err);
+        });
+}
+
+exports.getAllChannels = async function () {
+    const channels = await Channel.find({});
+    return channels;
 }

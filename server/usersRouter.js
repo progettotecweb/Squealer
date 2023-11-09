@@ -83,14 +83,6 @@ router.get("/:id", async (req, res) => {
 router.post("/all", async (req, res) => {
     const users = await usersDB.getAllUsers();
 
-    if (!users) {
-        res.status(404).json({
-            ok: false,
-            error: "Users not found",
-        });
-        return;
-    }
-
     res.status(200).json(users);
 });
 
