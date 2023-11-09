@@ -226,12 +226,14 @@ window.onload = function () {
                     mycard += content;
                     mycard += "</div>";
                     mycard += '<div class="my-card-grid-tr">';
-                    mycard += '<p class = "channel-official-card">' + (data[i].official === "true" ? "Official" : "Unofficial") + '</p>';
-                    mycard +='</div>';
-                    let channelInfoDataBs = 'data-bs-channelId="' + data[i]._id
-                        + '"data-bs-toggle="modal" data-bs-target="#channelModal"'
-                        + '" data-bs-channelName="' + data[i].name
-                        + '" data-bs-channelDescription="' + data[i].description + '"'
+                    let official = data[i].official === true ? "Official" : "Unofficial"
+                    mycard += '<p class = "channel-official-card">' + official + '</p>';
+                    mycard += '</div>';
+                    let channelInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
+                        + 'data-bs-toggle="modal"'
+                        + 'data-bs-target="#channelModal"'
+                        + 'data-bs-channelName="' + data[i].name + '"'
+                        + 'data-bs-channelDescription="' + data[i].description + '"'
                         + 'data-bs-channelVisibility="' + data[i].visibility + '"'
                         + 'data-bs-channelOwner="' + data[i].owner + '"'
                         + 'data-bs-channelFollowers="' + data[i].followers + '"'

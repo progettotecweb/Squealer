@@ -124,7 +124,6 @@
 
 .channel-content {
     text-align: center;
-
 }
 
 .my-card-grid-tr {
@@ -142,6 +141,7 @@
 .user-popularity {}
 
 .card-user-footer {}
+.card-channel-footer {}
 
 .my-card-grid-b {
     grid-area: 2 / 1 / 3 / 3;
