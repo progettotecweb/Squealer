@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
 
+//USERS
 const DAILY_MSG_QUOTA = 1000;
 const WEEKLY_MSG_QUOTA = DAILY_MSG_QUOTA * 6;
 const MONTHLY_MSG_QUOTA = DAILY_MSG_QUOTA * 24;
@@ -53,6 +54,100 @@ const userSchema = new mongoose.Schema({
     ],
 });
 
+//CHANNELS
+const channelSchema = new mongoose.Schema({
+    name: String,
+    description: String,
+    owner_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
+    administrators: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+    ],
+    visibility: {type: String, default: "public"},
+    can_user_post: {type: Boolean, default: false},
+    squeals: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Squeal",
+        },
+    ],
+    followers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+    ],
+    official: { type: Boolean, default: false }
+});
+
+//SQUEALS
+const squealSchema = new mongoose.Schema({
+    ownerID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
+    recipients: [
+        {
+            type: {
+                type: String,
+                enum: ["user", "channel"],
+            },
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                refPath: "type",
+            },
+        },
+    ],
+    content: String,
+    keywords: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Keywords",
+        },
+    ],
+    visibility: {
+        type: String,
+        enum: ["public", "private"],
+        default: "private",
+    },
+    reactions: {
+        "-2": { type: Number, default: 0 },
+        "-1": { type: Number, default: 0 },
+        "+1": { type: Number, default: 0 },
+        "+2": { type: Number, default: 0 },
+    },
+    CM: {
+        "R+": { type: Number, default: 0 },
+        "R-": { type: Number, default: 0 },
+        label: {
+            type: {
+                type: String,
+                enum: ["popular", "impopular", "spam", "offensive", "neutral"],
+                default: "neutral",
+            },
+            //description: { type: String, default: ""},
+        },
+    },
+    impressions: { type: Number, default: 0 },
+    datetime: { type: Date, default: Date.now },
+    controversial: { type: Boolean, default: false },
+    automatic: { type: Boolean, default: false },
+    replies: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Squeal",
+        },
+    ],
+    isAReply: { type: Boolean, default: false },
+});
+
+const Squeal = mongoose.model("Squeal", squealSchema);
+const Channel = mongoose.model("Channel", channelSchema);
 const User = mongoose.model("User", userSchema);
 connectToDB();
 create();
@@ -82,23 +177,25 @@ async function connectToDB() {
 };
 
 async function create() {
-
     console.log("Connected to MongoDB");
     const db = mongoose.connection;
-    //const Post = mongoose.model("Post", postSchema);
-
+    
     try {
         // Elimino le collezione esistenti
         await db.dropCollection("users");
-        //await db.dropCollection("posts");
+        await db.dropCollection("channels");
+        await db.dropCollection("squeals");
 
         //leggo le collezioni
         let usersData = readJsonData("users.json");
-        //let postsData = readJsonData("posts.json");
+        let channelsData = readJsonData("channels.json");
+       // let squealsData = readJsonData("squeals.json");
 
         // Inserisco le collezioni lette
         await User.insertMany(usersData);
-        // await Post.insertMany(postsData);
+        await Channel.insertMany(channelsData);
+        //await Squeal.insertMany(squealsData);
+
         console.log("Database popolato con successo");
     } catch (err) {
         console.error("Errore durante la popolazione del database:", err);

@@ -165,6 +165,13 @@ window.onload = function () {
             });
     }
 
+
+    async function loadChannels(orderBy = "alphabetical") {
+        const allChannels = await fetch("/api/channels/all", {
+            
+        });
+    }
+
     const userModal = document.getElementById('userModal')
     if (userModal) {
         userModal.addEventListener('show.bs.modal', event => {
