@@ -8,16 +8,38 @@ const id = defineProps(['id'])
 
 
 user.value = getMyData(id.id)
-console.log(user.value)
+user.value.then((data: any) => {
+    user.value = data
+})
+
 
 </script>
 
 
 <template>
-    <div>
-        <h1>{{ id }}</h1>
-        <h1>{{ user }}</h1>
+    <div class="user_box">
+        <img :src=user.img.blob alt="pic" class="modal-img" />
+        
+        <h1>{{ user.name }}</h1>
+        <h1>----------</h1>
     </div>
 </template>
 
-<style></style>
+<style>
+    .user_box {
+        background-color: #4c6ae1;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 10px;
+        width: 200px;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+</style>
+
+
+

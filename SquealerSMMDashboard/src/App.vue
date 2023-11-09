@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import {  onBeforeMount, ref } from 'vue'
-//import SMM_main from './components/SMM_main.vue'
+import {  ref } from 'vue'
 import user_box from './components/user_box.vue'
 import { getUserData } from './components/fetch.ts'
 
@@ -8,13 +7,11 @@ import { getUserData } from './components/fetch.ts'
 const user = ref<any>(null); 
 const controlled_user = ref<any>(null);
 
-onBeforeMount(() => {
-  user.value = getUserData()
-  user.value.then((data: any) => {
-    user.value = data
-    controlled_user.value = user.value.controls.user_id
-    
-  })
+
+user.value = getUserData()
+user.value.then((data: any) => {
+  user.value = data
+  controlled_user.value = user.value.controls.user_id
   
 })
 
