@@ -68,8 +68,8 @@ const channelSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
-    visibility: {type: String, default: "public"},
-    can_user_post: {type: Boolean, default: false},
+    visibility: { type: String, default: "public" },
+    can_user_post: { type: Boolean, default: false },
     squeals: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -82,7 +82,8 @@ const channelSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
-    official: { type: Boolean, default: false }
+    official: { type: Boolean, default: false },
+    blocked: { type: Boolean, default: false }
 });
 
 //SQUEALS
@@ -179,7 +180,7 @@ async function connectToDB() {
 async function create() {
     console.log("Connected to MongoDB");
     const db = mongoose.connection;
-    
+
     try {
         // Elimino le collezione esistenti
         await db.dropCollection("users");
@@ -189,7 +190,7 @@ async function create() {
         //leggo le collezioni
         let usersData = readJsonData("users.json");
         let channelsData = readJsonData("channels.json");
-       // let squealsData = readJsonData("squeals.json");
+        // let squealsData = readJsonData("squeals.json");
 
         // Inserisco le collezioni lette
         await User.insertMany(usersData);

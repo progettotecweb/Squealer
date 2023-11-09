@@ -37,6 +37,7 @@
         "can_user_post": false,
         "squeals": [],
         "followers": [],
-        "official": false
+        "official": false,
+        "blocked": true
     }
 ]

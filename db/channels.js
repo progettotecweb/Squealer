@@ -34,6 +34,7 @@ const channelSchema = new mongoose.Schema({
         },
     ],
     official: { type: Boolean, default: false },
+    blocked: { type: Boolean, default: false }
 });
 
 const Channel = mongoose.model("Channel", channelSchema);
@@ -69,4 +70,18 @@ exports.createNewChannel = async function (channel) {
     const newChannel = new Channel(channel);
     await newChannel.save();
     return newChannel;
+}
+
+exports.updateChannel = async function (id, channel) {
+    Channel.findByIdAndUpdate(id, channel, { new: true }).then((channel) => {
+        return channel;
+    })
+        .catch((err) => {
+            console.log(err);
+        });
+}
+
+exports.getAllChannels = async function () {
+    const channels = await Channel.find({});
+    return channels;
 }
