@@ -40,16 +40,18 @@
             <div id="box" class="mt-3">
                 <div class="section-header d-flex">
                     <ul class="section-list list-group list-group-horizontal d-flex justify-content-center mt-2 mb-2">
-                        <li class="text-light box-section active-section" id="userSection">Users</li>
+                        <li class="text-light box-section active-section active-section-not-scrolled" id="userSection">
+                            Users</li>
                         <li class="text-light box-section" id="channelSection">Channels</li>
                         <li class="text-light box-section" id="squealSection">Squeals</li>
                     </ul>
-
-                    <select class="form-select sort-select" id="select-orderby">
-                        <option value="alphabetical" selected>Sort by</option>
-                        <option value="alphabetical">Username</option>
-                        <option value="popularity">Popularity</option>
-                    </select>
+                    <div class="select-container d-flex">
+                        <select class="form-select sort-select" id="select-orderby">
+                            <option value="alphabetical" selected>Sort by</option>
+                            <option value="alphabetical">Username</option>
+                            <option value="popularity">Popularity</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="box-content" class="">
                     <div class="my-card">

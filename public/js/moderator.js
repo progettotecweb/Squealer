@@ -63,6 +63,21 @@ window.onload = function () {
     const activeSection = document.querySelector(".active-section");
     loadSection(activeSection);
 
+    const boxContentDiv = document.querySelector("#box-content");
+    boxContentDiv.addEventListener("scroll", (e) => {
+        const activeSection = document.querySelector(".active-section");
+
+        //check if the scroll is at the top
+        if (boxContentDiv.scrollTop === 0) {
+            //aggiungo la mia classe
+            activeSection.classList.add("active-section-not-scrolled");
+        }
+        else {
+            activeSection.classList.remove("active-section-not-scrolled");
+        }
+    });
+
+
     function loadSection(section) {
         switch (section.id) {
             case "userSection":
@@ -137,7 +152,7 @@ window.onload = function () {
                         + '"data-bs-quota_monthly="' + data[i].msg_quota.monthly + '" data-bs-quota_weekly="' + data[i].msg_quota.weekly
                         + '" data-bs-quota_extra="' + data[i].msg_quota.extra + '"' + 'data-bs-blocked="' + data[i].blocked + '"';
                     let btn = '<input type="button" class="user-btn btn btn-primary align-self-center"' + userInfoDataBs + ' value="View more" />';
-                    let footer ='<div class="card-user-footer d-flex justify-content-center">' + btn + '</div>';
+                    let footer = '<div class="card-user-footer d-flex justify-content-center">' + btn + '</div>';
                     mycard += footer;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;
@@ -310,11 +325,13 @@ window.onload = function () {
 }
 
 function changeSectionClass(newSection) {
-    //before adding the new class i remove the old one
+    //before adding the new class, remove the old one
     const activeSection = document.querySelector(".active-section");
     activeSection.classList.remove("active-section");
+    activeSection.classList.remove("active-section-not-scrolled");
 
     //update the section
     newSection.classList.add("active-section");
+    newSection.classList.add("active-section-not-scrolled");
 }
 

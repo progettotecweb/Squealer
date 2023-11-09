@@ -43,8 +43,10 @@
 #box-content {
     min-height: 50vh;
     max-height: 70vh;
+
     overflow-y: auto;
     overflow-x: hidden;
+
     padding: 1em;
 
     background-color: #2E6079;
@@ -79,9 +81,14 @@
     position: relative;
     /* Add this line */
     /*color: rgb(26, 210, 146) !important;*/
-    border-radius: 7px 7px 0 0;
+    border-radius: 15px;
     background-color: #2E6079;
+
+}
+
+.active-section-not-scrolled {
     /*bottom shadow*/
+    border-radius: 7px 7px 0 0 !important;
     box-shadow: 0px 10px 0px 0px #2E6079;
 }
 
@@ -139,9 +146,15 @@
     width: 100%;
 }
 
+.select-container{
+    width: 0px;
+    height: 0px;
+}
+
 .sort-select {
-    position: initial;
+    position: absolute;
     width: 15%;
+    transform:translateX(-100%);
 }
 
 
@@ -189,7 +202,7 @@
         font-size: x-large;
     }
 
-    .modal-content *{
+    .modal-content * {
         font-size: x-large !important;
     }
 }
