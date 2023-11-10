@@ -118,6 +118,7 @@
                             </div>
                             <div class="modal-body">
                                 <p class="selected-channel-info">
+                                    </form>
                                     <span class="h6" id="channel-official">Official</span><br>
                                     <span class="h6">Name: </span>
                                     <input type="text" class="form-text" id="channel-name"
@@ -127,9 +128,13 @@
                                     <input type="text" class="form-text" id="channel-description"
                                         data-bs-value_description="description"><br>
 
-                                    <span class="h6">Administrators: </span>
-                                    <input type="text" class="form-text" id="channel-administrators"
-                                        data-bs-value_administrators="administrators"><br>
+                                    <span class="h6 ">Administrators: </span>
+                                    <input type="text" class="form-text " id="channel-administrators"
+                                        data-bs-value_administrators="administrators">
+                                    <span class="label">Check admins</span>
+                                    <input type="checkbox" class="form-check-input "
+                                        id="channel-administrators-checkbox">
+                                        <span class="label" id="channel-administrators-label">Insert username(s) separated by a comma</span>
                                 </p>
                                 <span class="blocked-desc">Channel is <span id="blocked-text" class="h6"></span></span>
                                 <button type="button" class="btn btn-block" id="btn-blockChannel"

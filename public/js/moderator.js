@@ -238,11 +238,12 @@ window.onload = function () {
                         + 'data-bs-channelOwner="' + data[i].owner + '"'
                         + 'data-bs-channelFollowers="' + data[i].followers + '"'
                         + 'data-bs-channelSqueals="' + data[i].squeals + '"'
-                        + 'data-bs-administrators="' + data[i].administrators + '"'
+                        //+ 'data-bs-administrators-name="' + usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name") + '"'
+                        + 'data-bs-administrators-id="' + data[i].administrators + '"'
                         + 'data-bs-canUserPost="' + data[i].can_user_post + '"'
                         + 'data-bs-official="' + data[i].official + '"'
                         + 'data-bs-blocked="' + data[i].blocked + '"';
-
+                    usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name")
                     let btn = '<input type="button" class="channel-btn btn btn-primary align-self-center"' + channelInfoDataBs + ' value="View more" />';
                     let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + '</div>';
                     mycard += footer;
@@ -345,7 +346,8 @@ window.onload = function () {
                 owner: button.getAttribute('data-bs-channelOwner'),
                 followers: button.getAttribute('data-bs-channelFollowers'),
                 squeals: button.getAttribute('data-bs-channelSqueals'),
-                administrators: button.getAttribute('data-bs-administrators'),
+                administratorsName: button.getAttribute('data-bs-administrators-name'),
+                administratorsId: button.getAttribute('data-bs-administrators-id'),
                 canUserPost: button.getAttribute('data-bs-canUserPost'),
                 official: button.getAttribute('data-bs-official'),
                 blocked: button.getAttribute('data-bs-blocked')
@@ -368,8 +370,22 @@ window.onload = function () {
             //set input values
             inputName.value = databs.name;
             inputDescription.value = databs.description;
-            inputAdmins.value = databs.administrators;
+            inputAdmins.value = databs.administratorsName;
+            //setAdminInput(databs.administratorsName, inputAdmins);
+            if (databs.administratorsId) {
+                inputAdmins.setAttribute("data-bs-administrators-id", databs.administratorsId);
+            }
             officialText.textContent = databs.official === "true" ? "Official" : "Unofficial";
+
+            //admin 
+            //reset check admins label and checkbox
+            const checkAdmins = channelModal.querySelector("#channel-administrators-checkbox");
+            checkAdmins.checked = false;
+            const correctLabel = document.querySelector("#channel-administrators-label");
+            correctLabel.classList.remove("text-danger");
+            correctLabel.classList.remove("text-success");
+            correctLabel.innerHTML = "Insert username(s) separated by a comma";
+
 
             //blocked
             if (databs.blocked === "false") {
@@ -405,6 +421,22 @@ window.onload = function () {
             btnSave.setAttribute("data-bs-channelId", databs.id);
             btnSave.setAttribute("data-bs-operation", "channels")
         })
+
+        //add event listener to the administrators input
+        const inputAdmins = channelModal.querySelector("#channel-administrators");
+        const checkAdmins = channelModal.querySelector("#channel-administrators-checkbox");
+        checkAdmins.addEventListener("change", async (e) => {
+            if (checkAdmins.checked) {
+                setAdminInput(inputAdmins.value, inputAdmins, true);
+            }
+            else {
+                //reset check admins label and checkbox
+                const correctLabel = document.querySelector("#channel-administrators-label");
+                correctLabel.classList.remove("text-danger");
+                correctLabel.classList.remove("text-success");
+                correctLabel.innerHTML = "Insert username(s) separated by a comma";
+            }
+        });
     }
 
     //reset values when modal is closed
@@ -418,6 +450,14 @@ window.onload = function () {
         const btnVisible = channelModal.querySelector("#btn-visibilityChannel");
         btnVisible.disabled = false;
         btnVisible.setAttribute("data-bs-value_visibility", "false");
+
+        //reset check admins label and checkbox
+        const checkAdmins = channelModal.querySelector("#channel-administrators-checkbox");
+        checkAdmins.checked = false;
+        const correctLabel = document.querySelector("#channel-administrators-label");
+        correctLabel.classList.remove("text-danger");
+        correctLabel.classList.remove("text-success");
+        correctLabel.innerHTML = "Insert username(s) separated by a comma";
     });
 
     //change btn value when clicked
@@ -496,8 +536,7 @@ window.onload = function () {
                     visibility: document.querySelector("#btn-visibilityChannel").getAttribute("data-bs-value_visibility") === "true" ? data.visibility === "public" ? "private" : "public" : data.visibility,
                     name: document.querySelector("#channel-name").value,
                     description: document.querySelector("#channel-description").value,
-                    //administrators: document.querySelector("#channel-administrators").value
-                    administrators: []
+                    administrators: document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id") != null ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null,
                 }
                 break;
 
@@ -506,7 +545,8 @@ window.onload = function () {
         };
 
         Object.keys(dataToUpdate).forEach(key => {
-            data[key] = dataToUpdate[key];
+            if (dataToUpdate[key] != null)
+                data[key] = dataToUpdate[key];
         });
 
         //update table
@@ -577,4 +617,100 @@ function changeSectionClass(newSection) {
     //update the section
     newSection.classList.add("active-section");
     newSection.classList.add("active-section-not-scrolled");
+}
+
+async function usersIdToName(usersId, channelId, dataBsName) {
+    let usersName = [];
+    for (let i = 0; i < usersId.length; i++) {
+        if (usersId[i] === ",") continue;
+        const user = await fetch("/api/users/" + usersId[i], {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                return data.name;
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        usersName.push(user);
+    }
+
+    //update data in btn
+    const btn = document.querySelectorAll(".channel-btn");
+
+    //search channel id btn
+    for (let i = 0; i < btn.length; i++) {
+        if (btn[i].getAttribute("data-bs-channelId") == channelId) {
+            btn[i].setAttribute(dataBsName, usersName.join(", "));
+        }
+    }
+}
+
+async function usersNameToId(usersNames, div, dataBsName) {
+    // normalize the string for our purpose
+    let usersNamesArray = usersNames.trim();//remove spaces
+    usersNamesArray = usersNamesArray.replace(/\s+/g, '');// remove spaces
+    usersNamesArray = usersNamesArray.split(",");   // split the string into an array of strings
+
+    let usersId = [];
+    const correctLabel = document.querySelector("#channel-administrators-label");
+
+    //get all users from db
+    const allUsers = await fetch("/api/users/all", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            //console.log(data);
+            return data;
+        })
+        .catch(err => {
+            console.log(err);
+        });
+
+    //check if the users exist in the data retrieved from db
+    for (let i = 0; i < usersNamesArray.length; i++) {
+        let found = false;
+        for (let j = 0; j < allUsers.length; j++) {
+            if (usersNamesArray[i] === allUsers[j].name) {
+                usersId.push(allUsers[j]._id);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            //set wrong label
+            correctLabel.classList.add("text-danger");
+            correctLabel.classList.remove("text-success");
+            correctLabel.innerHTML = "Wrong username(s)!";
+
+            return;
+        }
+    }
+
+    //console.log(usersId);
+    //update data in input div
+    div.setAttribute(dataBsName, usersId.join(","));
+
+    //set correct label
+    correctLabel.classList.add("text-success");
+    correctLabel.classList.remove("text-danger");
+    correctLabel.innerHTML = "Correct username(s)!";
+}
+
+async function setAdminInput(value, inputAdmins, toId = false) {
+    if (toId) {
+        const usersId = await usersNameToId(value, inputAdmins, "data-bs-administrators-id");
+    }
+    inputAdmins.value = value;
+    inputAdmins.setAttribute("data-bs-administrators-name", value);
+    //inputAdmins.setAttribute("data-bs-administrators-id", usersId);
 }
