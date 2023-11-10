@@ -243,7 +243,9 @@ window.onload = function () {
                         + 'data-bs-canUserPost="' + data[i].can_user_post + '"'
                         + 'data-bs-official="' + data[i].official + '"'
                         + 'data-bs-blocked="' + data[i].blocked + '"';
-                    usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name")
+
+                    if (data[i].administrators)//se ci sono admin, altrimenti null
+                        usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name")
                     let btn = '<input type="button" class="channel-btn btn btn-primary align-self-center"' + channelInfoDataBs + ' value="View more" />';
                     let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + '</div>';
                     mycard += footer;
@@ -536,7 +538,7 @@ window.onload = function () {
                     visibility: document.querySelector("#btn-visibilityChannel").getAttribute("data-bs-value_visibility") === "true" ? data.visibility === "public" ? "private" : "public" : data.visibility,
                     name: document.querySelector("#channel-name").value,
                     description: document.querySelector("#channel-description").value,
-                    administrators: document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id") != null ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null,
+                    administrators: document.querySelector("#channel-administrators").value != '' ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null,
                 }
                 break;
 
@@ -545,8 +547,7 @@ window.onload = function () {
         };
 
         Object.keys(dataToUpdate).forEach(key => {
-            if (dataToUpdate[key] != null)
-                data[key] = dataToUpdate[key];
+            data[key] = dataToUpdate[key];
         });
 
         //update table

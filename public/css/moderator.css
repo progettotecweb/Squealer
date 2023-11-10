@@ -179,7 +179,10 @@
     transform: translateX(-100%);
 }
 
-
+.admin-checkbox{
+    box-shadow: 0px 0px 3px 0px #000000;
+    cursor: pointer;
+}
 
 /*Styles for max-width 600px*/
 @media only screen and (max-width: 1080px) {
