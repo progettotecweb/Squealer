@@ -246,8 +246,24 @@ window.onload = function () {
 
                     if (data[i].administrators)//se ci sono admin, altrimenti null
                         usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name")
-                    let btn = '<input type="button" class="channel-btn btn btn-primary align-self-center"' + channelInfoDataBs + ' value="View more" />';
-                    let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + '</div>';
+                    let btn = '<input type="button" class="m-1 channel-btn btn btn-primary align-self-end"' + channelInfoDataBs + ' value="Details" />';
+
+                    let channelSquealsInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
+                        + 'data-bs-toggle="modal"'
+                        + 'data-bs-target="#channelSquealsModal"'
+                        + 'data-bs-channelName="' + data[i].name + '"'
+                        + 'data-bs-channelDescription="' + data[i].description + '"'
+                        + 'data-bs-channelVisibility="' + data[i].visibility + '"'
+                        + 'data-bs-channelOwner="' + data[i].owner + '"'
+                        + 'data-bs-channelFollowers="' + data[i].followers + '"'
+                        + 'data-bs-administrators-id="' + data[i].administrators + '"'
+                        + 'data-bs-canUserPost="' + data[i].can_user_post + '"'
+                        + 'data-bs-official="' + data[i].official + '"'
+                        + 'data-bs-blocked="' + data[i].blocked + '"';
+
+                    setChannelSquealsAttributes(data[i]._id, "data-bs-channelSqueals");
+                    let btnChannel_squeals = '<input type="button" class="m-1 channel-btn btn btn-secondary align-self-end" ' + channelSquealsInfoDataBs + '" value="Squeals" />';
+                    let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + btnChannel_squeals + '</div>';
                     mycard += footer;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;
@@ -714,4 +730,23 @@ async function setAdminInput(value, inputAdmins, toId = false) {
     inputAdmins.value = value;
     inputAdmins.setAttribute("data-bs-administrators-name", value);
     //inputAdmins.setAttribute("data-bs-administrators-id", usersId);
+}
+
+async function setChannelSquealsAttributes(channelId, attributeName) {
+    console.log("channelId: " + channelId);
+    //search squeals that have the channel as recipient
+    const channelSqueals = await fetch("/api/squeals/allSquealsByChannel/" + channelId, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            return data;
+        })
+        .catch(err => {
+            console.log(err);
+        });
 }

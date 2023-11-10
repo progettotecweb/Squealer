@@ -134,7 +134,8 @@
                                     <span class="label">Check admins</span>
                                     <input type="checkbox" class="form-check-input admin-checkbox"
                                         id="channel-administrators-checkbox">
-                                        <span class="label" id="channel-administrators-label">Insert username(s) separated by a comma</span>
+                                    <span class="label" id="channel-administrators-label">Insert username(s) separated
+                                        by a comma</span>
                                 </p>
                                 <span class="blocked-desc">Channel is <span id="blocked-text" class="h6"></span></span>
                                 <button type="button" class="btn btn-block" id="btn-blockChannel"
@@ -143,6 +144,36 @@
                                         class="h6"></span></span>
                                 <button type="button" class="btn btn-block" id="btn-visibilityChannel"
                                     data-bs-value_visibility="false">Visibile/Private</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHANNEL SQUEALS MODAL -->
+                <div class="modal fade" id="channelSquealsModal" tabindex="-1"
+                    aria-labelledby="channelSquealsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="channelSquealsModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="channel-post-squeal">
+                                    <textarea class="form-control" id="channel-post-squeal-textarea"
+                                        rows="3" ></textarea>
+                                    <button class="btn btn-success btn-savechanges" data-bs-dismiss="modal">
+                                        Post squeal
+                                    </button>
+                                </div>
+                                <div class="channel-view-squeals">
+
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"

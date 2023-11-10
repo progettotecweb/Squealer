@@ -8,8 +8,8 @@ const keywordsDB = require("../db/keywords");
 
 router.get("/:id", async (req, res) => {
     const squeals = await squealsDB.getAllSquealsByOwnerID(req.params.id);
-    
-    const results = squeals.map( async (squeal) => await squealsDB.transformSqueal(squeal))
+
+    const results = squeals.map(async (squeal) => await squealsDB.transformSqueal(squeal))
     for (let i = 0; i < results.length; i++) {
         results[i] = await results[i]
     }
@@ -31,7 +31,7 @@ router.post("/post", async (req, res) => {
     const keywords = message.match(regexp);
     console.log(keywords);
 
-    if(keywords) {
+    if (keywords) {
         keywords.forEach(async (keyword) => {
             const keywordName = keyword.slice(1);
             await keywordsDB.addSquealToKeyword(keywordName, newSqueal._id);
@@ -59,6 +59,15 @@ router.post("/post", async (req, res) => {
     res.json({
         success: true,
     });
+});
+
+router.get("/allSquealsByChannel/:id", async (req, res) => {
+    const squeals = await squealsDB.getAllSquealsByRecipientID("channel", req.params.id);
+    const results = squeals.map(async (squeal) => await squealsDB.transformSqueal(squeal))
+    for (let i = 0; i < results.length; i++) {
+        results[i] = await results[i]
+    }
+    res.status(200).json(results.reverse());
 });
 
 module.exports = router;
