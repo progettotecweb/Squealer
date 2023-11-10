@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
-
-
-// import SMM_main from './components/SMM_main.vue'
+import {  ref } from 'vue'
+import user_box from './components/user_box.vue'
 import { getUserData } from './components/fetch.ts'
 
 
-const user = ref('');
+const user = ref<any>(null); 
+const controlled_user = ref<any>(null);
 
 
-onBeforeMount(() => {
-  getUserData()
+user.value = getUserData()
+user.value.then((data: any) => {
+  user.value = data
+  controlled_user.value = user.value.controls.user_id
+  
 })
 
 
@@ -24,18 +26,21 @@ onBeforeMount(() => {
     <div class="row flex-xl-nowrap">
       <div class="col-12 col-md-3 col-xl-2 bd-sidebar">
         <p>colonnna sinistra</p>
-        <p>{{ user }}</p>
+        <p>{{ user.name }}</p>
       </div>
       <main
         class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content bg-secondary flex flex-col justify-center items-center text-center text-w undefined text-slate-50"
         role="main">
         <h1 class="bd-title" id="content">Dashboard</h1>
         <div>
-          <p>prima di SMM</p>
-          <SMM_main data: data />
-          <p>dopo SMM</p>
+          <div class="d-flex justify-content-around flex-wrap " >
+              <user_box 
+                  v-for="account in controlled_user"  
+                  :id="account"></user_box>
+          </div>
+          
         </div>
-      </main>SquealerSMMDashboard/src/App.vue
+      </main>
       <div class="d-none d-xl-block col-xl-2 bd-toc">
         <p>colonnna destra</p>
       </div>

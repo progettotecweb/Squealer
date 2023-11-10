@@ -1,23 +1,45 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import { ref } from 'vue'
+import { getMyData } from './fetch';
 // import { useFetch } from '/js/fetch.js'
 
 const user = ref<any>(null)
-defineProps(['id'])
+const id = defineProps(['id'])
 
 
-// user.value = useFetch("/api/searchUserById?id=" + id)
-
-onBeforeMount(() => {
-    user.value = 'ciao'
-
+user.value = getMyData(id.id)
+user.value.then((data: any) => {
+    user.value = data
 })
+
 
 </script>
 
 
 <template>
-    <h1>{{ id }}</h1>
+    <div class="user_box">
+        <img :src=user.img.blob alt="pic" class="modal-img" />
+        
+        <h1>{{ user.name }}</h1>
+        <h1>----------</h1>
+    </div>
 </template>
 
-<style></style>
+<style>
+    .user_box {
+        background-color: #4c6ae1;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 10px;
+        width: 200px;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+</style>
+
+
+
