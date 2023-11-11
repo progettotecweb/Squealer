@@ -97,3 +97,8 @@ exports.getSquealByID = async function (id) {
     const res = await Squeal.findById(id);
     return res;
 };
+
+exports.deleteSquealByID = async function (id) {
+    const res = await Squeal.findByIdAndDelete(id);
+    return res;
+};

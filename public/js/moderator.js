@@ -54,6 +54,8 @@ async function getUserData() {
     document.getElementById("master-user-name").innerHTML = userInfo.name;
     const blobsrc = "data:" + userInfo.img.mimetype + ";base64," + userInfo.img.blob;
     document.getElementById("master-user-img").src = blobsrc;
+    //add data-bs master user id
+    document.getElementById("master-user-name").setAttribute("data-bs-master_user_id", userInfo._id);
 }
 
 getUserData();
@@ -78,20 +80,20 @@ window.onload = function () {
     });
 
     const sectionList = document.querySelector(".section-list");
-    sectionList.addEventListener("click", (e) => {
+    sectionList.addEventListener("click", async (e) => {
         if (e.target.classList.contains("box-section")) {
-            loadSection(e.target);
+            await loadSection(e.target);
         }
     });
 
 
-    function loadSection(section) {
+    async function loadSection(section) {
         switch (section.id) {
             case "userSection":
-                loadUsers();
+                await loadUsers();
                 break;
             case "channelSection":
-                loadChannels();
+                await loadChannels();
                 break;
             case "squealSection":
                 loadSqueals();
@@ -173,7 +175,7 @@ window.onload = function () {
     }
 
 
-    async function loadChannels(orderBy = "alphabetical") {
+    async function loadChannels() {
         const allChannels = await fetch("/api/channels/allChannels", {
             method: "POST",
             headers: {
@@ -234,9 +236,9 @@ window.onload = function () {
                         + 'data-bs-canUserPost="' + data[i].can_user_post + '"'
                         + 'data-bs-official="' + data[i].official + '"'
                         + 'data-bs-blocked="' + data[i].blocked + '"'
-                        + 'data-bs-channelSqueals="' + data[i].squeals + '"';
-
-                    //console.log(data[i].squeals);
+                        + 'data-bs-channelSqueals="' + data[i].squeals + '"'
+                        + 'data-bs-master_user_id="' + document.querySelector('#master-user-name').getAttribute("data-bs-master_user_id") + '"';
+                    //console.log("SQUEALS:\n" + data[i].squeals);
                     //setChannelSquealsAttributes(data[i]._id, "data-bs-channelSqueals");
                     let btnChannel_squeals = '<input type="button" class="m-1 channel-btn btn btn-secondary align-self-end" ' + channelSquealsInfoDataBs + ' value="Squeals" />';
                     let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + btnChannel_squeals + '</div>';
@@ -485,14 +487,12 @@ window.onload = function () {
                 administratorsId: button.getAttribute('data-bs-administrators-id'),
                 canUserPost: button.getAttribute('data-bs-canUserPost'),
                 official: button.getAttribute('data-bs-official'),
-                blocked: button.getAttribute('data-bs-blocked')
+                blocked: button.getAttribute('data-bs-blocked'),
+                master_user_id: button.getAttribute('data-bs-master_user_id')
             }
 
             // Update the modal's content.
-            const modalTitle = channelSquealsModal.querySelector('.modal-title')
-            //const modalImg = userModal.querySelector('.modal-img')
-            const modalBody = channelSquealsModal.querySelector('.selected-channel-info')
-            const btnSave = channelSquealsModal.querySelector("#btn-savechanges");
+            const modalTitle = channelSquealsModal.querySelector('.modal-title');
 
             modalTitle.textContent = databs.name
 
@@ -502,10 +502,30 @@ window.onload = function () {
             //create the cards for every squeal
             searchAndAddSqueals(databs.squeals, viewSquealsDiv);
 
+            //add event listener for the post squeal btn
+            const btnPostSqueal = channelSquealsModal.querySelector("#channel-squeal-post-btn");
+            btnPostSqueal.addEventListener("click", async () => {
+                //check if value is empty
+                const inputSqueal = channelSquealsModal.querySelector("#channel-post-squeal-textarea");
+                if (inputSqueal.value === "") {
+                    return;
+                } else {
+                    btnPostSqueal.disabled = true;
+                }
+            });
+
+            const btnSave = channelSquealsModal.querySelector("#btn-savechanges");
             btnSave.setAttribute("data-bs-channelId", databs.id);
-            btnSave.setAttribute("data-bs-operation", "channels")
+            btnSave.setAttribute("data-bs-operation", "channel-squeal-create");
         });
     }
+
+    //reset values when modal is closed
+    channelSquealsModal.addEventListener('hidden.bs.modal', () => {
+        //reset btn post squeal
+        const btnPostSqueal = channelSquealsModal.querySelector("#channel-squeal-post-btn");
+        btnPostSqueal.disabled = false;
+    });
 
     //save changes if button is pressed, add event listener to every button
     const btnSave = document.getElementsByClassName("btn-savechanges");
@@ -522,94 +542,145 @@ window.onload = function () {
         const operationUpdate = btn.getAttribute("data-bs-operation");
         let id;
         let table;
+        let crud;
 
         switch (operationUpdate) {
             case "users":
                 id = btn.getAttribute("data-bs-userId");
                 table = "users";
+                crud = "UPDATE";
                 break;
             case "channels":
                 id = btn.getAttribute("data-bs-channelId");
                 table = "channels";
+                crud = "UPDATE";
+                break;
+            case "channel-squeal-create":
+                id = btn.getAttribute("data-bs-channelId");
+                table = "squeals";
+                crud = "CREATE";
+                break;
+            case "channel-squeal-delete":
+                //id = btn.getAttribute("data-bs-channelId");
+                table = "squeals";
+                crud = "CREATE";
                 break;
             case "squeals":
                 break;
         }
 
 
-        let data = await fetch("/api/" + table + "/" + id, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                return data;
-            })
-            .catch(err => {
-                console.log(err);
-            });
-
-        //retrieve data to update from modal
-        let dataToUpdate;
-        switch (operationUpdate) {
-            case "users":
-                dataToUpdate = {
-                    blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
-                    msg_quota: {
-                        daily: document.querySelector("#user-quota-daily").value,
-                        weekly: document.querySelector("#user-quota-weekly").value,
-                        monthly: document.querySelector("#user-quota-monthly").value,
-                        extra: document.querySelector("#user-quota-extra").value
+        switch (crud) {
+            case "UPDATE":
+                let data = await fetch("/api/" + table + "/" + id, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
                     }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        return data;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+
+                //retrieve data to update from modal
+                let dataToUpdate;
+                switch (operationUpdate) {
+                    case "users":
+                        dataToUpdate = {
+                            blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
+                            msg_quota: {
+                                daily: document.querySelector("#user-quota-daily").value,
+                                weekly: document.querySelector("#user-quota-weekly").value,
+                                monthly: document.querySelector("#user-quota-monthly").value,
+                                extra: document.querySelector("#user-quota-extra").value
+                            }
+                        }
+                        break;
+                    case "channels":
+                        dataToUpdate = {
+                            blocked: document.querySelector("#btn-blockChannel").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
+                            visibility: document.querySelector("#btn-visibilityChannel").getAttribute("data-bs-value_visibility") === "true" ? data.visibility === "public" ? "private" : "public" : data.visibility,
+                            name: document.querySelector("#channel-name").value,
+                            description: document.querySelector("#channel-description").value,
+                            administrators: document.querySelector("#channel-administrators").value != '' ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null,
+                        }
+                        break;
+
+                    case "squeals":
+                        break;
+                };
+
+                Object.keys(dataToUpdate).forEach(key => {
+                    data[key] = dataToUpdate[key];
+                });
+
+                //update table
+                await fetch("/api/" + table + "/" + id, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(res => {
+                        if (res.ok) {
+                            //console.log("Data updated!");
+                        } else {
+                            console.log("Error while updating data!");
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+                break;
+
+            case "CREATE":
+                if (operationUpdate === "channel-squeal-create") {//create squeal
+                    //retrieve data to update from modal
+                    let dataToUpdate = {
+                        ownerID: document.querySelector("#master-user-name").getAttribute("data-bs-master_user_id"),
+                        content: document.querySelector("#channel-post-squeal-textarea").value,
+                        recipients: [{
+                            type: "channel",
+                            id: btn.getAttribute("data-bs-channelId")
+                        }]
+                    }
+                    console.log(dataToUpdate);
+                    //update table
+                    await fetch("/api/" + table + "/post", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dataToUpdate)
+                    })
+                        .then(res => {
+                            if (res.ok) {
+                                //console.log("Data updated!");
+                            } else {
+                                console.log("Error while updating data!");
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
                 }
                 break;
-            case "channels":
-                dataToUpdate = {
-                    blocked: document.querySelector("#btn-blockChannel").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
-                    visibility: document.querySelector("#btn-visibilityChannel").getAttribute("data-bs-value_visibility") === "true" ? data.visibility === "public" ? "private" : "public" : data.visibility,
-                    name: document.querySelector("#channel-name").value,
-                    description: document.querySelector("#channel-description").value,
-                    administrators: document.querySelector("#channel-administrators").value != '' ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null,
-                }
-                break;
-
-            case "squeals":
-                break;
-        };
-
-        Object.keys(dataToUpdate).forEach(key => {
-            data[key] = dataToUpdate[key];
-        });
-
-        //update table
-        await fetch("/api/" + table + "/" + id, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
-            .then(res => {
-                if (res.ok) {
-                    //console.log("Data updated!");
-                } else {
-                    console.log("Error while updating data!");
-                }
-            })
-            .catch(err => {
-                console.log(err);
-            });
-
+        }
 
         //reload the section
         switch (operationUpdate) {
             case "users":
-                loadUsers(document.getElementById("select-orderby").value);
+                await loadUsers(document.getElementById("select-orderby").value);
                 break;
             case "channels":
-                loadChannels();
+            case "channel-squeal-create":
+            //case "channel-squeal-delete":
+                await loadChannels();
                 break;
             case "squeals":
                 break;
@@ -618,9 +689,9 @@ window.onload = function () {
 
     //event listener for the order by select
     const selectOrderBy = document.getElementById("select-orderby");
-    selectOrderBy.addEventListener("change", (e) => {
+    selectOrderBy.addEventListener("change", async (e) => {
         const value = e.target.value;
-        loadUsers(value);
+        await loadUsers(value);
     });
 
     //change active section
@@ -800,30 +871,65 @@ async function searchAndAddSqueals(squealsId, div) {
                 console.log(err);
             });
 
-        addSquealCard(squeal, owner, div);
+        await addSquealCard(squeal, owner, div);
+
+        //get all delete squeal btn and add event listener
+        const btnDelete = document.querySelectorAll(".channel-squeal-btn");
+        for (let i = 0; i < btnDelete.length; i++) {
+            btnDelete[i].addEventListener("click", async (e) => {
+                await deleteSqueal(e.target.getAttribute("data-bs-squealId"), e);
+            });
+        }
+    }
+
+    async function deleteSqueal(squealId, btn) {
+        console.log(squealId);
+        //first, we remove the squeal from the db
+        await fetch("/api/squeals/" + squealId, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    //now we remove the squeal from the modal
+                    const squealCard = btn.target.parentElement.parentElement;
+                    console.log(squealCard);
+                    squealCard.outerHTML = "";
+                } else {
+                    //console.log("Error while deleting squeal!");
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
     function addSquealCard(squeal, owner, div) {
         //create the card
 
         let header = '<div class="squeal-header d-flex justify-content-between">';
-        let ownerDiv = '<div class="squeal-owner-div align-self-center">'
+        let ownerDiv = '<div class="squeal-owner-div align-self-between">'
             + '<img src="data:' + owner.img.mimetype + ';base64,' + owner.img.blob + '" alt="' + owner.name + '\'s propic" class="user-pic"/>'
             + '<span class="squeal-owner-name h6">' + owner.name + '</span>'
             + '</div>';
-        let datetime = '<div class="squeal-date-div align-self-center">' +
+        let datetime = '<div class="squeal-date-div align-self-center text-center">' +
             '<span class="squeal-date">' + formatDate(squeal.datetime) + '</span>'
             + '</div>';
-        let automatic = '<div class="squeal-automatic-div align-self-center">' +
-            '<span class="squeal-automatic"><b>' + (squeal.automatic === 'true' ? 'Automatic' : '') + '</b></span>' +
-            '</div>';
+        if (squeal.automatic === 'true') {
+            let automatic = '<div class="squeal-automatic-div align-self-center">' +
+                '<span class="squeal-automatic"><b>' + (squeal.automatic === 'true' ? 'Automatic' : '') + '</b></span>' +
+                '</div>';
+        }
 
         header += ownerDiv;
         header += datetime;
-        header += automatic;
+        if (squeal.automatic === 'true')
+            header += automatic;
         header += '</div>';
 
-        let content = '<div class="squeal-content text-center">';
+        let content = '<div class="squeal-content">';
         let text = '<p class="squeal-text">' + squeal.content + '</p>';
         let replies = '<div class="squeal-replies">';
         replies += '</div>';
@@ -856,7 +962,7 @@ async function searchAndAddSqueals(squealsId, div) {
         footer += controversial;
         footer += '</div>';
 
-        let btnDelete = '<div class="d-flex justify-content-center mt-2"><input type="button" class="squeal-btn btn btn-danger align-self-center" data-bs-squealId="' + squeal._id + '" value="Delete squeal" /></div>';
+        let btnDelete = '<div class="d-flex justify-content-center mt-2"><input type="button" class="channel-squeal-btn btn btn-danger align-self-center" data-bs-squealId="' + squeal._id + '" value="Delete squeal" /></div>';
         let mycard = "<div class='my-card-squeal'>";
         mycard += header;
         mycard += content;
@@ -877,4 +983,25 @@ function formatDate(date) {
     const seconds = d.getSeconds();
 
     return day + "/" + month + "/" + year + " " + hour + ":" + minutes;
+}
+
+async function postSqueal(squeal, btn) {
+    console.log(squeal);
+    await fetch("/api/squeals/post", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(squeal)
+    })
+        .then(res => {
+            if (res.ok) {
+                //console.log("Squeal posted!");
+            } else {
+                console.log("Error while posting squeal!");
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
 }
