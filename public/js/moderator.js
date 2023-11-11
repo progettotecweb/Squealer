@@ -187,32 +187,6 @@ window.onload = function () {
                 //clear the box
                 boxContent.innerHTML = "";
 
-                /*//sort the users
-                switch (orderBy) {
-                    case "alphabetical":
-                        data.sort((a, b) => {
-                            if (a.name < b.name) {
-                                return -1;
-                            }
-                            if (a.name > b.name) {
-                                return 1;
-                            }
-                            return 0;
-                        });
-                        break;
-                    case "popularity":
-                        data.sort((a, b) => {
-                            if (a.popularity < b.popularity) {
-                                return 1;
-                            }
-                            if (a.popularity > b.popularity) {
-                                return -1;
-                            }
-                            return 0;
-                        });
-                        break;
-                }*/
-
                 //create the cards for every channel
                 for (let i = 0; i < data.length; i++) {
                     let mycard = "<div class='my-card'>";
@@ -259,10 +233,12 @@ window.onload = function () {
                         + 'data-bs-administrators-id="' + data[i].administrators + '"'
                         + 'data-bs-canUserPost="' + data[i].can_user_post + '"'
                         + 'data-bs-official="' + data[i].official + '"'
-                        + 'data-bs-blocked="' + data[i].blocked + '"';
+                        + 'data-bs-blocked="' + data[i].blocked + '"'
+                        + 'data-bs-channelSqueals="' + data[i].squeals + '"';
 
-                    setChannelSquealsAttributes(data[i]._id, "data-bs-channelSqueals");
-                    let btnChannel_squeals = '<input type="button" class="m-1 channel-btn btn btn-secondary align-self-end" ' + channelSquealsInfoDataBs + '" value="Squeals" />';
+                    //console.log(data[i].squeals);
+                    //setChannelSquealsAttributes(data[i]._id, "data-bs-channelSqueals");
+                    let btnChannel_squeals = '<input type="button" class="m-1 channel-btn btn btn-secondary align-self-end" ' + channelSquealsInfoDataBs + ' value="Squeals" />';
                     let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + btnChannel_squeals + '</div>';
                     mycard += footer;
                     mycard += "</div>";
@@ -489,6 +465,47 @@ window.onload = function () {
         btnVisibilityChannel.disabled = true;
         btnVisibilityChannel.setAttribute("data-bs-value_visibility", "true");
     });
+
+
+    const channelSquealsModal = document.getElementById('channelSquealsModal')
+    if (channelSquealsModal) {
+        channelSquealsModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget
+            // Extract info from data-bs-* attributes
+            const databs = {
+                id: button.getAttribute('data-bs-channelId'),
+                name: button.getAttribute('data-bs-channelName'),
+                description: button.getAttribute('data-bs-channelDescription'),
+                visibility: button.getAttribute('data-bs-channelVisibility'),
+                owner: button.getAttribute('data-bs-channelOwner'),
+                followers: button.getAttribute('data-bs-channelFollowers'),
+                squeals: button.getAttribute('data-bs-channelSqueals'),
+                administratorsName: button.getAttribute('data-bs-administrators-name'),
+                administratorsId: button.getAttribute('data-bs-administrators-id'),
+                canUserPost: button.getAttribute('data-bs-canUserPost'),
+                official: button.getAttribute('data-bs-official'),
+                blocked: button.getAttribute('data-bs-blocked')
+            }
+
+            // Update the modal's content.
+            const modalTitle = channelSquealsModal.querySelector('.modal-title')
+            //const modalImg = userModal.querySelector('.modal-img')
+            const modalBody = channelSquealsModal.querySelector('.selected-channel-info')
+            const btnSave = channelSquealsModal.querySelector("#btn-savechanges");
+
+            modalTitle.textContent = databs.name
+
+            const viewSquealsDiv = channelSquealsModal.querySelector(".channel-view-squeals");
+            viewSquealsDiv.innerHTML = "";
+
+            //create the cards for every squeal
+            searchAndAddSqueals(databs.squeals, viewSquealsDiv);
+
+            btnSave.setAttribute("data-bs-channelId", databs.id);
+            btnSave.setAttribute("data-bs-operation", "channels")
+        });
+    }
 
     //save changes if button is pressed, add event listener to every button
     const btnSave = document.getElementsByClassName("btn-savechanges");
@@ -733,7 +750,6 @@ async function setAdminInput(value, inputAdmins, toId = false) {
 }
 
 async function setChannelSquealsAttributes(channelId, attributeName) {
-    console.log("channelId: " + channelId);
     //search squeals that have the channel as recipient
     const channelSqueals = await fetch("/api/squeals/allSquealsByChannel/" + channelId, {
         method: "GET",
@@ -743,10 +759,122 @@ async function setChannelSquealsAttributes(channelId, attributeName) {
     })
         .then(res => res.json())
         .then(data => {
-            console.log(data);
             return data;
         })
         .catch(err => {
             console.log(err);
         });
+}
+
+
+async function searchAndAddSqueals(squealsId, div) {
+    let squealIdArray = squealsId.split(",");
+
+    for (let i = 0; i < squealIdArray.length; i++) {
+        if (squealIdArray[i] === "") continue;
+        const squeal = await fetch("/api/squeals/search/" + squealIdArray[i], {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                return data;
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        const owner = await fetch("/api/users/" + squeal.ownerID, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                return data;
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        addSquealCard(squeal, owner, div);
+    }
+
+    function addSquealCard(squeal, owner, div) {
+        //create the card
+
+        let header = '<div class="squeal-header d-flex justify-content-between">';
+        let ownerDiv = '<div class="squeal-owner-div align-self-center">'
+            + '<img src="data:' + owner.img.mimetype + ';base64,' + owner.img.blob + '" alt="' + owner.name + '\'s propic" class="user-pic"/>'
+            + '<span class="squeal-owner-name h6">' + owner.name + '</span>'
+            + '</div>';
+        let datetime = '<div class="squeal-date-div align-self-center">' +
+            '<span class="squeal-date">' + formatDate(squeal.datetime) + '</span>'
+            + '</div>';
+        let automatic = '<div class="squeal-automatic-div align-self-center">' +
+            '<span class="squeal-automatic"><b>' + (squeal.automatic === 'true' ? 'Automatic' : '') + '</b></span>' +
+            '</div>';
+
+        header += ownerDiv;
+        header += datetime;
+        header += automatic;
+        header += '</div>';
+
+        let content = '<div class="squeal-content text-center">';
+        let text = '<p class="squeal-text">' + squeal.content + '</p>';
+        let replies = '<div class="squeal-replies">';
+        replies += '</div>';
+
+        content += text;
+        content += '</div>';
+
+        let footer = '<div class="squeal-footer">';
+        let reactions = '<div class="squeal-reactions squeal-footer-tl">'
+            + '<span>'
+            + '😡' + squeal.reactions.m2 + ' '
+            + '😒' + squeal.reactions.m1 + ' '
+            + '😄' + squeal.reactions.p1 + ' '
+            + '😝' + squeal.reactions.p2 + ' '
+            + '</span>'
+            + '</div>';
+        let CM = '<div class="squeal-cm squeal-footer-bl">'
+            + '<span><b>CM</b>: ' + squeal.cm.label.type + '</span>'
+            + '</div>';
+        let impressions = '<div class="squeal-impressions squeal-footer-tr">'
+            + '<span>' + squeal.impressions + ' impression(s)</span>'
+            + '</div>';
+        let controversial = '<div class="squeal-controversial squeal-footer-br">'
+            + '<span><i>' + (squeal.controversial === 'true' ? 'Controversial' : 'Not controversial') + '</i></span>'
+            + '</div>';
+
+        footer += reactions;
+        footer += CM;
+        footer += impressions;
+        footer += controversial;
+        footer += '</div>';
+
+        let btnDelete = '<div class="d-flex justify-content-center mt-2"><input type="button" class="squeal-btn btn btn-danger align-self-center" data-bs-squealId="' + squeal._id + '" value="Delete squeal" /></div>';
+        let mycard = "<div class='my-card-squeal'>";
+        mycard += header;
+        mycard += content;
+        mycard += footer;
+        mycard += btnDelete;
+        mycard += '</div>'
+        div.innerHTML += mycard;
+    }
+}
+
+function formatDate(date) {
+    const d = new Date(date);
+    const month = d.getMonth();//+1
+    const day = d.getDate();
+    const year = d.getFullYear();
+    const hour = d.getHours();
+    const minutes = d.getMinutes();
+    const seconds = d.getSeconds();
+
+    return day + "/" + month + "/" + year + " " + hour + ":" + minutes;
 }

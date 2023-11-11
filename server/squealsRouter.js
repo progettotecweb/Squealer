@@ -5,6 +5,7 @@ const usersDB = require("../db/users");
 const channelsDB = require("../db/channels");
 const squealsDB = require("../db/squeals");
 const keywordsDB = require("../db/keywords");
+const { server_log } = require("../utils/utils");
 
 router.get("/:id", async (req, res) => {
     const squeals = await squealsDB.getAllSquealsByOwnerID(req.params.id);
@@ -68,6 +69,15 @@ router.get("/allSquealsByChannel/:id", async (req, res) => {
         results[i] = await results[i]
     }
     res.status(200).json(results.reverse());
+});
+
+
+router.get("/search/:id", async (req, res) => {
+    const squeal = await squealsDB.getSquealByID(req.params.id);
+    let result = await squealsDB.transformSqueal(squeal);
+    result = await result;
+
+    res.status(200).json(result);
 });
 
 module.exports = router;
