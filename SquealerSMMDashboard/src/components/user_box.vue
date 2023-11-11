@@ -21,7 +21,6 @@ const id = defineProps(['id'])
         <div id="user-img-box">
             <img :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" class="img-fluid img-thumbnail"/> 
         </div>
-        
         <h1>{{ user.name}}</h1>
     </div>
 </template>
@@ -30,7 +29,7 @@ const id = defineProps(['id'])
 
 
     #user-box{
-        background-color: #4c6ae1;
+        background-color: #374e64;
         border-radius: 10px;
         padding: 10px;
         margin: 10px;
@@ -40,11 +39,12 @@ const id = defineProps(['id'])
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        color: aliceblue;
     }
 
     #user-img-box{
-        width: 50%;
-        height: 50%;
+        width: 60%;
+        height: 60%;
     }
 
 </style>
