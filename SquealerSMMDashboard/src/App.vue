@@ -21,9 +21,9 @@ user.value.then((data: any) => {
 <template >
   <header class="navbar navbar-expand navbar-dark sticky-top">
     <div class="container-fluid row justify-content-around"><!--mid or more navbar-->
-      <h2 class="col">SMM Dashboard</h2>
-      <div class="col" style="height: 30px; width: 30px;">
-        <img src="/public/squealer.png" alt="squealer-logo" class="img-fluid"/>
+      <h2 class="col navbar-brand">SMM Dashboard</h2>
+      <div class="col" style="height: 30pt; width: 30pt;">
+        <img src="/public/squealer.png" alt="squealer-logo" class="img-fluid" style="width: 30pt; height: 30pt;"/>
       </div>
       <a class="col btn" href="/logout">Logout</a>
     </div>
@@ -63,6 +63,7 @@ user.value.then((data: any) => {
 </template>
 
 <style >
+
 header{
   background-color: #374e64;
   color: aliceblue;
