@@ -59,6 +59,7 @@ router.post("/post", async (req, res) => {
 
     res.json({
         success: true,
+        squeal: newSqueal
     });
 });
 

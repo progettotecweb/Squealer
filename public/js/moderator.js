@@ -175,7 +175,7 @@ window.onload = function () {
     }
 
 
-    async function loadChannels() {
+    async function loadChannels(waitForNewSqueal = false, squeal = null) {
         const allChannels = await fetch("/api/channels/allChannels", {
             method: "POST",
             headers: {
@@ -238,7 +238,7 @@ window.onload = function () {
                         + 'data-bs-blocked="' + data[i].blocked + '"'
                         + 'data-bs-channelSqueals="' + data[i].squeals + '"'
                         + 'data-bs-master_user_id="' + document.querySelector('#master-user-name').getAttribute("data-bs-master_user_id") + '"';
-                    //console.log("SQUEALS:\n" + data[i].squeals);
+                    console.log("SQUEALS:\n" + data[i].squeals);
                     //setChannelSquealsAttributes(data[i]._id, "data-bs-channelSqueals");
                     let btnChannel_squeals = '<input type="button" class="m-1 channel-btn btn btn-secondary align-self-end" ' + channelSquealsInfoDataBs + ' value="Squeals" />';
                     let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + btnChannel_squeals + '</div>';
@@ -502,18 +502,6 @@ window.onload = function () {
             //create the cards for every squeal
             searchAndAddSqueals(databs.squeals, viewSquealsDiv);
 
-            //add event listener for the post squeal btn
-            const btnPostSqueal = channelSquealsModal.querySelector("#channel-squeal-post-btn");
-            btnPostSqueal.addEventListener("click", async () => {
-                //check if value is empty
-                const inputSqueal = channelSquealsModal.querySelector("#channel-post-squeal-textarea");
-                if (inputSqueal.value === "") {
-                    return;
-                } else {
-                    btnPostSqueal.disabled = true;
-                }
-            });
-
             const btnSave = channelSquealsModal.querySelector("#btn-savechanges");
             btnSave.setAttribute("data-bs-channelId", databs.id);
             btnSave.setAttribute("data-bs-operation", "channel-squeal-create");
@@ -522,17 +510,18 @@ window.onload = function () {
 
     //reset values when modal is closed
     channelSquealsModal.addEventListener('hidden.bs.modal', () => {
-        //reset btn post squeal
-        const btnPostSqueal = channelSquealsModal.querySelector("#channel-squeal-post-btn");
-        btnPostSqueal.disabled = false;
+        //reset textarea
+        const textarea = channelSquealsModal.querySelector("#channel-post-squeal-textarea");
+        textarea.value = "";
+
     });
 
     //save changes if button is pressed, add event listener to every button
     const btnSave = document.getElementsByClassName("btn-savechanges");
     for (let i = 0; i < btnSave.length; i++) {
-        btnSave[i].addEventListener("click", (e) => {
+        btnSave[i].addEventListener("click", async (e) => {
             //console.log(e.target)
-            updateDBandSection(e.target);
+            await updateDBandSection(e.target);
         });
     }
 
@@ -568,7 +557,6 @@ window.onload = function () {
             case "squeals":
                 break;
         }
-
 
         switch (crud) {
             case "UPDATE":
@@ -639,7 +627,7 @@ window.onload = function () {
                 break;
 
             case "CREATE":
-                if (operationUpdate === "channel-squeal-create") {//create squeal
+                if (operationUpdate === "channel-squeal-create" && document.querySelector("#channel-post-squeal-textarea").value != '') {//create squeal
                     //retrieve data to update from modal
                     let dataToUpdate = {
                         ownerID: document.querySelector("#master-user-name").getAttribute("data-bs-master_user_id"),
@@ -649,9 +637,9 @@ window.onload = function () {
                             id: btn.getAttribute("data-bs-channelId")
                         }]
                     }
-                    console.log(dataToUpdate);
-                    //update table
-                    await fetch("/api/" + table + "/post", {
+                    //console.log(dataToUpdate);
+                    //insert in table
+                    const insertPromise = await fetch("/api/" + table + "/post", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -660,10 +648,13 @@ window.onload = function () {
                     })
                         .then(res => {
                             if (res.ok) {
-                                //console.log("Data updated!");
+                                return res.json();
                             } else {
                                 console.log("Error while updating data!");
                             }
+                        })
+                        .then(data => {
+                            return loadChannels();  //reload the section to show the new squeal
                         })
                         .catch(err => {
                             console.log(err);
@@ -679,7 +670,8 @@ window.onload = function () {
                 break;
             case "channels":
             case "channel-squeal-create":
-            //case "channel-squeal-delete":
+                //case "channel-squeal-delete":
+                //console.log("newId: " + newId);
                 await loadChannels();
                 break;
             case "squeals":
