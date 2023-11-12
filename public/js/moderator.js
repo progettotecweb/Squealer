@@ -238,7 +238,7 @@ window.onload = function () {
                         + 'data-bs-blocked="' + data[i].blocked + '"'
                         + 'data-bs-channelSqueals="' + data[i].squeals + '"'
                         + 'data-bs-master_user_id="' + document.querySelector('#master-user-name').getAttribute("data-bs-master_user_id") + '"';
-                    console.log("SQUEALS:\n" + data[i].squeals);
+
                     //setChannelSquealsAttributes(data[i]._id, "data-bs-channelSqueals");
                     let btnChannel_squeals = '<input type="button" class="m-1 channel-btn btn btn-secondary align-self-end" ' + channelSquealsInfoDataBs + ' value="Squeals" />';
                     let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + btnChannel_squeals + '</div>';
@@ -875,7 +875,7 @@ async function searchAndAddSqueals(squealsId, div) {
     }
 
     async function deleteSqueal(squealId, btn) {
-        console.log(squealId);
+        //console.log(squealId);
         //first, we remove the squeal from the db
         await fetch("/api/squeals/" + squealId, {
             method: "DELETE",
@@ -887,7 +887,7 @@ async function searchAndAddSqueals(squealsId, div) {
                 if (res.ok) {
                     //now we remove the squeal from the modal
                     const squealCard = btn.target.parentElement.parentElement;
-                    console.log(squealCard);
+                    //console.log(squealCard);
                     squealCard.outerHTML = "";
                 } else {
                     //console.log("Error while deleting squeal!");
