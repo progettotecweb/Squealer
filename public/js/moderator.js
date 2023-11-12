@@ -870,8 +870,18 @@ async function searchAndAddSqueals(squealsId, div) {
         for (let i = 0; i < btnDelete.length; i++) {
             btnDelete[i].addEventListener("click", async (e) => {
                 await deleteSqueal(e.target.getAttribute("data-bs-squealId"), e);
+                
+                //check if squeals are empty
+                if (div.innerHTML === "") {
+                    div.innerHTML = "<p class='text-center'>No squeals yet!</p>";
+                }
             });
         }
+    }
+
+    //check if squeals are empty
+    if (div.innerHTML === "") {
+        div.innerHTML = "<p class='text-center'>No squeals yet!</p>";
     }
 
     async function deleteSqueal(squealId, btn) {

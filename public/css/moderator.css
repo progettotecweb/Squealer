@@ -118,6 +118,15 @@
     margin: 1.5em 0em;
 }
 
+.channel-squeal-post-btn {
+    margin: 0.5em;
+}
+
+#channel-post-squeal-textarea {
+    box-shadow: 0px 0px 2px 0px #000000;
+}
+
+
 .squeal-owner-div .user-pic {
     width: 3em;
     height: 3em;
