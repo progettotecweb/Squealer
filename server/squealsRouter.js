@@ -9,13 +9,14 @@ const { server_log } = require("../utils/utils");
 
 router.get("/:id", async (req, res) => {
     const squeals = await squealsDB.getAllSquealsByOwnerID(req.params.id);
-
-    const results = squeals.map(async (squeal) => await squealsDB.transformSqueal(squeal))
-    for (let i = 0; i < results.length; i++) {
-        results[i] = await results[i]
-    }
-    res.json({ results: results.reverse() });
+    res.json({ results: squeals.reverse() });
 });
+
+router.put("/:id", async (req, res) => {
+    await squealsDB.updateSquealReactionByID(req.params.id, req.body.reaction, req.body.userid).then((data) => {
+        res.status(200).json({ success: true, squeal: data });
+    })
+})
 
 router.post("/post", async (req, res) => {
     let squeal = req.body;

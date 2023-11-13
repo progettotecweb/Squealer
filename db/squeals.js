@@ -35,6 +35,21 @@ const squealSchema = new mongoose.Schema({
         m1: { type: Number, default: 0 },
         p1: { type: Number, default: 0 },
         p2: { type: Number, default: 0 },
+        usersReactions: {
+            type: [
+                {
+                    userID: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: "User",
+                    },
+                    reaction: {
+                        type: String,
+                        enum: ["m2", "m1", "p1", "p2"],
+                    },
+                },
+            ],
+            default: [],
+        }
     },
     cm: {
         Rp: { type: Number, default: 0 },
@@ -70,7 +85,7 @@ exports.createNewSqueal = async function (squeal) {
 };
 
 exports.getAllSquealsByOwnerID = async function (ownerID) {
-    const res = await Squeal.find({ ownerID: ownerID });
+    const res = await Squeal.find({ ownerID: ownerID }).populate("ownerID", "name img");
     return res;
 };
 
@@ -102,3 +117,34 @@ exports.deleteSquealByID = async function (id) {
     const res = await Squeal.findByIdAndDelete(id);
     return res;
 };
+
+exports.updateSquealReactionByID = async function (id, reaction, userid) {
+    const res = await Squeal.findById(id);
+
+    if (res.reactions.usersReactions.some((userReaction) => userReaction.userID.toString() === userid)) {
+        
+        //find old reaction
+        const old = res.reactions.usersReactions.find((userReaction) => userReaction.userID.toString() === userid).reaction;
+
+
+        if(old === reaction) {
+            res.reactions[reaction] -= 1;
+            res.reactions.usersReactions = res.reactions.usersReactions.filter((userReaction) => userReaction.userID.toString() !== userid);
+            res.save();
+            return res;
+        } else {
+            res.reactions[old] -= 1;
+            res.reactions[reaction] += 1;
+            res.reactions.usersReactions.find((userReaction) => userReaction.userID.toString() === userid).reaction = reaction;
+            res.save();
+            return res;
+        }
+    } else {
+        res.reactions.usersReactions.push({ userID: userid, reaction: reaction });
+        res.reactions[reaction] += 1;
+    }
+
+    res.save();
+    
+    return res;
+}

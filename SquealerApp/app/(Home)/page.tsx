@@ -13,11 +13,11 @@ const Homepage = () => {
     const {data : session} = useSession();
 
     interface Squeal {
+        _id: string;
         content: string;
-        userInfo: {
-            name: string;
-        }
+        ownerID: any;
         datetime: string,
+        reactions: any;
     }
 
     interface Res {
@@ -38,12 +38,14 @@ const Homepage = () => {
                     isLoading && <div>Loading...</div>
                 } {
                     data && data.results.map((squeal, index )=> {
-                        return <Squeal key={index}  content={squeal.content} name={squeal?.userInfo?.name} date={squeal?.datetime}/>
+                        return <Squeal key={index} id={squeal._id} content={squeal.content} owner={squeal?.ownerID} date={squeal?.datetime} reactions={squeal?.reactions}/>
                     })
                 }
             </section>
         </PageContainer>
     );
 };
+
+
 
 export default Homepage;
