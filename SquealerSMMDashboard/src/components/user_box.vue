@@ -29,7 +29,7 @@ const id = defineProps(['id'])
 
 
     #user-box{
-        background-color: #374e64;
+        background-color: #3e5870;
         border-radius: 10px;
         padding: 10px;
         margin: 10px;
