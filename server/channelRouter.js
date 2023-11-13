@@ -40,7 +40,7 @@ router.post("/follow", async (req, res) => {
     }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/id/:id", async (req, res) => {
     const channel = await channelsDB.searchChannelByID(req.params.id);
 
     if (!channel) {
@@ -73,7 +73,7 @@ router.get("/:name", async (req, res) => {
     res.status(200).json(channel);
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/id/:id", async (req, res) => {
     const channel = await channelsDB.searchChannelByID(req.params.id);
     if (!channel) {
         res.status(404).json({
