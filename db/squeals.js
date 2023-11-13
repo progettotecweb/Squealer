@@ -31,14 +31,14 @@ const squealSchema = new mongoose.Schema({
         default: "private",
     },
     reactions: {
-        "-2": { type: Number, default: 0 },
-        "-1": { type: Number, default: 0 },
-        "+1": { type: Number, default: 0 },
-        "+2": { type: Number, default: 0 },
+        m2: { type: Number, default: 0 },
+        m1: { type: Number, default: 0 },
+        p1: { type: Number, default: 0 },
+        p2: { type: Number, default: 0 },
     },
-    CM: {
-        "R+": { type: Number, default: 0 },
-        "R-": { type: Number, default: 0 },
+    cm: {
+        Rp: { type: Number, default: 0 },
+        Rm: { type: Number, default: 0 },
         label: {
             type: {
                 type: String,
@@ -91,4 +91,14 @@ exports.transformSqueal = async (dbSqueal) => {
         },
     };
     return squeal;
+};
+
+exports.getSquealByID = async function (id) {
+    const res = await Squeal.findById(id);
+    return res;
+};
+
+exports.deleteSquealByID = async function (id) {
+    const res = await Squeal.findByIdAndDelete(id);
+    return res;
 };

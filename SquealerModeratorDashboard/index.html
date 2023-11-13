@@ -118,6 +118,7 @@
                             </div>
                             <div class="modal-body">
                                 <p class="selected-channel-info">
+                                    </form>
                                     <span class="h6" id="channel-official">Official</span><br>
                                     <span class="h6">Name: </span>
                                     <input type="text" class="form-text" id="channel-name"
@@ -127,9 +128,14 @@
                                     <input type="text" class="form-text" id="channel-description"
                                         data-bs-value_description="description"><br>
 
-                                    <span class="h6">Administrators: </span>
-                                    <input type="text" class="form-text" id="channel-administrators"
+                                    <span class="h6 ">Administrators: </span>
+                                    <input type="text" class="form-text " id="channel-administrators"
                                         data-bs-value_administrators="administrators"><br>
+                                    <span class="label">Check admins</span>
+                                    <input type="checkbox" class="form-check-input admin-checkbox"
+                                        id="channel-administrators-checkbox">
+                                    <span class="label" id="channel-administrators-label">Insert username(s) separated
+                                        by a comma</span>
                                 </p>
                                 <span class="blocked-desc">Channel is <span id="blocked-text" class="h6"></span></span>
                                 <button type="button" class="btn btn-block" id="btn-blockChannel"
@@ -143,6 +149,37 @@
                                 <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
                                     id="btn-savechanges">Save changes</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHANNEL SQUEALS MODAL -->
+                <div class="modal fade" id="channelSquealsModal" tabindex="-1"
+                    aria-labelledby="channelSquealsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="channelSquealsModalLabel ">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                    id="close-channel-squeal-modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="channel-post-squeal d-flex flex-column">
+                                    <textarea class="form-control" id="channel-post-squeal-textarea" rows="3"
+                                        placeholder="Write here..."></textarea>
+                                    <button class="btn btn-success btn-savechanges channel-squeal-post-btn"
+                                        id="btn-savechanges" data-bs-dismiss="modal">
+                                        Post squeal
+                                    </button>
+                                </div>
+                                <hr>
+                                <div class="channel-view-squeals">
+                                </div>
+                            </div>
+                            <!--<div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>-->
                         </div>
                     </div>
                 </div>

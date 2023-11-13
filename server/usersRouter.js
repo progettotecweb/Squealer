@@ -79,6 +79,21 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(user);
 });
 
+//get user from name
+router.get("/name/:name", async (req, res) => {
+    const user = await usersDB.searchUserByName(req.params.name);
+
+    if (!user) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    res.status(200).json(user);
+});
+
 //get all users
 router.post("/all", async (req, res) => {
     const users = await usersDB.getAllUsers();

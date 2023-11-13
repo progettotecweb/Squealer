@@ -186,7 +186,8 @@ async function create() {
         await db.dropCollection("users");
         await db.dropCollection("channels");
         await db.dropCollection("squeals");
-
+        await db.dropCollection("keywords");
+        
         //leggo le collezioni
         let usersData = readJsonData("users.json");
         let channelsData = readJsonData("channels.json");
