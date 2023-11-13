@@ -541,7 +541,7 @@ window.onload = function () {
                 break;
             case "channels":
                 id = btn.getAttribute("data-bs-channelId");
-                table = "channels";
+                table = "channels/id";
                 crud = "UPDATE";
                 break;
             case "channel-squeal-create":
