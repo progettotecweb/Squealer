@@ -8,14 +8,14 @@ const squealSchema = new mongoose.Schema({
     },
     recipients: [
         {
-            type: {
-                type: String,
-                enum: ["user", "channel"],
-            },
             id: {
                 type: mongoose.Schema.Types.ObjectId,
-                refPath: "type",
+                refPath: 'recipients.type'
             },
+            type:{
+                type: String,
+                enum: ['User', 'Channel']
+            }
         },
     ],
     content: String,
@@ -109,7 +109,7 @@ exports.transformSqueal = async (dbSqueal) => {
 };
 
 exports.getSquealByID = async function (id) {
-    const res = await Squeal.findById(id);
+    const res = await Squeal.findById(id).populate("ownerID", "name img");
     return res;
 };
 
@@ -122,12 +122,12 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
     const res = await Squeal.findById(id);
 
     if (res.reactions.usersReactions.some((userReaction) => userReaction.userID.toString() === userid)) {
-        
+
         //find old reaction
         const old = res.reactions.usersReactions.find((userReaction) => userReaction.userID.toString() === userid).reaction;
 
 
-        if(old === reaction) {
+        if (old === reaction) {
             res.reactions[reaction] -= 1;
             res.reactions.usersReactions = res.reactions.usersReactions.filter((userReaction) => userReaction.userID.toString() !== userid);
             res.save();
@@ -145,6 +145,11 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
     }
 
     res.save();
-    
+
     return res;
 }
+
+exports.getAllSqueals = async function () {
+    const res = await Squeal.find({}).populate("ownerID", "name img").populate("recipients.id");
+    return res;
+};

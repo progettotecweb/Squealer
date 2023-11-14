@@ -95,14 +95,14 @@ const squealSchema = new mongoose.Schema({
     },
     recipients: [
         {
-            type: {
-                type: String,
-                enum: ["user", "channel"],
-            },
             id: {
                 type: mongoose.Schema.Types.ObjectId,
-                refPath: "type",
+                refPath: 'recipients.type'
             },
+            type:{
+                type: String,
+                enum: ['User', 'Channel']
+            }
         },
     ],
     content: String,

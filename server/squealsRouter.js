@@ -47,11 +47,11 @@ router.post("/post", async (req, res) => {
     // Squeal distribution
     const recipients = squeal.recipients;
     recipients.forEach(async (recipient) => {
-        if (recipient.type === "user") {
+        if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
             user.squeals.push(newSqueal._id);
             user.save();
-        } else if (recipient.type === "channel") {
+        } else if (recipient.type === "Channel") {
             const channel = await channelsDB.searchChannelByID(recipient.id);
             channel.squeals.push(newSqueal._id);
             channel.save();
@@ -76,10 +76,7 @@ router.get("/allSquealsByChannel/:id", async (req, res) => {
 
 router.get("/search/:id", async (req, res) => {
     const squeal = await squealsDB.getSquealByID(req.params.id);
-    let result = await squealsDB.transformSqueal(squeal);
-    result = await result;
-
-    res.status(200).json(result);
+    res.status(200).json(squeal);
 });
 
 router.delete("/:id", async (req, res) => {
@@ -91,12 +88,12 @@ router.delete("/:id", async (req, res) => {
 
     const recipients = squeal.recipients;                    // recipients of the squeal
     recipients.forEach(async (recipient) => {             // for each recipient of the squeal we remove the squeal from their squeals array
-        if (recipient.type === "user") {
+        if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
             const squealIndex = user.squeals.indexOf(req.params.id);
             user.squeals.splice(squealIndex, 1);
             user.save();
-        } else if (recipient.type === "channel") {
+        } else if (recipient.type === "Channel") {
             const channel = await channelsDB.searchChannelByID(recipient.id);
             const squealIndex = channel.squeals.indexOf(req.params.id);
             channel.squeals.splice(squealIndex, 1);
@@ -107,6 +104,11 @@ router.delete("/:id", async (req, res) => {
     await squealsDB.deleteSquealByID(req.params.id);     // delete the squeal from the squeals collection
 
     res.status(200).json({ success: true });
+});
+
+router.post("/all", async (req, res) => {
+    const squeals = await squealsDB.getAllSqueals();
+    res.status(200).json(squeals.reverse());
 });
 
 module.exports = router;

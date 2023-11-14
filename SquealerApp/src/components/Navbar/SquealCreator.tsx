@@ -69,8 +69,8 @@ const SquealCreator = () => {
                         return {
                             value: {
                                 type: query.startsWith("@")
-                                    ? "user"
-                                    : "channel",
+                                    ? "User"
+                                    : "Channel",
                                 id: res.id,
                             },
                             label: res.name,

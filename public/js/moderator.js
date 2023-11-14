@@ -198,7 +198,7 @@ window.onload = function () {
                 //console.log(data);
                 const boxContent = document.getElementById("box-content");
                 //clear the box
-                boxContent.innerHTML = "";
+                boxContent.innerHTML = ""; console.log(data);
 
                 //get the filters attributes from the filter btn
                 const btnFilter = document.querySelector("#btn-filter");
@@ -309,6 +309,54 @@ window.onload = function () {
                     mycard += footer;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+
+    async function loadSqueals() {
+        const allSqueals = await fetch("/api/squeals/all", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                //console.log(data);
+                const boxContent = document.getElementById("box-content");
+                //clear the box
+                boxContent.innerHTML = "";
+
+                //get the filters attributes from the filter btn
+                const btnFilter = document.querySelector("#btn-filter");
+                const filter = {
+                    orderBy: btnFilter.getAttribute("data-bs-squealsFilter-orderby") === null ? "date" : btnFilter.getAttribute("data-bs-squealsFilter-orderby"),
+                    type: btnFilter.getAttribute("data-bs-squealsFilter-type") === null ? "All" : btnFilter.getAttribute("data-bs-squealsFilter-type")
+                };
+
+                //sort the squeals
+                /*switch (filter.orderBy) {
+                    case "date":
+                        data.sort((a, b) => {
+                            if (a.date < b.date) {
+                                return 1;
+                            }
+                            if (a.date > b.date) {
+                                return -1;
+                            }
+                            return 0;
+                        });
+                        break;
+                }*/
+
+                //create the cards for every squeal
+                //console.log(data)
+                for (let i = 0; i < data.length; i++) {
+                    addSquealCard(data[i], data[i].recipients, boxContent, false);
                 }
             })
             .catch(err => {
@@ -751,11 +799,11 @@ window.onload = function () {
                         ownerID: document.querySelector("#master-user-name").getAttribute("data-bs-master_user_id"),
                         content: document.querySelector("#channel-post-squeal-textarea").value,
                         recipients: [{
-                            type: "channel",
+                            type: "Channel",
                             id: btn.getAttribute("data-bs-channelId")
                         }]
                     }
-                    //console.log(dataToUpdate);
+                    console.log(table);
                     //insert in table
                     const insertPromise = await fetch("/api/" + table + "/post", {
                         method: "POST",
@@ -937,27 +985,9 @@ async function setAdminInput(value, inputAdmins, toId = false) {
     //inputAdmins.setAttribute("data-bs-administrators-id", usersId);
 }
 
-async function setChannelSquealsAttributes(channelId, attributeName) {
-    //search squeals that have the channel as recipient
-    const channelSqueals = await fetch("/api/squeals/allSquealsByChannel/" + channelId, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    })
-        .then(res => res.json())
-        .then(data => {
-            return data;
-        })
-        .catch(err => {
-            console.log(err);
-        });
-}
-
-
 async function searchAndAddSqueals(squealsId, div) {
     let squealIdArray = squealsId.split(",");
-
+    console.log(squealIdArray);
     for (let i = 0; i < squealIdArray.length; i++) {
         if (squealIdArray[i] === "") continue;
         const squeal = await fetch("/api/squeals/search/" + squealIdArray[i], {
@@ -974,21 +1004,7 @@ async function searchAndAddSqueals(squealsId, div) {
                 console.log(err);
             });
 
-        const owner = await fetch("/api/users/" + squeal.ownerID, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                return data;
-            })
-            .catch(err => {
-                console.log(err);
-            });
-
-        await addSquealCard(squeal, owner, div);
+        await addSquealCard(squeal, null, div, true);
 
         //get all delete squeal btn and add event listener
         const btnDelete = document.querySelectorAll(".channel-squeal-btn");
@@ -1032,72 +1048,90 @@ async function searchAndAddSqueals(squealsId, div) {
                 console.log(err);
             });
     }
+}
 
-    function addSquealCard(squeal, owner, div) {
-        //create the card
-
-        let header = '<div class="squeal-header d-flex justify-content-between">';
-        let ownerDiv = '<div class="squeal-owner-div align-self-between">'
-            + '<img src="data:' + owner.img.mimetype + ';base64,' + owner.img.blob + '" alt="' + owner.name + '\'s propic" class="user-pic"/>'
-            + '<span class="squeal-owner-name h6">' + owner.name + '</span>'
-            + '</div>';
-        let datetime = '<div class="squeal-date-div align-self-center text-center">' +
-            '<span class="squeal-date">' + formatDate(squeal.datetime) + '</span>'
-            + '</div>';
-        if (squeal.automatic === 'true') {
-            let automatic = '<div class="squeal-automatic-div align-self-center">' +
-                '<span class="squeal-automatic"><b>' + (squeal.automatic === 'true' ? 'Automatic' : '') + '</b></span>' +
-                '</div>';
+function addSquealCard(squeal, recipients, div, del = false) {
+    //create the card
+    let recipientsDiv = '';
+    if (recipients != null) {
+        recipientsDiv = '<div class="squeal-recipients-div align-self-center">'
+        for (let i = 0; i < recipients.length; i++) {
+            recipientsDiv += '<span class="squeal-recipient ">'
+                + (recipients[i].type === "Channel" ? '§' : '@')
+                + recipients[i].id.name + '</span>';
+            if (i < recipients.length - 1)
+                recipientsDiv += ', ';
         }
+        recipientsDiv += '</div>';
 
-        header += ownerDiv;
-        header += datetime;
-        if (squeal.automatic === 'true')
-            header += automatic;
-        header += '</div>';
-
-        let content = '<div class="squeal-content">';
-        let text = '<p class="squeal-text">' + squeal.content + '</p>';
-        let replies = '<div class="squeal-replies">';
-        replies += '</div>';
-
-        content += text;
-        content += '</div>';
-
-        let footer = '<div class="squeal-footer">';
-        let reactions = '<div class="squeal-reactions squeal-footer-tl">'
-            + '<span>'
-            + '😡' + squeal.reactions.m2 + ' '
-            + '😒' + squeal.reactions.m1 + ' '
-            + '😄' + squeal.reactions.p1 + ' '
-            + '😝' + squeal.reactions.p2 + ' '
-            + '</span>'
-            + '</div>';
-        let CM = '<div class="squeal-cm squeal-footer-bl">'
-            + '<span><b>CM</b>: ' + squeal.cm.label.type + '</span>'
-            + '</div>';
-        let impressions = '<div class="squeal-impressions squeal-footer-tr">'
-            + '<span>' + squeal.impressions + ' impression(s)</span>'
-            + '</div>';
-        let controversial = '<div class="squeal-controversial squeal-footer-br">'
-            + '<span><i>' + (squeal.controversial === 'true' ? 'Controversial' : 'Not controversial') + '</i></span>'
-            + '</div>';
-
-        footer += reactions;
-        footer += CM;
-        footer += impressions;
-        footer += controversial;
-        footer += '</div>';
-
-        let btnDelete = '<div class="d-flex justify-content-center mt-2"><input type="button" class="channel-squeal-btn btn btn-danger align-self-center" data-bs-squealId="' + squeal._id + '" value="Delete squeal" /></div>';
-        let mycard = "<div class='my-card-squeal'>";
-        mycard += header;
-        mycard += content;
-        mycard += footer;
-        mycard += btnDelete;
-        mycard += '</div>'
-        div.innerHTML += mycard;
     }
+    console.log(squeal);
+    let header = '<div class="squeal-header d-flex justify-content-between">';
+    let ownerDiv = '<div class="squeal-owner-div p-1 align-self-between">'
+        + '<img src="data:' + squeal.ownerID.img.mimetype + ';base64,' + squeal.ownerID.img.blob + '" alt="' + squeal.ownerID.name + '\'s propic" class="user-pic"/>'
+        + '<span class="squeal-owner-name h6 m-2">' + squeal.ownerID.name + '</span>'
+        + '</div>';
+    let datetime = '<div class="squeal-date-div align-self-center text-center">' +
+        '<span class="squeal-date">' + formatDate(squeal.datetime) + '</span>'
+        + '</div>';
+    let automatic = '';
+    if (squeal.automatic === true) {
+        automatic += '<div class="squeal-automatic-div align-self-center text-center">' +
+            '<span class="squeal-automatic"><b>' + (squeal.automatic === true ? 'Automatic' : '') + '</b></span>' +
+            '</div>';
+    }
+
+
+
+    header += ownerDiv;
+    header += datetime;
+    header += '</div>';
+
+    let content = '<div class="squeal-content">';
+    let text = '<p class="squeal-text">' + squeal.content + '</p>';
+    let replies = '<div class="squeal-replies">';
+    replies += '</div>';
+
+    content += text;
+    content += '</div>';
+
+    let footer = '<div class="squeal-footer">';
+    let reactions = '<div class="squeal-reactions squeal-footer-tl">'
+        + '<span>'
+        + '😡' + squeal.reactions.m2 + ' '
+        + '😒' + squeal.reactions.m1 + ' '
+        + '😄' + squeal.reactions.p1 + ' '
+        + '😝' + squeal.reactions.p2 + ' '
+        + '</span>'
+        + '</div>';
+    let CM = '<div class="squeal-cm squeal-footer-bl">'
+        + '<span><b>CM</b>: ' + squeal.cm.label.type + '</span>'
+        + '</div>';
+    let impressions = '<div class="squeal-impressions squeal-footer-tr">'
+        + '<span>' + squeal.impressions + ' impression(s)</span>'
+        + '</div>';
+    let controversial = '<div class="squeal-controversial squeal-footer-br">'
+        + '<span><i>' + (squeal.controversial === 'true' ? 'Controversial' : 'Not controversial') + '</i></span>'
+        + '</div>';
+
+    footer += reactions;
+    footer += CM;
+    footer += impressions;
+    footer += controversial;
+    footer += '</div>';
+    let btnDelete = '';
+    if (del) {
+        btnDelete += '<div class="d-flex justify-content-center mt-2"><input type="button" class="channel-squeal-btn btn btn-danger align-self-center" data-bs-squealId="' + squeal._id + '" value="Delete squeal" /></div>';
+    }
+    let mycard = "<div class='my-card-squeal channel-squeal'>";
+    mycard += recipientsDiv;
+    mycard += header;
+    mycard += content;
+    mycard += footer;
+    mycard += automatic;
+    mycard += btnDelete;
+    mycard += '</div>'
+    div.innerHTML += mycard;
 }
 
 function formatDate(date) {

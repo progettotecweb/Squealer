@@ -140,7 +140,8 @@
 .my-card-grid-b2 {
     grid-area: 3 / 2 / 4 / 3;
 }
-.my-card-grid-bottom{
+
+.my-card-grid-bottom {
     grid-area: 4 / 1 / 5 / 3;
 }
 
@@ -166,11 +167,15 @@
 
 .my-card-squeal {
     width: 100%;
+    max-height: 20em;
     /*border: 1px solid black;*/
     box-shadow: 0px 0px 5px 0px #000000;
     background-color: #F0F0F0;
     border-radius: 10px;
     padding: 1em;
+}
+
+.channel-squeal{
     margin: 1.5em 0em;
 }
 
@@ -226,7 +231,16 @@
 }
 
 .squeal-owner-div {
-    max-width: 33%;
+    max-width: 50%;
+}
+
+.squeal-recipients-div{
+    text-align: end;
+    margin-bottom: 0.5em;
+}
+
+.squeal-recipient {
+    font-style: italic;
 }
 
 .squeal-date-div {
@@ -234,7 +248,7 @@
 }
 
 .squeal-automatic-div {
-    max-width: 33%;
+    width: auto;
 }
 
 .user-pic {
@@ -272,7 +286,7 @@
 
 
 
-.channel-official{
+.channel-official {
     text-align: center;
     font-style: italic;
 }
