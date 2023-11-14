@@ -12,6 +12,7 @@ const channelSchema = new mongoose.Schema({
     owner_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        default: null,
     },
     administrators: [
         {
@@ -82,6 +83,6 @@ exports.updateChannel = async function (id, channel) {
 }
 
 exports.getAllChannels = async function () {
-    const channels = await Channel.find({});
+    const channels = await Channel.find({}).populate("owner_id", "name");
     return channels;
 }

@@ -124,8 +124,6 @@ window.onload = function () {
                     type: btnFilter.getAttribute("data-bs-userFilter-type") === null ? "All" : btnFilter.getAttribute("data-bs-userFilter-type")
                 };
 
-                console.log(filter);
-
                 //sort the users
                 switch (filter.orderBy) {
                     case "alphabetical":
@@ -201,13 +199,68 @@ window.onload = function () {
                 //clear the box
                 boxContent.innerHTML = "";
 
+                //get the filters attributes from the filter btn
+                const btnFilter = document.querySelector("#btn-filter");
+                const filter = {
+                    orderBy: btnFilter.getAttribute("data-bs-channelFilter-orderby") === null ? "alphabetical" : btnFilter.getAttribute("data-bs-channelFilter-orderby"),
+                    type: btnFilter.getAttribute("data-bs-channelFilter-type") === null ? "All" : btnFilter.getAttribute("data-bs-channelFilter-type")
+                };
+
+                //sort the channels
+                switch (filter.orderBy) {
+                    case "alphabetical":
+                        data.sort((a, b) => {
+                            if (a.name < b.name) {
+                                return -1;
+                            }
+                            if (a.name > b.name) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        break;
+                    case "popularity":
+                        data.sort((a, b) => {
+                            if (a.followers.length < b.followers.length) {
+                                return 1;
+                            }
+                            if (a.followers.length > b.followers.length) {
+                                return -1;
+                            }
+                            return 0;
+                        });
+                        break;
+                    case "owner":
+                        data.sort((a, b) => {
+                            //if owner is null then put it at the end
+                            if (a.owner_id === null && b.owner_id === null) {
+                                return 0;
+                            }
+                            if (a.owner_id === null) {
+                                return 1;
+                            }
+                            if (b.owner_id === null) {
+                                return -1;
+                            }
+
+                            if (a.owner_id.name < b.owner_id.name) {
+                                return -1;
+                            }
+                            if (a.owner_id.name > b.owner_id.name) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        break;
+                }
+
                 //create the cards for every channel
                 for (let i = 0; i < data.length; i++) {
+                    //check the filter type and skip the channel if it doesn't match, or show all
+                    if (filter.type != "All" && (data[i].official === true ? 'Official' : 'Unofficial') != filter.type) continue;
+
                     let mycard = "<div class='my-card'>";
 
-                    //const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
-                    //let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic'/>";
-                    //mycard += img;
                     mycard += '<div class="channel-content my-card-grid-tl">';
                     let content = "<p class='channel-name'>" + data[i].name + "</p>";
                     content += "<p class='channel-description'>" + data[i].description + "</p>";
@@ -215,7 +268,12 @@ window.onload = function () {
                     mycard += "</div>";
                     mycard += '<div class="my-card-grid-tr">';
                     let official = data[i].official === true ? "Official" : "Unofficial"
+                    let owner = data[i].owner_id === null ? "" : data[i].owner_id.name;
+                    let followers = data[i].followers.length;
                     mycard += '<p class = "channel-official-card">' + official + '</p>';
+                    if (owner != "")
+                        mycard += '<p class = "channel-owner-card">Owner: ' + owner + '</p>';
+                    mycard += '<p class = "channel-followers-card">' + followers + ' Follower(s)</p>';
                     mycard += '</div>';
                     let channelInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
                         + 'data-bs-toggle="modal"'
@@ -349,8 +407,8 @@ window.onload = function () {
 
             // Update the modal's content.
             const modalTitle = userFilterModal.querySelector('.modal-title');
-            const orderBy = userFilterModal.querySelector('#select-orderby');
-            const type = userFilterModal.querySelector('#select-type');
+            const orderBy = userFilterModal.querySelector('#filterUsers-select-orderby');
+            const type = userFilterModal.querySelector('#filterUsers-select-type');
 
             const btnSave = userFilterModal.querySelector("#btn-savechanges");
             btnSave.addEventListener("click", (e) => {
@@ -556,6 +614,27 @@ window.onload = function () {
             //console.log(e.target)
             await updateDBandSection(e.target);
         });
+    }
+
+    //USER FILTER MODAL
+    const channelFilterModal = document.getElementById('channelFilterModal')
+    if (channelFilterModal) {
+        channelFilterModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget
+
+            // Update the modal's content.
+            const modalTitle = channelFilterModal.querySelector('.modal-title');
+            const orderBy = channelFilterModal.querySelector('#filterChannels-select-orderby');
+            const type = channelFilterModal.querySelector('#filterChannels-select-type');
+
+            const btnSave = channelFilterModal.querySelector("#btn-savechanges");
+            btnSave.addEventListener("click", (e) => {
+                button.setAttribute("data-bs-channelFilter-orderby", orderBy.value);
+                button.setAttribute("data-bs-channelFilter-type", type.value);
+                loadChannels();
+            });
+        })
     }
 
     //update the db and reload the section

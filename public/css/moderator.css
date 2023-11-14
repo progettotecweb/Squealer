@@ -241,6 +241,14 @@
     font-style: italic;
 }
 
+.channel-owner-card {
+    text-align: center;
+}
+
+.channel-followers-card {
+    text-align: center;
+}
+
 .modal-img {
     width: 5em;
     height: 5em;

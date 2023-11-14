@@ -117,20 +117,19 @@
                             </div>
                             <div class="modal-body">
                                 <span class="h6">Choose the order</span>
-                                <select class="form-select sort-select" id="select-orderby">
+                                <select class="form-select sort-select" id="filterUsers-select-orderby">
                                     <option value="alphabetical" selected>Alphabetical</option>
                                     <option value="popularity">Popularity</option>
                                 </select>
 
                                 <span class="h6">Choose the type of user to show</span>
-                                <select class="form-select sort-select" id="select-type">
+                                <select class="form-select sort-select" id="filterUsers-select-type">
                                     <option value="All" selected>All</option>
                                     <option value="User">User</option>
                                     <option value="Pro">Pro</option>
                                     <option value="SMM">SMM</option>
                                     <option value="Mod">Mod</option>
                                 </select>
-
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
@@ -230,9 +229,19 @@
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <p>
-                                    seleziona filtro canali
-                                </p>
+                                <span class="h6">Choose the order</span>
+                                <select class="form-select sort-select" id="filterChannels-select-orderby">
+                                    <option value="alphabetical" selected>Alphabetical</option>
+                                    <option value="owner">Owner name</option>
+                                    <option value="popularity">Popularity</option>
+                                </select>
+
+                                <span class="h6">Choose the type</span>
+                                <select class="form-select sort-select" id="filterChannels-select-type">
+                                    <option value="All" selected>All</option>
+                                    <option value="Official">Official</option>
+                                    <option value="Unofficial">Unofficial</option>
+                                </select>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"

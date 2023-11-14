@@ -61,6 +61,7 @@ const channelSchema = new mongoose.Schema({
     owner_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        default: null,
     },
     administrators: [
         {
@@ -117,14 +118,29 @@ const squealSchema = new mongoose.Schema({
         default: "private",
     },
     reactions: {
-        "-2": { type: Number, default: 0 },
-        "-1": { type: Number, default: 0 },
-        "+1": { type: Number, default: 0 },
-        "+2": { type: Number, default: 0 },
+        m2: { type: Number, default: 0 },
+        m1: { type: Number, default: 0 },
+        p1: { type: Number, default: 0 },
+        p2: { type: Number, default: 0 },
+        usersReactions: {
+            type: [
+                {
+                    userID: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: "User",
+                    },
+                    reaction: {
+                        type: String,
+                        enum: ["m2", "m1", "p1", "p2"],
+                    },
+                },
+            ],
+            default: [],
+        }
     },
-    CM: {
-        "R+": { type: Number, default: 0 },
-        "R-": { type: Number, default: 0 },
+    cm: {
+        Rp: { type: Number, default: 0 },
+        Rm: { type: Number, default: 0 },
         label: {
             type: {
                 type: String,
