@@ -272,16 +272,16 @@
 
 
 
-.channel-official-card {
+.channel-official{
     text-align: center;
     font-style: italic;
 }
 
-.channel-owner-card {
+.channel-owner {
     text-align: center;
 }
 
-.channel-followers-card {
+.channel-followers {
     text-align: center;
 }
 

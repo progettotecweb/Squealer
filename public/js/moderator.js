@@ -162,7 +162,7 @@ window.onload = function () {
                     let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic my-card-grid-tl'/>";
                     mycard += img;
                     mycard += '<div class="user-content my-card-grid-tr">';
-                    let content = "<p class='user-name'>" + data[i].name + "</p>";
+                    let content = "<p class='user-name h5'>" + data[i].name + "</p>";
                     content += "<p class='user-popularity'>⭐" + data[i].popularity + "</p>";
                     mycard += content;
                     mycard += "</div>";
@@ -261,26 +261,14 @@ window.onload = function () {
                     if (filter.type != "All" && (data[i].official === true ? 'Official' : 'Unofficial') != filter.type) continue;
 
                     let mycard = "<div class='my-card my-card-grid-t-c12-b'>";
-                    /*mycard += '<div class="channel-content my-card-grid-t-c12-b">';
-                    let content = "<p class='channel-name my-card-grid-c2'>" + data[i].name + "</p>";
-                    content += "<p class='channel-description my-card-grid-bottom2'>" + data[i].description + "</p>";
-                    mycard += content;
-                    
-                    let official = data[i].official === true ? "Official" : "Unofficial"
-                    let owner = data[i].owner_id === null ? "" : data[i].owner_id.name;
-                    let followers = data[i].followers.length;
-                    mycard += '<p class = "channel-official-card my-card-grid-c2">' + official + '</p>';
-                    if (owner != "")
-                        mycard += '<p class = "channel-owner-card my-card-grid-c2">Owner: ' + owner + '</p>';
-                    mycard += '<p class = "channel-followers-card my-card-grid-c1">' + followers + ' Follower(s)</p>';
-                    mycard += "</div>";*/
 
-                    let name = '<div class="channel-name my-card-grid-top2 text-center w-100">' + data[i].name + '</div>';
+                    let name = '<div class="h5 channel-name my-card-grid-top2 text-center w-100">' + data[i].name + '</div>';
                     let description = '<div class="channel-description my-card-grid-center2 text-center w-100">' + data[i].description + '</div>';
                     let officialandowner = '<div class = "my-card-grid-b1"><div class="channel-official">' + (data[i].official === true ? "Official" : "Unofficial") + '</div>'
                         + '<div class = "channel-owner">' + (data[i].owner_id === null ? "" : ('Owner: ' + data[i].owner_id.name)) + '</div></div>';
                     let followers = '<div class = "channel-followers my-card-grid-b2">' + data[i].followers.length + ' Follower(s)</div>';
                     mycard += name + description + officialandowner + followers;
+
                     let channelInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
                         + 'data-bs-toggle="modal"'
                         + 'data-bs-target="#channelModal"'
