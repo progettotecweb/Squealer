@@ -51,7 +51,7 @@ const Squeal: React.FC<SquealProps> = ({ content, owner, date, reactions,id }) =
     const {data: session} = useSession();
 
     const updateSquealReaction = (id:string, reaction:string, userid?: string) => {
-        fetch(`/api/squeals/${id}`, {
+        fetch(`/api/squeals/reaction/${id}`, {
             method: "PUT",
             body: JSON.stringify({reaction, userid}),
             headers: {

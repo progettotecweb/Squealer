@@ -12,7 +12,7 @@ const squealSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 refPath: 'recipients.type'
             },
-            type:{
+            type: {
                 type: String,
                 enum: ['User', 'Channel']
             }
@@ -152,4 +152,14 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
 exports.getAllSqueals = async function () {
     const res = await Squeal.find({}).populate("ownerID", "name img").populate("recipients.id");
     return res;
+};
+
+exports.updateSquealByID = async function (id, newSqueal) {
+    console.log("newSqueal", newSqueal);
+    Squeal.findByIdAndUpdate(id, newSqueal, { new: true }).then((squeal) => {
+        return squeal;
+    })
+        .catch((err) => {
+            console.log(err);
+        });
 };

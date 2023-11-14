@@ -13,10 +13,34 @@ router.get("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
+    const squeal = await squealsDB.getSquealByID(req.params.id);
+    if (!squeal) {
+        res.status(404).json({ success: false, error: "Squeal not found" });
+        return;
+    }
+
+    const updatedSqueal ={
+        recipients: req.body.recipients,
+        content: req.body.content,
+        visibility: req.body.visibility,
+        reactions: req.body.reactions,
+        cm: req.body.cm,
+        impressions: req.body.impressions,
+        controversial: req.body.controversiality,
+        replies: req.body.replies,
+        isAReply: req.body.isAReply
+    }
+
+    await squealsDB.updateSquealByID(req.params.id, updatedSqueal);
+
+    res.status(200).json({ ok: true });
+})
+
+router.put("/reaction/:id", async (req, res) => {
     await squealsDB.updateSquealReactionByID(req.params.id, req.body.reaction, req.body.userid).then((data) => {
         res.status(200).json({ success: true, squeal: data });
     })
-})
+});
 
 router.post("/post", async (req, res) => {
     let squeal = req.body;

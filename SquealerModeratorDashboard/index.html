@@ -161,7 +161,6 @@
                             </div>
                             <div class="modal-body">
                                 <p class="selected-channel-info">
-                                    </form>
                                     <span class="h6" id="channel-official">Official</span><br>
                                     <span class="h6">Name: </span>
                                     <input type="text" class="form-text" id="channel-name"
@@ -177,7 +176,7 @@
                                     <span class="label">Check admins</span>
                                     <input type="checkbox" class="form-check-input admin-checkbox"
                                         id="channel-administrators-checkbox">
-                                    <span class="label" id="channel-administrators-label">Insert username(s) separated
+                                    <span class="label" id="channel-administrators-label">Insert @username(s) separated
                                         by a comma</span>
                                 </p>
                                 <span class="blocked-desc">Channel is <span id="blocked-text" class="h6"></span></span>
@@ -251,6 +250,56 @@
                                     <option value="Official">Official</option>
                                     <option value="Unofficial">Unofficial</option>
                                 </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- SQUEALS MODAL -->
+                <div class="modal fade" id="squealModal" tabindex="-1" aria-labelledby="squealModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="squealModalLabel">Squeal details</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="selected-squeal-info">
+                                <p class="h6">Owner:
+                                    <span id="squeal-owner"></span>
+                                </p> <br>
+
+                                <span class="h6 ">Recipients: </span>
+                                <input type="text" class="form-text " id="squeal-recipients"
+                                    data-bs-value_recipients="recipients"><br>
+                                <span class="label">Check recipients</span>
+                                <input type="checkbox" class="form-check-input admin-checkbox"
+                                    id="channel-recipients-checkbox">
+                                <span class="label" id="channel-recipients-label">
+                                    Insert @usernames and §channels names separated by a comma
+                                </span><br><br>
+
+                                <span class="h6">Reactions</span><br>
+                                <span class="label">😡</span>
+                                <input type="number" class="form-number w-25" id="squeal-reactions-m2"
+                                    data-bs-value_reactions_m2="0"><br>
+                                <span class="label">😒</span>
+                                <input type="number" class="form-number w-25" id="squeal-reactions-m1"
+                                    data-bs-value_reactions_m1="0"><br>
+                                <span class="label">😄</span>
+                                <input type="number" class="form-number w-25" id="squeal-reactions-p1"
+                                    data-bs-value_reactions_p1="0"><br>
+                                <span class="label">😝</span>
+                                <input type="number" class="form-number w-25" id="squeal-reactions-p2"
+                                    data-bs-value_reactions_p2="0"><br>
+
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
