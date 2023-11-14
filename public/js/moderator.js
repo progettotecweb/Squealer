@@ -169,7 +169,8 @@ window.onload = function () {
                     let userInfoDataBs = 'data-bs-userId="' + data[i]._id + '" data-bs-toggle="modal" data-bs-target="#userModal" data-bs-username="'
                         + data[i].name + '" data-bs-userimg="' + blobsrc + '" data-bs-quota_daily="' + data[i].msg_quota.daily
                         + '"data-bs-quota_monthly="' + data[i].msg_quota.monthly + '" data-bs-quota_weekly="' + data[i].msg_quota.weekly
-                        + '" data-bs-quota_extra="' + data[i].msg_quota.extra + '"' + 'data-bs-blocked="' + data[i].blocked + '"';
+                        + '" data-bs-quota_extra="' + data[i].msg_quota.extra + '"' + 'data-bs-blocked="' + data[i].blocked + '"'
+                        + 'data-bs-role="' + data[i].role + '"';
                     let btn = '<input type="button" class="user-btn btn btn-primary align-self-center"' + userInfoDataBs + ' value="View more" />';
                     let footer = '<div class="card-user-footer my-card-grid-b d-flex justify-content-center">' + btn + '</div>';
                     mycard += footer;
@@ -338,7 +339,8 @@ window.onload = function () {
                     monthly: button.getAttribute('data-bs-quota_monthly'),
                     extra: button.getAttribute('data-bs-quota_extra')
                 },
-                blocked: button.getAttribute('data-bs-blocked')
+                blocked: button.getAttribute('data-bs-blocked'),
+                role: button.getAttribute('data-bs-role')
             }
 
             // Update the modal's content.
@@ -352,6 +354,7 @@ window.onload = function () {
             const inputQuotaWeekly = userModal.querySelector("#user-quota-weekly");
             const inputQuotaMonthly = userModal.querySelector("#user-quota-monthly");
             const inputQuotaExtra = userModal.querySelector("#user-quota-extra");
+            const inputRole = userModal.querySelector("#user-role");
 
             //set input values
             //msg quota
@@ -359,6 +362,15 @@ window.onload = function () {
             inputQuotaWeekly.value = databs.quota.weekly;
             inputQuotaMonthly.value = databs.quota.monthly;
             inputQuotaExtra.value = databs.quota.extra;
+            //role
+            //make the role option selected
+            const roleOptions = inputRole.options;
+            for (let i = 0; i < roleOptions.length; i++) {
+                if (roleOptions[i].value === databs.role) {
+                    roleOptions[i].selected = true;
+                    break;
+                }
+            }
 
             //blocked
             if (databs.blocked === "false") {
@@ -697,7 +709,8 @@ window.onload = function () {
                                 weekly: document.querySelector("#user-quota-weekly").value,
                                 monthly: document.querySelector("#user-quota-monthly").value,
                                 extra: document.querySelector("#user-quota-extra").value
-                            }
+                            },
+                            role: document.querySelector("#user-role").value
                         }
                         break;
                     case "channels":

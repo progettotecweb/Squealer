@@ -210,6 +210,10 @@
     text-align: left;
 }
 
+.role-text{
+    margin-right: 1em;
+}
+
 .channel-content {
     text-align: center;
 }
