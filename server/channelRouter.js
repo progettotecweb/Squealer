@@ -82,7 +82,7 @@ router.put("/id/:id", async (req, res) => {
         });
         return;
     }
-
+    console.log("channel",req.body);
     const updatedChannel = {
         name: req.body.name,
         description: req.body.description,

@@ -19,19 +19,26 @@ router.put("/:id", async (req, res) => {
         return;
     }
 
-    const updatedSqueal ={
+    const updatedSqueal = {
         recipients: req.body.recipients,
-        content: req.body.content,
-        visibility: req.body.visibility,
         reactions: req.body.reactions,
-        cm: req.body.cm,
-        impressions: req.body.impressions,
-        controversial: req.body.controversiality,
-        replies: req.body.replies,
-        isAReply: req.body.isAReply
     }
 
     await squealsDB.updateSquealByID(req.params.id, updatedSqueal);
+
+    // Squeal distribution
+    const recipients = squeal.recipients;
+    recipients.forEach(async (recipient) => {
+        if (recipient.type === "User") {
+            const user = await usersDB.searchUserByID(recipient.id);
+            user.squeals.push(req.params.id);
+            user.save();
+        } else if (recipient.type === "Channel") {
+            const channel = await channelsDB.searchChannelByID(recipient.id);
+            channel.squeals.push(req.params.id);
+            channel.save();
+        }
+    });
 
     res.status(200).json({ ok: true });
 })

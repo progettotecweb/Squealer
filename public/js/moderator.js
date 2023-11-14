@@ -670,14 +670,15 @@ window.onload = function () {
             const databs = {
                 id: button.getAttribute('data-bs-squealId'),
                 owner: button.getAttribute('data-bs-squealOwner'),
-                recipients: button.getAttribute('data-bs-squealRecipients'),
+                recipients: button.getAttribute('data-bs-squealRecipientsname'),
                 reactions: {
                     m2: button.getAttribute('data-bs-squealReactions-m2'),
                     m1: button.getAttribute('data-bs-squealReactions-m1'),
                     p1: button.getAttribute('data-bs-squealReactions-p1'),
                     p2: button.getAttribute('data-bs-squealReactions-p2')
                 },
-                recipientsId: button.getAttribute('data-bs-squealRecipientsId')
+                recipientsId: button.getAttribute('data-bs-squealRecipientsId'),
+                idsType: button.getAttribute('data-bs-idsType')
             }
 
             // Update the modal's content.
@@ -700,10 +701,8 @@ window.onload = function () {
             inputReactions.m1.value = databs.reactions.m1;
             inputReactions.p1.value = databs.reactions.p1;
             inputReactions.p2.value = databs.reactions.p2;
-            if (databs.recipientsId) {
-                inputRecipients.setAttribute("data-bs-recipients-id", databs.recipientsId);
-            }
-
+            inputRecipients.setAttribute("data-bs-recipients-id", databs.recipientsId);
+            inputRecipients.setAttribute("data-bs-ids-type", databs.idsType);
 
             //recipients
             //reset check admins label and checkbox
@@ -720,7 +719,7 @@ window.onload = function () {
             checkRecipients.addEventListener("change", async (e) => {
                 if (checkRecipients.checked) {
                     const correctLabel = document.querySelector("#channel-recipients-label");
-                    checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id");
+                    checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true }, "data-bs-ids-type");
                 }
                 else {
                     //reset check admins label and checkbox
@@ -737,9 +736,9 @@ window.onload = function () {
 
 
         //reset values when modal is closed
-        channelModal.addEventListener('hidden.bs.modal', () => {
+        squealsModal.addEventListener('hidden.bs.modal', () => {
             //reset checkbox 
-            const checkRecipients = channelModal.querySelector("#channel-recipients-checkbox");
+            const checkRecipients = squealsModal.querySelector("#channel-recipients-checkbox");
             checkRecipients.checked = false;
             //reset check admins label and checkbox
             const correctLabel = document.querySelector("#channel-recipients-label");
@@ -858,10 +857,8 @@ window.onload = function () {
                             break;
 
                         case "squeals":
-                            console.log(document.querySelector("#squeal-recipients").value);
-
                             dataToUpdate = {
-                                recipients: document.querySelector("#squeal-recipients").value != '' ? document.querySelector("#squeal-recipients").getAttribute("data-bs-recipients-id").replace('\n', '').split(',') : null,
+                                recipients: getRecipientsFromModal(),
                                 reactions: {
                                     m2: document.querySelector("#squeal-reactions-m2").value,
                                     m1: document.querySelector("#squeal-reactions-m1").value,
@@ -1074,7 +1071,7 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
         if (todo.user) {
             for (let j = 0; j < allUsers.length; j++) {
                 if (namesArray[i].split('@')[1] === allUsers[j].name) {
-                    ids.push(allUsers[j]._id);
+                    ids.push({ type: "User", id: allUsers[j]._id });
                     found = true;
                     break;
                 }
@@ -1084,7 +1081,7 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
         if (todo.channel) {
             for (let j = 0; j < allChannels.length; j++) {
                 if (namesArray[i].split('§')[1] === allChannels[j].name) {
-                    ids.push(allChannels[j]._id);
+                    ids.push({ type: "Channel", id: allChannels[j]._id });
                     found = true;
                     break;
                 }
@@ -1095,35 +1092,38 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
             //set wrong label
             correctLabel.classList.add("text-danger");
             correctLabel.classList.remove("text-success");
-            correctLabel.innerHTML = "Wrong username(s)!";
+            correctLabel.innerHTML = "Wrong name(s)!";
 
             return;
         }
     }
 
-
-
     //console.log(usersId);
     //update data in input div
-    div.setAttribute(dataBsId, ids.join(","));
+    div.setAttribute(dataBsId, formatIdsToAttribute(ids));
 
     //set correct label
     correctLabel.classList.add("text-success");
     correctLabel.classList.remove("text-danger");
-    correctLabel.innerHTML = "Correct username(s)!";
+    correctLabel.innerHTML = "Correct name(s)!";
+
+    return ids;
 }
 
-async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dataBsId, todo = { user: true, channel: true }) {
+async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dataBsId, todo = { user: true, channel: true },dataBsType) {
+    let ids = [];
     if (toId) {
-        const usersId = await namesToIds(value, input, correctLabel, dataBsId, todo);
+        ids = await namesToIds(value, input, correctLabel, dataBsId, todo);
     }
     input.value = value;
     if (todo.user && !todo.channel) {
         input.setAttribute("data-bs-administrators-name", value);
     } else {
         input.setAttribute("data-bs-recipients-name", value);
+        input.setAttribute(dataBsType, getIdsType(ids));
     }
-    //inputAdmins.setAttribute("data-bs-administrators-id", usersId);
+
+    return ids;
 }
 
 async function searchAndAddSqueals(squealsId, div) {
@@ -1267,12 +1267,13 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     if (viewMore) {
         btnViewMore += '<div class="d-flex justify-content-center mt-2"><input type="button" class="channel-squeal-btn btn btn-primary align-self-center" data-bs-squealId="' + squeal._id + '" data-bs-toggle="modal" data-bs-target="#squealModal" value="View more"'
             + 'data-bs-squealOwner="' + squeal.ownerID.name + '"'
-            + 'data-bs-squealRecipients="' + formatRecipientsForAttribute(squeal.recipients) + '"'
+            + 'data-bs-squealRecipientsName="' + formatRecipientsForAttribute(squeal.recipients) + '"'
             + 'data-bs-squealReactions-m2="' + squeal.reactions.m2 + '"'
             + 'data-bs-squealReactions-m1="' + squeal.reactions.m1 + '"'
             + 'data-bs-squealReactions-p1="' + squeal.reactions.p1 + '"'
             + 'data-bs-squealReactions-p2="' + squeal.reactions.p2 + '"'
-            + 'data-bs-squealRecipientsId="' + squeal.recipientsId + '"'
+            + 'data-bs-squealRecipientsId="' + formatRecipientsIdsToAttribute(squeal.recipients) + '"'
+            + 'data-bs-idsType="' + getIdsType(squeal.recipients) + '"'
             + ' /></div>';
     }
     let mycard = "<div class='my-card-squeal channel-squeal'>";
@@ -1345,4 +1346,52 @@ function formatAdmin(admins) {
     }
 
     return adminsFormatted;
+}
+
+function formatRecipientsIdsToAttribute(recipientsIds) {
+    let recipientsFormatted = '';
+    for (let i = 0; i < recipientsIds.length; i++) {
+        recipientsFormatted += recipientsIds[i].id._id;
+        if (i < recipientsIds.length - 1)
+            recipientsFormatted += ','; //add comma if not last
+    }
+
+    return recipientsFormatted;
+}
+
+function getIdsType(recipients) {
+    //for every recipient, check if it's a channel or a user
+    let idsType = '';
+    for (let i = 0; i < recipients.length; i++) {
+        idsType += recipients[i].type === "Channel" ? 'Channel' : 'User';
+        if (i < recipients.length - 1)
+            idsType += ','; //add comma if not last
+    }
+
+    return idsType;
+}
+
+function formatIdsToAttribute(ids) {
+    //for every ids get only the type
+    let idsFormatted = '';
+    for (let i = 0; i < ids.length; i++) {
+        idsFormatted += ids[i].id;
+        if (i < ids.length - 1)
+            idsFormatted += ','; //add comma if not last
+    }
+    return idsFormatted;
+}
+
+function getRecipientsFromModal() {
+    //id: document.querySelector("#squeal-recipients").getAttribute("data-bs-recipients-id").replace('\n', '').split(','),
+    //type: document.querySelector("#squeal-recipients").getAttribute("data-bs-ids-type").replace('\n', '').split(',')
+    let recipients = [];
+    const ids = document.querySelector("#squeal-recipients").getAttribute("data-bs-recipients-id").replace('\n', '').split(',');
+    const types = document.querySelector("#squeal-recipients").getAttribute("data-bs-ids-type").replace('\n', '').split(',');
+
+    for (let i = 0; i < ids.length; i++) {
+        recipients.push({ id: ids[i], type: types[i] });
+    }
+
+    return recipients;
 }
