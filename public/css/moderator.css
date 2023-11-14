@@ -70,7 +70,7 @@
     grid-row-gap: 1.5em;
 }
 
-.section-header .sort-select {
+.section-header {
     text-align: center;
     width: auto;
 }
@@ -258,15 +258,13 @@
     width: 100%;
 }
 
-.select-container {
-    width: 0px;
-    height: 0px;
-}
+.btn-filter-container {}
 
-.sort-select {
+#btn-filter {
     position: absolute;
-    width: 15%;
-    transform: translateX(-100%);
+    width: 10%;
+    transform: translate(-110%, -50%);
+    padding: 1px !important;
 }
 
 .admin-checkbox {
@@ -301,7 +299,7 @@
         font-size: xx-large;
     }
 
-    .section-header .sort-select {
+    .section-header {
         font-size: x-large;
     }
 

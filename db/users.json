@@ -23,7 +23,7 @@
         "name": "fvPro",
         "password": "$2b$10$v5/7eK.IVg00VHa8jHmu5eZo62qV4ISBwqRV1uVPNyCw1zoodTq3q",
         "salt": "$2b$10$tiwE1L5H7khIC/jdTpxQOe",
-        "role": "User",
+        "role": "Pro",
         "quota_msg": {
             "giorno": 60,
             "settimana": 600,

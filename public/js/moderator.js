@@ -103,7 +103,7 @@ window.onload = function () {
 
 
 
-    async function loadUsers(orderBy = "alphabetical", showSelf = true) {
+    async function loadUsers(showSelf = true) {
         const allUsers = await fetch("/api/users/all", {
             method: "POST",
             headers: {
@@ -117,8 +117,17 @@ window.onload = function () {
                 //clear the box
                 boxContent.innerHTML = "";
 
+                //get the filters attributes from the filter btn
+                const btnFilter = document.querySelector("#btn-filter");
+                const filter = {
+                    orderBy: btnFilter.getAttribute("data-bs-userFilter-orderby") === null ? "alphabetical" : btnFilter.getAttribute("data-bs-userFilter-orderby"),
+                    type: btnFilter.getAttribute("data-bs-userFilter-type") === null ? "All" : btnFilter.getAttribute("data-bs-userFilter-type")
+                };
+
+                console.log(filter);
+
                 //sort the users
-                switch (orderBy) {
+                switch (filter.orderBy) {
                     case "alphabetical":
                         data.sort((a, b) => {
                             if (a.name < b.name) {
@@ -145,6 +154,9 @@ window.onload = function () {
 
                 //create the cards for every user
                 for (let i = 0; i < data.length; i++) {
+                    //check the filter type and skip the user if it doesn't match, or show all
+                    if (filter.type != "All" && data[i].role != filter.type) continue;
+
                     //check if the user is the moderator and if he wants to see himself
                     let mycard = "<div class='my-card'>";
 
@@ -327,6 +339,27 @@ window.onload = function () {
         btnBlockUser.disabled = true;
         btnBlockUser.setAttribute("data-bs-value_block", "true");
     });
+
+    //USER FILTER MODAL
+    const userFilterModal = document.getElementById('userFilterModal')
+    if (userFilterModal) {
+        userFilterModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget
+
+            // Update the modal's content.
+            const modalTitle = userFilterModal.querySelector('.modal-title');
+            const orderBy = userFilterModal.querySelector('#select-orderby');
+            const type = userFilterModal.querySelector('#select-type');
+
+            const btnSave = userFilterModal.querySelector("#btn-savechanges");
+            btnSave.addEventListener("click", (e) => {
+                button.setAttribute("data-bs-userFilter-orderby", orderBy.value);
+                button.setAttribute("data-bs-userFilter-type", type.value);
+                loadUsers();
+            });
+        })
+    }
 
     const channelModal = document.getElementById('channelModal')
     if (channelModal) {
@@ -666,7 +699,7 @@ window.onload = function () {
         //reload the section
         switch (operationUpdate) {
             case "users":
-                await loadUsers(document.getElementById("select-orderby").value);
+                await loadUsers();
                 break;
             case "channels":
             case "channel-squeal-create":
@@ -678,13 +711,6 @@ window.onload = function () {
                 break;
         }
     }
-
-    //event listener for the order by select
-    const selectOrderBy = document.getElementById("select-orderby");
-    selectOrderBy.addEventListener("change", async (e) => {
-        const value = e.target.value;
-        await loadUsers(value);
-    });
 
     //change active section
     const userSection = document.getElementById("userSection");
@@ -710,6 +736,20 @@ function changeSectionClass(newSection) {
     const activeSection = document.querySelector(".active-section");
     activeSection.classList.remove("active-section");
     activeSection.classList.remove("active-section-not-scrolled");
+
+    //in the new section, update the attribute for the filter modal
+    const btnFilter = document.querySelector("#btn-filter");
+    switch (newSection.id) {
+        case "userSection":
+            btnFilter.setAttribute("data-bs-target", "#userFilterModal");
+            break;
+        case "channelSection":
+            btnFilter.setAttribute("data-bs-target", "#channelFilterModal");
+            break;
+        case "squealSection":
+            btnFilter.setAttribute("data-bs-target", "#squealsFilterModal");
+            break;
+    }
 
     //update the section
     newSection.classList.add("active-section");
@@ -870,7 +910,7 @@ async function searchAndAddSqueals(squealsId, div) {
         for (let i = 0; i < btnDelete.length; i++) {
             btnDelete[i].addEventListener("click", async (e) => {
                 await deleteSqueal(e.target.getAttribute("data-bs-squealId"), e);
-                
+
                 //check if squeals are empty
                 if (div.innerHTML === "") {
                     div.innerHTML = "<p class='text-center'>No squeals yet!</p>";

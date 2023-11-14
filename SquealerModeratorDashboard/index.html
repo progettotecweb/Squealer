@@ -46,11 +46,10 @@
                         <li class="text-light box-section" id="squealSection">Squeals</li>
                     </ul>
                     <div class="select-container d-flex">
-                        <select class="form-select sort-select" id="select-orderby">
-                            <option value="alphabetical" selected>Sort by</option>
-                            <option value="alphabetical">Username</option>
-                            <option value="popularity">Popularity</option>
-                        </select>
+                        <div class="btn-filter-container align-self-center">
+                            <button type="button" class="btn btn-dark" id="btn-filter" data-bs-toggle="modal"
+                                data-bs-target="#userFilterModal"> Filter </button>
+                        </div>
                     </div>
                 </div>
                 <div id="box-content" class="">
@@ -105,6 +104,42 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- USERS FILTER MODAL-->
+                <div class="modal fade" id="userFilterModal" tabindex="-1" aria-labelledby="userFilterModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="userFilterModalLabel">Filter users</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <span class="h6">Choose the order</span>
+                                <select class="form-select sort-select" id="select-orderby">
+                                    <option value="alphabetical" selected>Alphabetical</option>
+                                    <option value="popularity">Popularity</option>
+                                </select>
+
+                                <span class="h6">Choose the type of user to show</span>
+                                <select class="form-select sort-select" id="select-type">
+                                    <option value="All" selected>All</option>
+                                    <option value="User">User</option>
+                                    <option value="Pro">Pro</option>
+                                    <option value="SMM">SMM</option>
+                                    <option value="Mod">Mod</option>
+                                </select>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 <!-- CHANNEL MODAL -->
                 <div class="modal fade" id="channelModal" tabindex="-1" aria-labelledby="channelModalLabel"
@@ -183,6 +218,30 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- CHANNELS FILTER MODAL-->
+                <div class="modal fade" id="channelFilterModal" tabindex="-1" aria-labelledby="channelFilterModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="channelFilterModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    seleziona filtro canali
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 </body>
