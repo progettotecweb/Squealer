@@ -156,7 +156,7 @@ window.onload = function () {
                     if (filter.type != "All" && data[i].role != filter.type) continue;
 
                     //check if the user is the moderator and if he wants to see himself
-                    let mycard = "<div class='my-card'>";
+                    let mycard = "<div class='my-card my-card-grid-tl-tr-b'>";
 
                     const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
                     let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic my-card-grid-tl'/>";
@@ -260,22 +260,27 @@ window.onload = function () {
                     //check the filter type and skip the channel if it doesn't match, or show all
                     if (filter.type != "All" && (data[i].official === true ? 'Official' : 'Unofficial') != filter.type) continue;
 
-                    let mycard = "<div class='my-card'>";
-
-                    mycard += '<div class="channel-content my-card-grid-tl">';
-                    let content = "<p class='channel-name'>" + data[i].name + "</p>";
-                    content += "<p class='channel-description'>" + data[i].description + "</p>";
+                    let mycard = "<div class='my-card my-card-grid-t-c12-b'>";
+                    /*mycard += '<div class="channel-content my-card-grid-t-c12-b">';
+                    let content = "<p class='channel-name my-card-grid-c2'>" + data[i].name + "</p>";
+                    content += "<p class='channel-description my-card-grid-bottom2'>" + data[i].description + "</p>";
                     mycard += content;
-                    mycard += "</div>";
-                    mycard += '<div class="my-card-grid-tr">';
+                    
                     let official = data[i].official === true ? "Official" : "Unofficial"
                     let owner = data[i].owner_id === null ? "" : data[i].owner_id.name;
                     let followers = data[i].followers.length;
-                    mycard += '<p class = "channel-official-card">' + official + '</p>';
+                    mycard += '<p class = "channel-official-card my-card-grid-c2">' + official + '</p>';
                     if (owner != "")
-                        mycard += '<p class = "channel-owner-card">Owner: ' + owner + '</p>';
-                    mycard += '<p class = "channel-followers-card">' + followers + ' Follower(s)</p>';
-                    mycard += '</div>';
+                        mycard += '<p class = "channel-owner-card my-card-grid-c2">Owner: ' + owner + '</p>';
+                    mycard += '<p class = "channel-followers-card my-card-grid-c1">' + followers + ' Follower(s)</p>';
+                    mycard += "</div>";*/
+
+                    let name = '<div class="channel-name my-card-grid-top2 text-center w-100">' + data[i].name + '</div>';
+                    let description = '<div class="channel-description my-card-grid-center2 text-center w-100">' + data[i].description + '</div>';
+                    let officialandowner = '<div class = "my-card-grid-b1"><div class="channel-official">' + (data[i].official === true ? "Official" : "Unofficial") + '</div>'
+                        + '<div class = "channel-owner">' + (data[i].owner_id === null ? "" : ('Owner: ' + data[i].owner_id.name)) + '</div></div>';
+                    let followers = '<div class = "channel-followers my-card-grid-b2">' + data[i].followers.length + ' Follower(s)</div>';
+                    mycard += name + description + officialandowner + followers;
                     let channelInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
                         + 'data-bs-toggle="modal"'
                         + 'data-bs-target="#channelModal"'
@@ -312,7 +317,7 @@ window.onload = function () {
 
                     //setChannelSquealsAttributes(data[i]._id, "data-bs-channelSqueals");
                     let btnChannel_squeals = '<input type="button" class="m-1 channel-btn btn btn-secondary align-self-end" ' + channelSquealsInfoDataBs + ' value="Squeals" />';
-                    let footer = '<div class="card-channel-footer my-card-grid-b d-flex justify-content-center">' + btn + btnChannel_squeals + '</div>';
+                    let footer = '<div class="card-channel-footer my-card-grid-bottom d-flex justify-content-center">' + btn + btnChannel_squeals + '</div></div>';
                     mycard += footer;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;

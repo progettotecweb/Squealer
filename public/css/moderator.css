@@ -108,18 +108,60 @@
 
 .my-card {
     width: 15em;
-    max-height: 20em;
+    max-height: 18em;
+
     /*border: 1px solid black;*/
     box-shadow: 0px 0px 5px 0px #000000;
     background-color: #F0F0F0;
     border-radius: 10px;
     padding: 1em;
+}
 
+.my-card-grid-t-c12-b {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+.my-card-grid-top2 {
+    grid-area: 1 / 1 / 2 / 3;
+}
+
+.my-card-grid-center2 {
+    grid-area: 2 / 1 / 3 / 3;
+}
+
+.my-card-grid-b1 {
+    grid-area: 3 / 1 / 4 / 2;
+}
+
+.my-card-grid-b2 {
+    grid-area: 3 / 2 / 4 / 3;
+}
+.my-card-grid-bottom{
+    grid-area: 4 / 1 / 5 / 3;
+}
+
+.my-card-grid-tl-tr-b {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     grid-column-gap: 0px;
     grid-row-gap: 0px;
+}
+
+.my-card-grid-tl {
+    grid-area: 1 / 1 / 2 / 2;
+}
+
+.my-card-grid-tr {
+    grid-area: 1 / 2 / 2 / 3;
+}
+
+.my-card-grid-b {
+    grid-area: 2 / 1 / 3 / 3;
 }
 
 .my-card-squeal {
@@ -202,24 +244,16 @@
     box-shadow: 0px 0px 5px 0px #000000;
 }
 
-.my-card-grid-tl {
-    grid-area: 1 / 1 / 2 / 2;
-}
-
 .user-content {
     text-align: left;
 }
 
-.role-text{
+.role-text {
     margin-right: 1em;
 }
 
 .channel-content {
     text-align: center;
-}
-
-.my-card-grid-tr {
-    grid-area: 1 / 2 / 2 / 3;
 }
 
 .user-name {
@@ -236,9 +270,7 @@
 
 .card-channel-footer {}
 
-.my-card-grid-b {
-    grid-area: 2 / 1 / 3 / 3;
-}
+
 
 .channel-official-card {
     text-align: center;
