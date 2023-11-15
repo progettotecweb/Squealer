@@ -27,16 +27,22 @@ router.put("/:id", async (req, res) => {
     await squealsDB.updateSquealByID(req.params.id, updatedSqueal);
 
     // Squeal distribution
-    const recipients = squeal.recipients;
+    const recipients = updatedSqueal.recipients;
     recipients.forEach(async (recipient) => {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
-            user.squeals.push(req.params.id);
-            user.save();
+            //check if user already has the squeal
+            if (!user.squeals.includes(req.params.id)) {//check if user already has the squeal, if not add it
+                user.squeals.push(req.params.id);
+                user.save();
+            }
         } else if (recipient.type === "Channel") {
             const channel = await channelsDB.searchChannelByID(recipient.id);
-            channel.squeals.push(req.params.id);
-            channel.save();
+            //check if channel already has the squeal
+            if (!channel.squeals.includes(req.params.id)) {//check if channel already has the squeal, if not add it
+                channel.squeals.push(req.params.id);
+                channel.save();
+            }
         }
     });
 

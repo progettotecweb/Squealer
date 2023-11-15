@@ -746,226 +746,226 @@ window.onload = function () {
             correctLabel.classList.remove("text-success");
             correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
         });
+    }
 
+    //save changes if button is pressed, add event listener to every button
+    const btnSave = document.getElementsByClassName("btn-savechanges");
+    for (let i = 0; i < btnSave.length; i++) {
+        btnSave[i].addEventListener("click", async (e) => {
+            //console.log(e.target)
+            await updateDBandSection(e.target);
+        });
+    }
 
-        //save changes if button is pressed, add event listener to every button
-        const btnSave = document.getElementsByClassName("btn-savechanges");
-        for (let i = 0; i < btnSave.length; i++) {
-            btnSave[i].addEventListener("click", async (e) => {
-                //console.log(e.target)
-                await updateDBandSection(e.target);
+    //USER FILTER MODAL
+    const channelFilterModal = document.getElementById('channelFilterModal')
+    if (channelFilterModal) {
+        channelFilterModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget
+
+            // Update the modal's content.
+            const modalTitle = channelFilterModal.querySelector('.modal-title');
+            const orderBy = channelFilterModal.querySelector('#filterChannels-select-orderby');
+            const type = channelFilterModal.querySelector('#filterChannels-select-type');
+
+            const btnSave = channelFilterModal.querySelector("#btn-savechanges");
+            btnSave.addEventListener("click", (e) => {
+                button.setAttribute("data-bs-channelFilter-orderby", orderBy.value);
+                button.setAttribute("data-bs-channelFilter-type", type.value);
+                loadChannels();
             });
+        })
+    }
+
+    //update the db and reload the section
+    async function updateDBandSection(btn) {
+        //retrieve operation type
+        const operationUpdate = btn.getAttribute("data-bs-operation");
+        let id;
+        let table;
+        let crud;
+
+        switch (operationUpdate) {
+            case "users":
+                id = btn.getAttribute("data-bs-userId");
+                table = "users";
+                crud = "UPDATE";
+                break;
+            case "channels":
+                id = btn.getAttribute("data-bs-channelId");
+                table = "channels/id";
+                crud = "UPDATE";
+                break;
+            case "channel-squeal-create":
+                id = btn.getAttribute("data-bs-channelId");
+                table = "squeals";
+                crud = "CREATE";
+                break;
+            case "channel-squeal-delete":
+                //id = btn.getAttribute("data-bs-channelId");
+                table = "squeals";
+                crud = "CREATE";
+                break;
+            case "squeals":
+                id = btn.getAttribute("data-bs-squealId");
+                table = "squeals";
+                crud = "UPDATE";
+                break;
         }
 
-        //USER FILTER MODAL
-        const channelFilterModal = document.getElementById('channelFilterModal')
-        if (channelFilterModal) {
-            channelFilterModal.addEventListener('show.bs.modal', event => {
-                // Button that triggered the modal
-                const button = event.relatedTarget
-
-                // Update the modal's content.
-                const modalTitle = channelFilterModal.querySelector('.modal-title');
-                const orderBy = channelFilterModal.querySelector('#filterChannels-select-orderby');
-                const type = channelFilterModal.querySelector('#filterChannels-select-type');
-
-                const btnSave = channelFilterModal.querySelector("#btn-savechanges");
-                btnSave.addEventListener("click", (e) => {
-                    button.setAttribute("data-bs-channelFilter-orderby", orderBy.value);
-                    button.setAttribute("data-bs-channelFilter-type", type.value);
-                    loadChannels();
-                });
-            })
-        }
-
-        //update the db and reload the section
-        async function updateDBandSection(btn) {
-            //retrieve operation type
-            const operationUpdate = btn.getAttribute("data-bs-operation");
-            let id;
-            let table;
-            let crud;
-
-            switch (operationUpdate) {
-                case "users":
-                    id = btn.getAttribute("data-bs-userId");
-                    table = "users";
-                    crud = "UPDATE";
-                    break;
-                case "channels":
-                    id = btn.getAttribute("data-bs-channelId");
-                    table = "channels/id";
-                    crud = "UPDATE";
-                    break;
-                case "channel-squeal-create":
-                    id = btn.getAttribute("data-bs-channelId");
-                    table = "squeals";
-                    crud = "CREATE";
-                    break;
-                case "channel-squeal-delete":
-                    //id = btn.getAttribute("data-bs-channelId");
-                    table = "squeals";
-                    crud = "CREATE";
-                    break;
-                case "squeals":
-                    id = btn.getAttribute("data-bs-squealId");
-                    table = "squeals";
-                    crud = "UPDATE";
-                    break;
-            }
-
-            switch (crud) {
-                case "UPDATE":
-                    let data = await fetch("/api/" + table + "/" + id, {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
+        switch (crud) {
+            case "UPDATE":
+                let data = await fetch("/api/" + table + "/" + id, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        return data;
                     })
-                        .then(res => res.json())
-                        .then(data => {
-                            return data;
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        });
-
-                    //retrieve data to update from modal
-                    let dataToUpdate;
-                    switch (operationUpdate) {
-                        case "users":
-                            dataToUpdate = {
-                                blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
-                                msg_quota: {
-                                    daily: document.querySelector("#user-quota-daily").value,
-                                    weekly: document.querySelector("#user-quota-weekly").value,
-                                    monthly: document.querySelector("#user-quota-monthly").value,
-                                    extra: document.querySelector("#user-quota-extra").value
-                                },
-                                role: document.querySelector("#user-role").value
-                            }
-                            break;
-
-                        case "channels":
-                            dataToUpdate = {
-                                blocked: document.querySelector("#btn-blockChannel").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
-                                visibility: document.querySelector("#btn-visibilityChannel").getAttribute("data-bs-value_visibility") === "true" ? data.visibility === "public" ? "private" : "public" : data.visibility,
-                                name: document.querySelector("#channel-name").value,
-                                description: document.querySelector("#channel-description").value,
-                                administrators: document.querySelector("#channel-administrators").value != '' ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null,
-                            }
-                            break;
-
-                        case "squeals":
-                            dataToUpdate = {
-                                recipients: getRecipientsFromModal(),
-                                reactions: {
-                                    m2: document.querySelector("#squeal-reactions-m2").value,
-                                    m1: document.querySelector("#squeal-reactions-m1").value,
-                                    p1: document.querySelector("#squeal-reactions-p1").value,
-                                    p2: document.querySelector("#squeal-reactions-p2").value
-                                }
-                            }
-                            break;
-                    };
-
-                    Object.keys(dataToUpdate).forEach(key => {
-                        data[key] = dataToUpdate[key];
+                    .catch(err => {
+                        console.log(err);
                     });
 
-                    //update table
-                    await fetch("/api/" + table + "/" + id, {
-                        method: "PUT",
+                //retrieve data to update from modal
+                let dataToUpdate;
+                switch (operationUpdate) {
+                    case "users":
+                        dataToUpdate = {
+                            blocked: document.querySelector("#btn-blockuser").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
+                            msg_quota: {
+                                daily: document.querySelector("#user-quota-daily").value,
+                                weekly: document.querySelector("#user-quota-weekly").value,
+                                monthly: document.querySelector("#user-quota-monthly").value,
+                                extra: document.querySelector("#user-quota-extra").value
+                            },
+                            role: document.querySelector("#user-role").value
+                        }
+                        break;
+
+                    case "channels":
+                        dataToUpdate = {
+                            blocked: document.querySelector("#btn-blockChannel").getAttribute("data-bs-value_block") === "true" ? !data.blocked : data.blocked,
+                            visibility: document.querySelector("#btn-visibilityChannel").getAttribute("data-bs-value_visibility") === "true" ? data.visibility === "public" ? "private" : "public" : data.visibility,
+                            name: document.querySelector("#channel-name").value,
+                            description: document.querySelector("#channel-description").value,
+                            administrators: document.querySelector("#channel-administrators").value != '' ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null,
+                        }
+                        break;
+
+                    case "squeals":
+                        dataToUpdate = {
+                            recipients: getRecipientsFromModal(),
+                            reactions: {
+                                m2: document.querySelector("#squeal-reactions-m2").value,
+                                m1: document.querySelector("#squeal-reactions-m1").value,
+                                p1: document.querySelector("#squeal-reactions-p1").value,
+                                p2: document.querySelector("#squeal-reactions-p2").value
+                            }
+                        }
+                        break;
+                };
+
+                Object.keys(dataToUpdate).forEach(key => {
+                    data[key] = dataToUpdate[key];
+                });
+
+                //update table
+                await fetch("/api/" + table + "/" + id, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(res => {
+                        if (res.ok) {
+                            //console.log("Data updated!");
+                        } else {
+                            console.log("Error while updating data!");
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+                break;
+
+            case "CREATE":
+                if (operationUpdate === "channel-squeal-create" && document.querySelector("#channel-post-squeal-textarea").value != '') {//create squeal
+                    //retrieve data to update from modal
+                    let dataToUpdate = {
+                        ownerID: document.querySelector("#master-user-name").getAttribute("data-bs-master_user_id"),
+                        content: document.querySelector("#channel-post-squeal-textarea").value,
+                        recipients: [{
+                            type: "Channel",
+                            id: btn.getAttribute("data-bs-channelId")
+                        }]
+                    }
+
+                    //insert in table
+                    const insertPromise = await fetch("/api/" + table + "/post", {
+                        method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify(data)
+                        body: JSON.stringify(dataToUpdate)
                     })
                         .then(res => {
                             if (res.ok) {
-                                //console.log("Data updated!");
+                                return res.json();
                             } else {
                                 console.log("Error while updating data!");
                             }
                         })
+                        .then(data => {
+                            return loadChannels();  //reload the section to show the new squeal
+                        })
                         .catch(err => {
                             console.log(err);
                         });
-                    break;
-
-                case "CREATE":
-                    if (operationUpdate === "channel-squeal-create" && document.querySelector("#channel-post-squeal-textarea").value != '') {//create squeal
-                        //retrieve data to update from modal
-                        let dataToUpdate = {
-                            ownerID: document.querySelector("#master-user-name").getAttribute("data-bs-master_user_id"),
-                            content: document.querySelector("#channel-post-squeal-textarea").value,
-                            recipients: [{
-                                type: "Channel",
-                                id: btn.getAttribute("data-bs-channelId")
-                            }]
-                        }
-
-                        //insert in table
-                        const insertPromise = await fetch("/api/" + table + "/post", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(dataToUpdate)
-                        })
-                            .then(res => {
-                                if (res.ok) {
-                                    return res.json();
-                                } else {
-                                    console.log("Error while updating data!");
-                                }
-                            })
-                            .then(data => {
-                                return loadChannels();  //reload the section to show the new squeal
-                            })
-                            .catch(err => {
-                                console.log(err);
-                            });
-                    }
-                    break;
-            }
-
-            //reload the section
-            switch (operationUpdate) {
-                case "users":
-                    await loadUsers();
-                    break;
-                case "channels":
-                case "channel-squeal-create":
-                    //case "channel-squeal-delete":
-                    //console.log("newId: " + newId);
-                    await loadChannels();
-                    break;
-                case "squeals":
-                    await loadSqueals();
-                    break;
-            }
+                }
+                break;
         }
 
-        //change active section
-        const userSection = document.getElementById("userSection");
-        const channelSection = document.getElementById("channelSection");
-        const squealSection = document.getElementById("squealSection");
-
-        userSection.addEventListener("click", (e) => {
-            changeSectionClass(e.target);
-        });
-
-        channelSection.addEventListener("click", (e) => {
-            changeSectionClass(e.target);
-
-        });
-
-        squealSection.addEventListener("click", (e) => {
-            changeSectionClass(e.target);
-        });
+        //reload the section
+        switch (operationUpdate) {
+            case "users":
+                await loadUsers();
+                break;
+            case "channels":
+            case "channel-squeal-create":
+                //case "channel-squeal-delete":
+                //console.log("newId: " + newId);
+                await loadChannels();
+                break;
+            case "squeals":
+                await loadSqueals();
+                break;
+        }
     }
+
+    //change active section
+    const userSection = document.getElementById("userSection");
+    const channelSection = document.getElementById("channelSection");
+    const squealSection = document.getElementById("squealSection");
+
+    userSection.addEventListener("click", (e) => {
+        changeSectionClass(e.target);
+    });
+
+    channelSection.addEventListener("click", (e) => {
+        changeSectionClass(e.target);
+
+    });
+
+    squealSection.addEventListener("click", (e) => {
+        changeSectionClass(e.target);
+    });
 }
+
 
 function changeSectionClass(newSection) {
     //before adding the new class, remove the old one
@@ -1110,7 +1110,7 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
     return ids;
 }
 
-async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dataBsId, todo = { user: true, channel: true },dataBsType) {
+async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dataBsId, todo = { user: true, channel: true }, dataBsType) {
     let ids = [];
     if (toId) {
         ids = await namesToIds(value, input, correctLabel, dataBsId, todo);
@@ -1139,12 +1139,14 @@ async function searchAndAddSqueals(squealsId, div) {
         })
             .then(res => res.json())
             .then(data => {
+                console.log(data);
                 return data;
             })
             .catch(err => {
                 console.log(err);
             });
 
+        console.log(squealIdArray);
         await addSquealCard(squeal, null, div, true);
 
         //get all delete squeal btn and add event listener
