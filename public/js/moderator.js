@@ -722,8 +722,9 @@ window.onload = function () {
                     checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true }, "data-bs-ids-type");
                 }
                 else {
+                    console.log("unchecked")
                     //reset check admins label and checkbox
-                    const correctLabel = document.querySelector("#channel-administrators-label");
+                    const correctLabel = document.querySelector("#channel-recipients-label");
                     correctLabel.classList.remove("text-danger");
                     correctLabel.classList.remove("text-success");
                     correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";

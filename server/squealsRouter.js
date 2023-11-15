@@ -46,6 +46,25 @@ router.put("/:id", async (req, res) => {
         }
     });
 
+    //check if the old recipients that are no more in the updated squeal still have the squeal
+    squeal.recipients.forEach(async (recipient) => {
+        if (recipient.type === "User") {
+            const user = await usersDB.searchUserByID(recipient.id);
+            if (user.squeals.includes(req.params.id)) {//check if user still has the squeal, if so remove it
+                const squealIndex = user.squeals.indexOf(req.params.id);
+                user.squeals.splice(squealIndex, 1);
+                user.save();
+            }
+        } else if (recipient.type === "Channel") {
+            const channel = await channelsDB.searchChannelByID(recipient.id);
+            if (channel.squeals.includes(req.params.id)) {//check if channel still has the squeal, if so remove it
+                const squealIndex = channel.squeals.indexOf(req.params.id);
+                channel.squeals.splice(squealIndex, 1);
+                channel.save();
+            }
+        }
+    });
+
     res.status(200).json({ ok: true });
 })
 
