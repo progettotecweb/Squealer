@@ -722,7 +722,6 @@ window.onload = function () {
                     checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true }, "data-bs-ids-type");
                 }
                 else {
-                    console.log("unchecked")
                     //reset check admins label and checkbox
                     const correctLabel = document.querySelector("#channel-recipients-label");
                     correctLabel.classList.remove("text-danger");
