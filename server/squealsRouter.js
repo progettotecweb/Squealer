@@ -24,46 +24,41 @@ router.put("/:id", async (req, res) => {
         reactions: req.body.reactions,
     }
 
+    console.log("updatedSqueal", updatedSqueal);
+
     await squealsDB.updateSquealByID(req.params.id, updatedSqueal);
 
     // Squeal distribution
+    //first we have to remove the squeal from the old recipients
+    squeal.recipients.forEach(async (recipient) => {
+        if (recipient.type === "User") {
+            const user = await usersDB.searchUserByID(recipient.id);
+            const squealIndex = user.squeals.indexOf(req.params.id);
+            user.squeals.splice(squealIndex, 1);
+            user.save();
+        } else if (recipient.type === "Channel") {
+            const channel = await channelsDB.searchChannelByID(recipient.id);
+            const squealIndex = channel.squeals.indexOf(req.params.id);
+            channel.squeals.splice(squealIndex, 1);
+            channel.save();
+        }
+    });
+
+    //then we add the squeal to the new recipients
     const recipients = updatedSqueal.recipients;
     recipients.forEach(async (recipient) => {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
-            //check if user already has the squeal
-            if (!user.squeals.includes(req.params.id)) {//check if user already has the squeal, if not add it
-                user.squeals.push(req.params.id);
-                user.save();
-            }
+            user.squeals.push(req.params.id);
+            user.save();
         } else if (recipient.type === "Channel") {
             const channel = await channelsDB.searchChannelByID(recipient.id);
-            //check if channel already has the squeal
-            if (!channel.squeals.includes(req.params.id)) {//check if channel already has the squeal, if not add it
-                channel.squeals.push(req.params.id);
-                channel.save();
-            }
+            channel.squeals.push(req.params.id);
+            channel.save();
         }
     });
 
-    //check if the old recipients that are no more in the updated squeal still have the squeal
-    squeal.recipients.forEach(async (recipient) => {
-        if (recipient.type === "User") {
-            const user = await usersDB.searchUserByID(recipient.id);
-            if (user.squeals.includes(req.params.id)) {//check if user still has the squeal, if so remove it
-                const squealIndex = user.squeals.indexOf(req.params.id);
-                user.squeals.splice(squealIndex, 1);
-                user.save();
-            }
-        } else if (recipient.type === "Channel") {
-            const channel = await channelsDB.searchChannelByID(recipient.id);
-            if (channel.squeals.includes(req.params.id)) {//check if channel still has the squeal, if so remove it
-                const squealIndex = channel.squeals.indexOf(req.params.id);
-                channel.squeals.splice(squealIndex, 1);
-                channel.save();
-            }
-        }
-    });
+
 
     res.status(200).json({ ok: true });
 })

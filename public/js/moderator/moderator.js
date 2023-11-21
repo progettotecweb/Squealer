@@ -1099,6 +1099,22 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
         }
     }
 
+    //check for duplicates and remove them
+    const idSet = new Set();
+    ids = ids.filter((item, index) => {
+        // concat the ID and the type to create a unique key
+        const key = `${item.type}-${item.id}`;
+
+        // add the key to the set
+        if (!idSet.has(key)) {
+            idSet.add(key);
+            return true;
+        }
+
+        return false;
+    });
+
+
     //console.log(usersId);
     //update data in input div
     div.setAttribute(dataBsId, formatIdsToAttribute(ids));
@@ -1120,8 +1136,10 @@ async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dat
     if (todo.user && !todo.channel) {
         input.setAttribute("data-bs-administrators-name", value);
     } else {
-        input.setAttribute("data-bs-recipients-name", value);
-        input.setAttribute(dataBsType, getIdsType(ids));
+        if (ids) {
+            input.setAttribute("data-bs-recipients-name", value);
+            input.setAttribute(dataBsType, getIdsType(ids));
+        }
     }
 
     return ids;
@@ -1140,14 +1158,12 @@ async function searchAndAddSqueals(squealsId, div) {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 return data;
             })
             .catch(err => {
                 console.log(err);
             });
 
-        console.log(squealIdArray);
         await addSquealCard(squeal, null, div, true);
 
         //get all delete squeal btn and add event listener
