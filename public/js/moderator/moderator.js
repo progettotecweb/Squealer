@@ -1250,10 +1250,23 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
     let content = '<div class="squeal-content">';
     let text = '<p class="squeal-text">' + squeal.content.text + '</p>';
+    const blobsrc = "data:" + squeal.content.img.mimetype + ";base64," + squeal.content.img.blob;
+    const alt = "Picture";
+    let img = `<div class='d-flex justify-content-center'><img src=${blobsrc} alt=${alt} class='img-squeal'/></div>`;
+
     let replies = '<div class="squeal-replies">';
     replies += '</div>';
 
-    content += text;
+    switch (squeal.type) {
+        case "text":
+            content += text;
+            break;
+        case "image":
+            content += img;
+            break;
+        case "geolocation":
+            break;
+    }
     content += '</div>';
 
     let footer = '<div class="squeal-footer">';

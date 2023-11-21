@@ -199,6 +199,11 @@
     word-break: break-all;
 }
 
+.img-squeal{
+    max-width: 10em;
+    max-height: 15em;
+}
+
 .squeal-footer {
     width: 100%;
     display: grid;
