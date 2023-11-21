@@ -10,11 +10,20 @@ const squeals = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
 
 const Homepage = () => {
 
-    const {data : session} = useSession();
+    const { data: session } = useSession();
 
     interface Squeal {
         _id: string;
-        content: string;
+        type: "text" | "image" | "geolocation";
+        content: {
+            text: string | null;
+            img: {
+                mimetype: string;
+                blob: string;
+            } | null;
+            geolocation: string | null;
+        };
+        geolocation: string | null;
         ownerID: any;
         datetime: string,
         reactions: any;
@@ -26,7 +35,7 @@ const Homepage = () => {
 
     const fetcher: Fetcher<Res, string> = (...args) => fetch(...args).then((res) => res.json());
 
-    const {data, isLoading, error} = useSWR<Res>(() => session ? `/api/squeals/${session?.user.id}` : null, fetcher);
+    const { data, isLoading, error } = useSWR<Res>(() => session ? `/api/squeals/${session?.user.id}` : null, fetcher);
 
     return (
         <PageContainer key="home">
@@ -37,8 +46,8 @@ const Homepage = () => {
                 {
                     isLoading && <div>Loading...</div>
                 } {
-                    data && data.results.map((squeal, index )=> {
-                        return <Squeal key={index} id={squeal._id} content={squeal.content} owner={squeal?.ownerID} date={squeal?.datetime} reactions={squeal?.reactions}/>
+                    data && data.results.map((squeal, index) => {
+                        return <Squeal type={squeal.type} key={index} id={squeal._id} content={squeal.content} owner={squeal?.ownerID} date={squeal?.datetime} reactions={squeal?.reactions} />
                     })
                 }
             </section>

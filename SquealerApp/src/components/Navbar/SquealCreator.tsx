@@ -6,6 +6,7 @@ import useSWR, { Fetcher } from "swr";
 import AsyncSelect from "react-select/async";
 import { set } from "mongoose";
 import { useSession } from "next-auth/react";
+import { formControlLabelClasses } from "@mui/material";
 
 const MAX_LEN = 50;
 
@@ -24,7 +25,10 @@ const Counter: React.FC<{ current_len: number }> = ({ current_len }) => {
 const SquealCreator = () => {
     interface Content {
         text: string | null;
-        img: string | null;
+        img: {
+            mimetype: string;
+            blob: string;
+        } | null;
         geolocation: string | null;
     }
 
@@ -76,26 +80,62 @@ const SquealCreator = () => {
         setQuery("");
     };
 
-    const handleImg = (file) => {
-        //convert file to base64 string
-        const reader = new FileReader();
-        reader.readAsDataURL(file.files[0]);
-        reader.onload = () => {
-            setImg(reader.result as string)
-            console.log(reader.result);
-        };
+    const handleImg = (file, setContentToUpdate = false) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                const imgDataUrl = reader.result as string;
+                setImg(imgDataUrl);
+
+                if (setContentToUpdate) {
+                    setContent({ text: null, img: formatImg(imgDataUrl), geolocation: null });
+                }
+
+                resolve(imgDataUrl); // resolve promise
+            };
+
+            reader.onerror = (error) => {
+                reject(error); // reject promise if something goes wrong
+            };
+
+            reader.readAsDataURL(file.files[0]);
+        });
     };
 
-    const handleContent = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+    const handleContent = async (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setMessage(value);
-        setContent({ ...content, [type]: value});
+        switch (type) {
+            case "text":
+                setMessage(value);
+                setContent({ ...content, [type]: value });
+                break;
+            case "image":
+                await handleImg(e.target, true);
+                //setContent({ text: null, img: formatImg(img), geolocation: null });
+                break;
+        }
+    };
+
+    const formatImg = (img: string | null) => {
+        if (!img) {
+            console.log("no img");
+            return null;
+        }
+        let myImg = { mimetype: "", blob: "" };
+        const imgSplit = img.split(",");
+        const imgType = imgSplit[0].split(";")[0].split(":")[1];
+        const imgBlob = imgSplit[1];
+        myImg = { mimetype: imgType, blob: imgBlob }
+
+        return myImg;
     };
 
 
     return (
 
         <div className="flex flex-col h-full w-full bg-grey-500 p-4 md:bg-[#111B21] md:rounded-lg md:mb-2">
+            <p>{content.img?.mimetype}</p>
             <AsyncSelect
                 isMulti
                 cacheOptions
@@ -152,7 +192,9 @@ const SquealCreator = () => {
                                 id="icon-button-file"
                                 type="file"
                                 capture="environment"
-                                onChange={(e) => { handleImg(e.target) }}
+                                onChange={(e) => {
+                                    handleContent(e);
+                                }}
                             />
                         </AnimatedTabContent>
                     }

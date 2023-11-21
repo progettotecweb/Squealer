@@ -29,8 +29,14 @@ const squealSchema = new mongoose.Schema({
             default: null
         },
         img: {
-            type: String,
-            default: null
+            mimetype: {
+                type: String,
+                default: null
+            },
+            blob: {
+                type: String,
+                default: null
+            },
         },
         geolocation: {
             type: String,

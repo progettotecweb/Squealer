@@ -49,9 +49,11 @@ export default function Page({ params }: { params: { name: string } }) {
                     data?.squeals.map((squeal, index) => {
                         return (
                             <Squeal
+                                type={squeal.type}
                                 key={index}
                                 content={squeal.content}
-                                name={squeal?.userInfo?.name}
+                                name={squeal?.userInfo?.name
+                                }
                                 date={squeal?.datetime}
                             />
                         );

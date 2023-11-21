@@ -77,6 +77,7 @@ router.post("/post", async (req, res) => {
 
     // Squeal creation
     const newSqueal = await squealsDB.createNewSqueal(squeal);
+    //console.log("newSqueal", newSqueal);
 
     // Keywords
     //check if the squeal has text

@@ -28,11 +28,14 @@ function formatDate(date) {
 export interface SquealProps {
     id: string;
     type?: "text" | "image" | "geolocation";
-    content?: {
+    content: {
         text: string | null;
-        img: string | null;
+        img: {
+            mimetype: string;
+            blob: string;
+        } | null;
         geolocation: string | null;
-    }
+    };
     owner?: {
         name: string;
         img: {
@@ -87,8 +90,22 @@ const Squeal: React.FC<SquealProps> = ({ type, content, owner, date, reactions, 
                 subheader={<Typography>{formatDate(date)}</Typography>}
             />
             <CardContent>
+                {(() => {
+                    switch (type) {
+                        case 'text':
+                            return <Typography variant="body2">{content?.text}</Typography>;
+                        case 'image':
+                            if (content?.img && content?.img.blob)
+                                return <img src={`data:${content?.img.mimetype};base64,${content?.img.blob}`} alt="FOTO" />;
+                            else return;
+                        case 'geolocation':
+                            return <div>{content?.geolocation}</div>;
+                        default:
+                            return ;
+                    }
+                })()}
 
-                <Typography variant="body2">{content?.text}</Typography>
+
             </CardContent>
             <CardActions className="text-slate-50 fill-slate-50" disableSpacing>
                 <SquealButton onClick={() => updateSquealReaction(id, "m2", session?.user.id)}>😡 {reactions_.m2}</SquealButton>
@@ -99,7 +116,7 @@ const Squeal: React.FC<SquealProps> = ({ type, content, owner, date, reactions, 
                     <ReplyOutlinedIcon className="text-slate-50" />
                 </IconButton>
             </CardActions>
-        </Card>
+        </Card >
     );
 };
 
