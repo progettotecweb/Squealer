@@ -18,7 +18,25 @@ const squealSchema = new mongoose.Schema({
             }
         },
     ],
-    content: String,
+    type: {
+        type: String,
+        enum: ["text", "image", "geolocation"],
+        default: "text",
+    },
+    content: {
+        text: {
+            type: String,
+            default: null
+        },
+        img: {
+            type: String,
+            default: null
+        },
+        geolocation: {
+            type: String,
+            default: null
+        }
+    },
     keywords: [
         {
             type: mongoose.Schema.Types.ObjectId,

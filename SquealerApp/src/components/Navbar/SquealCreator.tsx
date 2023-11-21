@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 import Tabs, { Tab, AnimatedTabContent } from "@/components/Tabs/Tabs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -22,17 +22,36 @@ const Counter: React.FC<{ current_len: number }> = ({ current_len }) => {
 };
 
 const SquealCreator = () => {
+    interface Content {
+        text: string | null;
+        img: string | null;
+        geolocation: string | null;
+    }
+
     const [message, setMessage] = useState("");
+    const [img, setImg] = useState<string | null>(null);
+    const [content, setContent] = useState<Content>({
+        text: null,
+        img: null,
+        geolocation: null,
+    });
+    const [type, setType] = useState<"text" | "image" | "geolocation">("text");
     const [query, setQuery] = useState<string>("");
     const { data: session } = useSession();
 
+    const handleTabChange = (index: number) => {
+        setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");
+    };
+
     const submitSqueal = async (e) => {
         e.preventDefault();
+
         fetch("/api/squeals/post", {
             method: "POST",
             body: JSON.stringify({
                 ownerID: session?.user.id,
-                content: message,
+                type: type,
+                content: content,
                 recipients: selected.map((res) => res.value),
             }),
             headers: {
@@ -41,6 +60,11 @@ const SquealCreator = () => {
         });
 
         setMessage("");
+        setContent({
+            text: null,
+            img: null,
+            geolocation: null,
+        });
         setSelected([]);
         setQuery("");
     };
@@ -52,7 +76,25 @@ const SquealCreator = () => {
         setQuery("");
     };
 
+    const handleImg = (file) => {
+        //convert file to base64 string
+        const reader = new FileReader();
+        reader.readAsDataURL(file.files[0]);
+        reader.onload = () => {
+            setImg(reader.result as string)
+            console.log(reader.result);
+        };
+    };
+
+    const handleContent = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+        const { name, value } = e.target;
+        setMessage(value);
+        setContent({ ...content, [type]: value});
+    };
+
+
     return (
+
         <div className="flex flex-col h-full w-full bg-grey-500 p-4 md:bg-[#111B21] md:rounded-lg md:mb-2">
             <AsyncSelect
                 isMulti
@@ -80,7 +122,7 @@ const SquealCreator = () => {
             />
 
             <Counter current_len={message.length} />
-            <Tabs>
+            <Tabs onTabChange={handleTabChange}>
                 <Tab
                     label="Text"
                     content={
@@ -88,7 +130,8 @@ const SquealCreator = () => {
                             <form name="squeal-post" className="md:h-[10vh]">
                                 <motion.textarea
                                     maxLength={MAX_LEN}
-                                    onChange={(e) => setMessage(e.target.value)}
+                                    //onChange={(e) => { setMessage(e.target.value) }}
+                                    onChange={handleContent}
                                     value={message}
                                     id="message"
                                     rows={4}
@@ -109,6 +152,7 @@ const SquealCreator = () => {
                                 id="icon-button-file"
                                 type="file"
                                 capture="environment"
+                                onChange={(e) => { handleImg(e.target) }}
                             />
                         </AnimatedTabContent>
                     }

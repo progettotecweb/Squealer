@@ -99,13 +99,31 @@ const squealSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 refPath: 'recipients.type'
             },
-            type:{
+            type: {
                 type: String,
                 enum: ['User', 'Channel']
             }
         },
     ],
-    content: String,
+    type: {
+        type: String,
+        enum: ["text", "image", "geo"],
+        default: "text",
+    },
+    content: {
+        text: {
+            type: String,
+            default: null
+        },
+        img: {
+            type: String,
+            default: null
+        },
+        geolocation: {
+            type: String,
+            default: null
+        }
+    },
     keywords: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -203,7 +221,7 @@ async function create() {
         await db.dropCollection("channels");
         await db.dropCollection("squeals");
         await db.dropCollection("keywords");
-        
+
         //leggo le collezioni
         let usersData = readJsonData("users.json");
         let channelsData = readJsonData("channels.json");

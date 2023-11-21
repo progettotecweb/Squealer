@@ -19,11 +19,10 @@ export const Tab: React.FC<TabProps> = ({
 }) => {
     return (
         <button
-            className={`py-2 px-4 text-sm font-medium text-center text-slate-50 focus:outline-none border-solid border-b-4 ${
-                activeTab === index
-                    ? " border-b-blue-500"
-                    : "border-transparent"
-            }`}
+            className={`py-2 px-4 text-sm font-medium text-center text-slate-50 focus:outline-none border-solid border-b-4 ${activeTab === index
+                ? " border-b-blue-500"
+                : "border-transparent"
+                }`}
             onClick={() => setActiveTab?.(index ? index : 0)}
         >
             {label}
@@ -69,17 +68,20 @@ interface TabsProps {
     children: AcceptedChildren;
     tabsClasses?: string;
     contentClasses?: string;
+    onTabChange?: (index: number) => void;
 }
 
 const Tabs: React.FC<TabsProps> = ({
     children,
     tabsClasses,
     contentClasses,
+    onTabChange,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
 
     const changeTab = (index: number) => {
         setActiveTab(index);
+        if (onTabChange) onTabChange(index);
     };
 
     return (

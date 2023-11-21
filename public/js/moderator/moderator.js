@@ -650,6 +650,7 @@ window.onload = function () {
             const btnSave = channelSquealsModal.querySelector("#btn-savechanges");
             btnSave.setAttribute("data-bs-channelId", databs.id);
             btnSave.setAttribute("data-bs-operation", "channel-squeal-create");
+            btnSave.setAttribute("data-bs-type", "text");
         });
     }
 
@@ -898,12 +899,14 @@ window.onload = function () {
                     //retrieve data to update from modal
                     let dataToUpdate = {
                         ownerID: document.querySelector("#master-user-name").getAttribute("data-bs-master_user_id"),
-                        content: document.querySelector("#channel-post-squeal-textarea").value,
+                        type: btn.getAttribute("data-bs-type"),
+                        content: getSquealContent(document.querySelector("#channel-post-squeal-textarea").value, btn.getAttribute("data-bs-type")),
                         recipients: [{
                             type: "Channel",
                             id: btn.getAttribute("data-bs-channelId")
                         }]
                     }
+
 
                     //insert in table
                     const insertPromise = await fetch("/api/" + table + "/post", {
@@ -1246,7 +1249,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     header += '</div>';
 
     let content = '<div class="squeal-content">';
-    let text = '<p class="squeal-text">' + squeal.content + '</p>';
+    let text = '<p class="squeal-text">' + squeal.content.text + '</p>';
     let replies = '<div class="squeal-replies">';
     replies += '</div>';
 
@@ -1412,4 +1415,21 @@ function getRecipientsFromModal() {
     }
 
     return recipients;
+}
+
+function getSquealContent(value, type) {
+    let squealContent = { text: null, image: null, geolocation: null };
+    switch (type) {
+        case "text":
+            squealContent.text = value;
+            break;
+        case "image":
+            squealContent.image = value;
+            break;
+        case "geolocation":
+            squealContent.geolocation = value;
+            break;
+    }
+
+    return squealContent;
 }

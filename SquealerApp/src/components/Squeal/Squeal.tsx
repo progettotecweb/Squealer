@@ -9,7 +9,7 @@ import Avatar from "@mui/material/Avatar";
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
-import {motion} from "framer-motion";
+import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
@@ -27,7 +27,12 @@ function formatDate(date) {
 
 export interface SquealProps {
     id: string;
-    content?: string;
+    type?: "text" | "image" | "geolocation";
+    content?: {
+        text: string | null;
+        img: string | null;
+        geolocation: string | null;
+    }
     owner?: {
         name: string;
         img: {
@@ -44,24 +49,24 @@ export interface SquealProps {
     };
 }
 
-const Squeal: React.FC<SquealProps> = ({ content, owner, date, reactions,id }) => {
+const Squeal: React.FC<SquealProps> = ({ type, content, owner, date, reactions, id }) => {
 
     const [reactions_, setReactions] = useState(reactions);
-    
-    const {data: session} = useSession();
 
-    const updateSquealReaction = (id:string, reaction:string, userid?: string) => {
+    const { data: session } = useSession();
+
+    const updateSquealReaction = (id: string, reaction: string, userid?: string) => {
         fetch(`/api/squeals/reaction/${id}`, {
             method: "PUT",
-            body: JSON.stringify({reaction, userid}),
+            body: JSON.stringify({ reaction, userid }),
             headers: {
                 "Content-Type": "application/json"
             }
         }).then((res) => res.json()).then((data) => {
-            if(data.success) setReactions(data.squeal.reactions);
+            if (data.success) setReactions(data.squeal.reactions);
         })
     }
-    
+
     return (
         <Card className=" mx-2 bg-slate-800 text-slate-50">
             <CardHeader
@@ -82,7 +87,8 @@ const Squeal: React.FC<SquealProps> = ({ content, owner, date, reactions,id }) =
                 subheader={<Typography>{formatDate(date)}</Typography>}
             />
             <CardContent>
-                <Typography variant="body2">{content}</Typography>
+
+                <Typography variant="body2">{content?.text}</Typography>
             </CardContent>
             <CardActions className="text-slate-50 fill-slate-50" disableSpacing>
                 <SquealButton onClick={() => updateSquealReaction(id, "m2", session?.user.id)}>😡 {reactions_.m2}</SquealButton>
@@ -99,9 +105,9 @@ const Squeal: React.FC<SquealProps> = ({ content, owner, date, reactions,id }) =
 
 
 
-const SquealButton = (props: {children: React.ReactNode, onClick?: () => void}) => {
+const SquealButton = (props: { children: React.ReactNode, onClick?: () => void }) => {
     return (
-        <motion.div whileHover={{scale: 1.1}}>
+        <motion.div whileHover={{ scale: 1.1 }}>
             <IconButton className="text-slate-50" onClick={props.onClick}>
                 {props.children}
             </IconButton>

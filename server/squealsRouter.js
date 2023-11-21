@@ -78,19 +78,24 @@ router.post("/post", async (req, res) => {
     // Squeal creation
     const newSqueal = await squealsDB.createNewSqueal(squeal);
 
-    const message = newSqueal.content;
-    // keywords begin with #
-    const regexp = /#\w+/g;
-    const keywords = message.match(regexp);
-    console.log(keywords);
+    // Keywords
+    //check if the squeal has text
+    if (newSqueal.content.text) {
+        const message = newSqueal.content.text;
+        // keywords begin with #
+        const regexp = /#\w+/g;
+        const keywords = message.match(regexp);
+        console.log(keywords);
 
-    if (keywords) {
-        keywords.forEach(async (keyword) => {
-            const keywordName = keyword.slice(1);
-            await keywordsDB.addSquealToKeyword(keywordName, newSqueal._id);
-        });
+        if (keywords) {
+            keywords.forEach(async (keyword) => {
+                const keywordName = keyword.slice(1);
+                await keywordsDB.addSquealToKeyword(keywordName, newSqueal._id);
+            });
+        }
     }
 
+    // Owner
     const owner = await usersDB.searchUserByID(squeal.ownerID);
     owner.squeals.push(newSqueal._id);
     owner.save();
