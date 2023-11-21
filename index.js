@@ -23,6 +23,8 @@ const channelRouter = require("./server/channelRouter.js");
 const usersRouter = require("./server/usersRouter.js");
 const apiRouter = require("./server/api.js");
 
+
+
 /* NEXT CONFIG */
 const next = require("next");
 const appNextOptions = {
@@ -60,8 +62,16 @@ appNext
         app.use("/img", express.static(global.rootDir + "/public/media"));
         app.use(express.urlencoded({ extended: true }));
         app.use(cors());
+
+        const bodyParser = require('body-parser');
+        //upload media limit
+        app.use(bodyParser.json({ limit: '10mb' }));
+        app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
         app.use(express.json());
         app.use(cookieParser());
+
+
 
         mymongo.connectToDB();
 
@@ -139,7 +149,7 @@ appNext
             );
         });
 
-        
+
 
         /* ========================== */
         /*                            */

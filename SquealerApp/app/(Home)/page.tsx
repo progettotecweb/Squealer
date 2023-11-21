@@ -6,6 +6,8 @@ import Squeal from "@/components/Squeal/Squeal";
 import { useSession } from "next-auth/react";
 import useSWR, { Fetcher } from "swr";
 
+
+
 const squeals = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
 
 const Homepage = () => {
