@@ -143,7 +143,6 @@ const SquealCreator = () => {
     return (
 
         <div className="flex flex-col h-full w-full bg-grey-500 p-4 md:bg-[#111B21] md:rounded-lg md:mb-2">
-            <p>{content.img?.mimetype}</p>
             <AsyncSelect
                 isMulti
                 cacheOptions
