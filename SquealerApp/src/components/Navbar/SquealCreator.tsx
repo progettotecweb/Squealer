@@ -8,6 +8,8 @@ import { set } from "mongoose";
 import { useSession } from "next-auth/react";
 import { formControlLabelClasses } from "@mui/material";
 
+import Camera from "./Camera";
+
 const MAX_LEN = 50;
 
 const Counter: React.FC<{ current_len: number }> = ({ current_len }) => {
@@ -131,6 +133,12 @@ const SquealCreator = () => {
         return myImg;
     };
 
+    const handleCapture = (img: string) => {
+        console.log(img);
+        setImg(img);
+        setContent({ text: null, img: formatImg(img), geolocation: null });
+    }
+
 
     return (
 
@@ -186,6 +194,17 @@ const SquealCreator = () => {
                     label="Image"
                     content={
                         <AnimatedTabContent>
+                            <div className="flex justify-center">
+                                <Camera onCapture={handleCapture} />
+                                {
+                                    img && (
+                                        <img className='rounded-lg imgPreview ml-24'
+                                            src={img}
+                                        />
+                                    )
+                                }
+                            </div>
+                            <p className="mt-4 mb-4">OR</p>
                             <input
                                 className="md:h-[10vh]"
                                 accept="image/*"

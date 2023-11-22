@@ -11,3 +11,29 @@
 .MuiCardHeader-content {
     text-align: start;
 }
+
+.imgPreview{
+    max-width: 20vw !important;
+    height: auto;
+}
+
+#btnCamera:active {
+    animation: cameraBtnAnimation 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes cameraBtnAnimation {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.2;
+    }
+
+    60% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
