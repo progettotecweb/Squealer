@@ -13,6 +13,8 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
+import GeolocationSqueal from "./GeolocationSqueal";
+
 function formatDate(date) {
     const d = new Date(date);
     const month = d.getMonth(); //+1
@@ -34,7 +36,10 @@ export interface SquealProps {
             mimetype: string;
             blob: string;
         } | null;
-        geolocation: string | null;
+        geolocation: {
+            latitude: number;
+            longitude: number;
+        };
     };
     owner?: {
         name: string;
@@ -99,9 +104,9 @@ const Squeal: React.FC<SquealProps> = ({ type, content, owner, date, reactions, 
                                 return <img src={`data:${content?.img.mimetype};base64,${content?.img.blob}`} alt="FOTO" />;
                             else return;
                         case 'geolocation':
-                            return <div>{content?.geolocation}</div>;
+                            return <div><GeolocationSqueal geolocation={[content?.geolocation?.latitude, content?.geolocation?.longitude]} squealID={id.toString()}></GeolocationSqueal></div>;
                         default:
-                            return ;
+                            return;
                     }
                 })()}
 

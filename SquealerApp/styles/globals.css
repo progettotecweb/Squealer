@@ -21,6 +21,11 @@
     animation: cameraBtnAnimation 1s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+.mapSqueal{
+    height: 50vh !important;
+    width: 100%;
+}
+
 @keyframes cameraBtnAnimation {
     0% {
         transform: scale(0.8);

@@ -7,8 +7,8 @@ import AsyncSelect from "react-select/async";
 import { set } from "mongoose";
 import { useSession } from "next-auth/react";
 import { formControlLabelClasses } from "@mui/material";
-
 import Camera from "./Camera";
+import Geolocation from "./Geolocation";
 
 const MAX_LEN = 50;
 
@@ -31,11 +31,15 @@ const SquealCreator = () => {
             mimetype: string;
             blob: string;
         } | null;
-        geolocation: string | null;
+        geolocation: {
+            latitude: number;
+            longitude: number;
+        } | null;
     }
 
     const [message, setMessage] = useState("");
     const [img, setImg] = useState<string | null>(null);
+    const [geolocation, setGeolocation] = useState<[number, number] | null>(null);
     const [content, setContent] = useState<Content>({
         text: null,
         img: null,
@@ -139,6 +143,13 @@ const SquealCreator = () => {
         setContent({ text: null, img: formatImg(img), geolocation: null });
     }
 
+    const handleLocation = (lat: number, lng: number) => {
+        //TODO quando posto uno squeal la geo si resetta e diventa null
+        console.log(lat, lng);
+        setGeolocation([lat, lng]);
+        setContent({ text: null, img: null, geolocation: { latitude: lat, longitude: lng } });
+    }
+
 
     return (
 
@@ -221,7 +232,7 @@ const SquealCreator = () => {
                     label="Geolocation"
                     content={
                         <AnimatedTabContent>
-                            <div className="md:h-[10vh]">Geolocation</div>
+                            <Geolocation onLocation={handleLocation} />
                         </AnimatedTabContent>
                     }
                 />

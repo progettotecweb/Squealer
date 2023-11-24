@@ -23,7 +23,10 @@ const Homepage = () => {
                 mimetype: string;
                 blob: string;
             } | null;
-            geolocation: string | null;
+            geolocation: {
+                latitude: number;
+                longitude: number;
+            };
         };
         geolocation: string | null;
         ownerID: any;

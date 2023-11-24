@@ -33,6 +33,6 @@
         "dist/types/**/*.ts",
         "app/api/auth/[...nextauth]/route.js",
         "src/auth.tsx"
-    ],
+, "src/components/Map.tsx"    ],
     "exclude": ["node_modules"]
 }

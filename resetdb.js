@@ -126,8 +126,14 @@ const squealSchema = new mongoose.Schema({
             },
         },
         geolocation: {
-            type: String,
-            default: null
+            latitude: {
+                type: Number,
+                default: null
+            },
+            longitude: {
+                type: Number,
+                default: null
+            },
         }
     },
     keywords: [
