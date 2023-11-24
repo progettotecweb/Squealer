@@ -48,6 +48,7 @@ const SquealCreator = () => {
     const [type, setType] = useState<"text" | "image" | "geolocation">("text");
     const [query, setQuery] = useState<string>("");
     const { data: session } = useSession();
+    const [activeTabNumber, setActiveTabNumber] = useState<number>(0);
 
     const handleTabChange = (index: number) => {
         setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");
@@ -75,6 +76,7 @@ const SquealCreator = () => {
             img: null,
             geolocation: null,
         });
+        setActiveTabNumber(0);
         setSelected([]);
         setQuery("");
     };
@@ -144,7 +146,6 @@ const SquealCreator = () => {
     }
 
     const handleLocation = (lat: number, lng: number) => {
-        //TODO quando posto uno squeal la geo si resetta e diventa null
         console.log(lat, lng);
         setGeolocation([lat, lng]);
         setContent({ text: null, img: null, geolocation: { latitude: lat, longitude: lng } });

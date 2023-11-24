@@ -16,7 +16,7 @@ const Geolocation: React.FC<GeolocationProps> = ({
     const [geolocation, setGeolocation] = useState<[number, number] | any>([null, null]);
     const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
- //TODO: change marker location and set the new location with onLocation
+    //TODO: change marker location and set the new location with onLocation
     useEffect(() => {
         // Get user's geolocation when the component mounts
         if (navigator.geolocation) {
@@ -72,11 +72,38 @@ const Geolocation: React.FC<GeolocationProps> = ({
                     .openPopup()
                     .addTo(mapRef.current);
 
+                // onckick event listener
+                mapRef.current.on('click', function (e) {
+                    const { lat, lng } = e.latlng;
+                    if (mapRef.current) {
+                        //remove previous marker
+                        mapRef.current.eachLayer(function (layer) {
+                            if (layer instanceof L.Marker && mapRef.current) {
+                                mapRef.current.removeLayer(layer);
+                            }
+                        });
+                    }
+
+                    if (mapRef.current) {
+                        // Add new marker
+                        const newMarker = L.marker([lat, lng])
+                            .bindPopup("Your position")
+                            .openPopup()
+                            .addTo(mapRef.current);
+
+                        //update new location
+                        onLocation(lat, lng);
+                    }
+                });
+
                 setMap(mapRef.current);
             } else {
                 // If map is already initialized, update its properties
                 mapRef.current.setView(geolocation, 13);
             }
+
+
+
         });
     }, geolocation);
 

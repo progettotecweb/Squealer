@@ -40,7 +40,7 @@ const Map: React.FunctionComponent<
 
                 //add marker
                 L.marker(geolocation)
-                    .bindPopup("You are here")
+                    .bindPopup("Position")
                     .openPopup()
                     .addTo(mapRef.current);
 

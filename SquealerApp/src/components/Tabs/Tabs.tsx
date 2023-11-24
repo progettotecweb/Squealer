@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, cloneElement } from "react";
+import { useState, cloneElement, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TabProps {
@@ -69,6 +69,7 @@ interface TabsProps {
     tabsClasses?: string;
     contentClasses?: string;
     onTabChange?: (index: number) => void;
+    makeActiveTab?: number;
 }
 
 const Tabs: React.FC<TabsProps> = ({
@@ -76,13 +77,17 @@ const Tabs: React.FC<TabsProps> = ({
     tabsClasses,
     contentClasses,
     onTabChange,
+    makeActiveTab,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
 
     const changeTab = (index: number) => {
+        console.log("changeTab", index);
         setActiveTab(index);
         if (onTabChange) onTabChange(index);
     };
+
+    
 
     return (
         <>
