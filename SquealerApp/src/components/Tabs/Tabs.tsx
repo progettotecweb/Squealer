@@ -77,12 +77,10 @@ const Tabs: React.FC<TabsProps> = ({
     tabsClasses,
     contentClasses,
     onTabChange,
-    makeActiveTab,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
 
     const changeTab = (index: number) => {
-        console.log("changeTab", index);
         setActiveTab(index);
         if (onTabChange) onTabChange(index);
     };

@@ -63,8 +63,6 @@ const Geolocation: React.FC<GeolocationProps> = ({
                     ]
 
                 });
-                console.log("mapRef.current", mapRef.current);
-                console.log("geo", geolocation);
 
                 //add marker
                 L.marker(geolocation)
@@ -112,8 +110,6 @@ const Geolocation: React.FC<GeolocationProps> = ({
             {geolocation[0] !== null && geolocation[1] !== null ? (
                 <div>
                     <div id="map" style={{ height: "400px", width: "100%" }} className="mapSqueal"></div>
-                    <p>Your current latitude is: {geolocation[0]}</p>
-                    <p>Your current longitude is: {geolocation[1]}</p>
                 </div>
             ) : (
                 <p>Loading geolocation...</p>

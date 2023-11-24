@@ -146,7 +146,6 @@ const SquealCreator = () => {
     }
 
     const handleLocation = (lat: number, lng: number) => {
-        console.log(lat, lng);
         setGeolocation([lat, lng]);
         setContent({ text: null, img: null, geolocation: { latitude: lat, longitude: lng } });
     }
