@@ -167,7 +167,7 @@
 
 .my-card-squeal {
     width: 100%;
-    max-height: 20em;
+    max-height: 25em;
     /*border: 1px solid black;*/
     box-shadow: 0px 0px 5px 0px #000000;
     background-color: #F0F0F0;
@@ -206,7 +206,7 @@
 
 .geo-squeal-container {
     max-width: 100%;
-    max-height: 15em;
+    max-height: 12em;
 }
 
 .geo-squeal{
@@ -252,6 +252,7 @@
 .squeal-recipients-div{
     text-align: end;
     margin-bottom: 0.5em;
+    min-height: 1em;
 }
 
 .squeal-recipient {
