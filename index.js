@@ -56,6 +56,7 @@ appNext
             "/bootstrap",
             express.static(global.rootDir + "/public/bootstrap")
         );
+        app.use("/leaflet", express.static(global.rootDir + "/public/leaflet"));
         app.use("/css", express.static(global.rootDir + "/public/css"));
         app.use("/data", express.static(global.rootDir + "/public/data"));
         app.use("/docs", express.static(global.rootDir + "/public/html"));

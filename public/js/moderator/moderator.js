@@ -1,3 +1,4 @@
+
 async function signout() {
     await fetch("/Home/api/auth/signout?callbackUrl=/Login", {
         method: "POST",
@@ -355,8 +356,15 @@ window.onload = function () {
 
                 //create the cards for every squeal
                 //console.log(data)
+                let geoSqueals = [];
                 for (let i = 0; i < data.length; i++) {
-                    addSquealCard(data[i], data[i].recipients, boxContent, false, true);
+                    let geo = addSquealCard(data[i], data[i].recipients, boxContent, false, true);
+                    if (geo)
+                        geoSqueals.push(geo);
+                }
+
+                for (let i = 0; i < geoSqueals.length; i++) {
+                    createGeoMap(geoSqueals[i].geolocation, geoSqueals[i].mapId);
                 }
             })
             .catch(err => {
@@ -1149,6 +1157,8 @@ async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dat
 
 async function searchAndAddSqueals(squealsId, div) {
     let squealIdArray = squealsId.split(",");
+    let geoSqueals = [];
+
     //console.log(squealIdArray);
     for (let i = 0; i < squealIdArray.length; i++) {
         if (squealIdArray[i] === "") continue;
@@ -1166,7 +1176,9 @@ async function searchAndAddSqueals(squealsId, div) {
                 console.log(err);
             });
 
-        await addSquealCard(squeal, null, div, true);
+        let geo = await addSquealCard(squeal, null, div, true);
+        if (geo)
+            geoSqueals.push(geo);
 
         //get all delete squeal btn and add event listener
         const btnDelete = document.querySelectorAll(".channel-squeal-btn");
@@ -1180,6 +1192,10 @@ async function searchAndAddSqueals(squealsId, div) {
                 }
             });
         }
+    }
+
+    for (let i = 0; i < geoSqueals.length; i++) {
+        createGeoMap(geoSqueals[i].geolocation, geoSqueals[i].mapId);
     }
 
     //check if squeals are empty
@@ -1253,7 +1269,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     const blobsrc = "data:" + squeal.content.img.mimetype + ";base64," + squeal.content.img.blob;
     const alt = "Picture";
     let img = `<div class='d-flex justify-content-center'><img src=${blobsrc} alt=${alt} class='img-squeal'/></div>`;
-
+    let geolocation = `<div class="geo-squeal-container"><div class="geo-squeal" id=${"map-" + squeal._id}></div></div>`
     let replies = '<div class="squeal-replies">';
     replies += '</div>';
 
@@ -1265,6 +1281,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
             content += img;
             break;
         case "geolocation":
+            content += geolocation;
             break;
     }
     content += '</div>';
@@ -1320,8 +1337,64 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     mycard += btnViewMore;
     mycard += '</div>'
     div.innerHTML += mycard;
+
+    let geoSqueal = {};
+    if (squeal.type === "geolocation") {
+        geoSqueal = { geolocation: squeal.content.geolocation, mapId: "map-" + squeal._id }
+        //let map = createGeoMap(squeal.content.geolocation, "map-" + squeal._id);
+        return geoSqueal;
+    }
+
 }
 
+
+function createGeoMap(geolocation, mapId = null) {
+    //check if geolocation.latitude and geolocation.longituted are null
+    if (geolocation.latitude === null || geolocation.longitude === null || mapId === null) {
+        return '';
+    }
+
+
+    /*//get all 'geo-squeal' divs and search for the one with the correct id
+    const geoSquealDivs = document.querySelectorAll(".geo-squeal");
+    let geoSquealDiv;
+    for (let i = 0; i < geoSquealDivs.length; i++) {
+        if (geoSquealDivs[i].querySelector("div").id === mapId) {
+            geoSquealDiv = geoSquealDivs[i];
+        }
+    }*/
+
+
+    //create the map with leaflet
+    /*let map = L.map(mapId,{
+
+    })
+        .setView([geolocation.latitude, geolocation.longitude], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    //add marker
+    let marker = L.marker([geolocation.latitude, geolocation.longitude])
+        .addTo(map);*/
+    console.log(document.querySelector("#" + mapId));
+    let map = L.map(mapId, {
+        center: [geolocation.latitude, geolocation.longitude],
+        zoom: 13,
+        layers: [
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 20,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }),
+            L.marker([geolocation.latitude, geolocation.longitude])
+        ]
+    }).setView([geolocation.latitude, geolocation.longitude], 13);
+
+
+
+    return map;
+}
 
 function formatDate(date) {
     const d = new Date(date);
