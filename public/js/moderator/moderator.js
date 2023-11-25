@@ -653,7 +653,17 @@ window.onload = function () {
             viewSquealsDiv.innerHTML = "";
 
             //create the cards for every squeal
-            searchAndAddSqueals(databs.squeals, viewSquealsDiv);
+            let geoSqueals = searchAndAddSqueals(databs.squeals, viewSquealsDiv);
+
+            geoSqueals.then((maps) => {
+                for (let i = 0; i < maps.length; i++) {
+                    let map = createGeoMap(maps[i].geolocation, maps[i].mapId);
+                    setTimeout(() => {
+                        map.invalidateSize();
+                    }, 1000);
+                }
+            });
+
 
             const btnSave = channelSquealsModal.querySelector("#btn-savechanges");
             btnSave.setAttribute("data-bs-channelId", databs.id);
@@ -1194,14 +1204,21 @@ async function searchAndAddSqueals(squealsId, div) {
         }
     }
 
+    /*let maps = [];
     for (let i = 0; i < geoSqueals.length; i++) {
-        createGeoMap(geoSqueals[i].geolocation, geoSqueals[i].mapId);
-    }
+        let map = createGeoMap(geoSqueals[i].geolocation, geoSqueals[i].mapId);
+        maps.push(map);
+        /*setTimeout(() => {
+            map.invalidateSize();
+        }, 1000);
+    }*/
 
     //check if squeals are empty
     if (div.innerHTML === "") {
         div.innerHTML = "<p class='text-center'>No squeals yet!</p>";
     }
+
+    return geoSqueals;
 
     async function deleteSqueal(squealId, btn) {
         //console.log(squealId);
