@@ -658,7 +658,7 @@ window.onload = function () {
             geoSqueals.then((maps) => {
                 for (let i = 0; i < maps.length; i++) {
                     let map = createGeoMap(maps[i].geolocation, maps[i].mapId);
-                    setTimeout(() => {
+                    setInterval(() => {
                         map.invalidateSize();
                     }, 1000);
                 }
@@ -1204,14 +1204,6 @@ async function searchAndAddSqueals(squealsId, div) {
         }
     }
 
-    /*let maps = [];
-    for (let i = 0; i < geoSqueals.length; i++) {
-        let map = createGeoMap(geoSqueals[i].geolocation, geoSqueals[i].mapId);
-        maps.push(map);
-        /*setTimeout(() => {
-            map.invalidateSize();
-        }, 1000);
-    }*/
 
     //check if squeals are empty
     if (div.innerHTML === "") {
@@ -1371,31 +1363,6 @@ function createGeoMap(geolocation, mapId = null) {
         return '';
     }
 
-
-    /*//get all 'geo-squeal' divs and search for the one with the correct id
-    const geoSquealDivs = document.querySelectorAll(".geo-squeal");
-    let geoSquealDiv;
-    for (let i = 0; i < geoSquealDivs.length; i++) {
-        if (geoSquealDivs[i].querySelector("div").id === mapId) {
-            geoSquealDiv = geoSquealDivs[i];
-        }
-    }*/
-
-
-    //create the map with leaflet
-    /*let map = L.map(mapId,{
-
-    })
-        .setView([geolocation.latitude, geolocation.longitude], 13);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
-    //add marker
-    let marker = L.marker([geolocation.latitude, geolocation.longitude])
-        .addTo(map);*/
-    console.log(document.querySelector("#" + mapId));
     let map = L.map(mapId, {
         center: [geolocation.latitude, geolocation.longitude],
         zoom: 13,
