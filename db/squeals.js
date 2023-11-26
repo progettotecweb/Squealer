@@ -20,7 +20,7 @@ const squealSchema = new mongoose.Schema({
     ],
     type: {
         type: String,
-        enum: ["text", "image", "geolocation"],
+        enum: ["text", "image", "video", "geolocation"],
         default: "text",
     },
     content: {
@@ -29,6 +29,16 @@ const squealSchema = new mongoose.Schema({
             default: null
         },
         img: {
+            mimetype: {
+                type: String,
+                default: null
+            },
+            blob: {
+                type: String,
+                default: null
+            },
+        },
+        video: {
             mimetype: {
                 type: String,
                 default: null

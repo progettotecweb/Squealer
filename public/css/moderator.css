@@ -201,7 +201,12 @@
 
 .img-squeal{
     max-width: 10em;
-    max-height: 15em;
+    max-height: 12em;
+}
+
+.video-squeal{
+    max-width: 10em;
+    max-height: 12em;
 }
 
 .geo-squeal-container {

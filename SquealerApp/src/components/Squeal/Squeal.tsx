@@ -29,7 +29,7 @@ function formatDate(date) {
 
 export interface SquealProps {
     id: string;
-    type?: "text" | "image" | "geolocation";
+    type?: "text" | "image" | "video" | "geolocation";
     content: {
         text: string | null;
         img: {
@@ -40,6 +40,10 @@ export interface SquealProps {
             latitude: number;
             longitude: number;
         };
+        video: {
+            mimetype: string;
+            blob: string;
+        } | null;
     };
     owner?: {
         name: string;
@@ -102,6 +106,10 @@ const Squeal: React.FC<SquealProps> = ({ type, content, owner, date, reactions, 
                         case 'image':
                             if (content?.img && content?.img.blob)
                                 return <img src={`data:${content?.img.mimetype};base64,${content?.img.blob}`} alt="FOTO" />;
+                            else return;
+                        case 'video':
+                            if (content?.video && content?.video.blob)
+                                return <video controls src={`data:${content?.video.mimetype};base64,${content?.video.blob}`} className="video-squeal h-1/3 w-2/3" />;
                             else return;
                         case 'geolocation':
                             return <div><GeolocationSqueal geolocation={[content?.geolocation?.latitude, content?.geolocation?.longitude]} squealID={id.toString()}></GeolocationSqueal></div>;

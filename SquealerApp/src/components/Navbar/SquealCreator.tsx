@@ -31,6 +31,10 @@ const SquealCreator = () => {
             mimetype: string;
             blob: string;
         } | null;
+        video: {
+            mimetype: string;
+            blob: string;
+        } | null;
         geolocation: {
             latitude: number;
             longitude: number;
@@ -39,19 +43,35 @@ const SquealCreator = () => {
 
     const [message, setMessage] = useState("");
     const [img, setImg] = useState<string | null>(null);
+    const [video, setVideo] = useState<string | null>(null);
     const [geolocation, setGeolocation] = useState<[number, number] | null>(null);
     const [content, setContent] = useState<Content>({
         text: null,
         img: null,
+        video: null,
         geolocation: null,
     });
-    const [type, setType] = useState<"text" | "image" | "geolocation">("text");
+    const [type, setType] = useState<"text" | "image" | "video" | "geolocation">("text");
     const [query, setQuery] = useState<string>("");
     const { data: session } = useSession();
     const [activeTabNumber, setActiveTabNumber] = useState<number>(0);
 
     const handleTabChange = (index: number) => {
-        setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");
+        //setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");
+        switch (index) {
+            case 0:
+                setType("text");
+                break;
+            case 1:
+                setType("image");
+                break;
+            case 2:
+                setType("video");
+                break;
+            case 3:
+                setType("geolocation");
+                break;
+        }
     };
 
     const submitSqueal = async (e) => {
@@ -74,6 +94,7 @@ const SquealCreator = () => {
         setContent({
             text: null,
             img: null,
+            video: null,
             geolocation: null,
         });
         setActiveTabNumber(0);
@@ -97,7 +118,7 @@ const SquealCreator = () => {
                 setImg(imgDataUrl);
 
                 if (setContentToUpdate) {
-                    setContent({ text: null, img: formatImg(imgDataUrl), geolocation: null });
+                    setContent({ text: null, img: formatImg(imgDataUrl), video: null, geolocation: null });
                 }
 
                 resolve(imgDataUrl); // resolve promise
@@ -111,7 +132,30 @@ const SquealCreator = () => {
         });
     };
 
-    const handleContent = async (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleVideo = (file, setContentToUpdate = false) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                const videoDataUrl = reader.result as string;
+                setVideo(videoDataUrl);
+
+                if (setContentToUpdate) {
+                    setContent({ text: null, img: null, video: formatImg(videoDataUrl), geolocation: null });
+                }
+
+                resolve(videoDataUrl); // resolve promise
+            };
+
+            reader.onerror = (error) => {
+                reject(error); // reject promise if something goes wrong
+            };
+
+            reader.readAsDataURL(file.files[0]);
+        });
+    };
+
+    const handleContent = async (e: any) => {
         const { name, value } = e.target;
         switch (type) {
             case "text":
@@ -119,8 +163,22 @@ const SquealCreator = () => {
                 setContent({ ...content, [type]: value });
                 break;
             case "image":
-                await handleImg(e.target, true);
-                //setContent({ text: null, img: formatImg(img), geolocation: null });
+                //check if file uploaded is an image
+                if (!e.target.files[0].type.startsWith("image")) {
+                    alert("File must be an image");
+                }
+                else {
+                    await handleImg(e.target, true);
+                }
+                break;
+            case "video":
+                //check if file uploaded is a video
+                if (!e.target.files[0].type.startsWith("video")) {
+                    alert("File must be a video");
+                }
+                else {
+                    await handleVideo(e.target, true);
+                }
                 break;
         }
     };
@@ -142,12 +200,12 @@ const SquealCreator = () => {
     const handleCapture = (img: string) => {
         console.log(img);
         setImg(img);
-        setContent({ text: null, img: formatImg(img), geolocation: null });
+        setContent({ text: null, img: formatImg(img), video: null, geolocation: null });
     }
 
     const handleLocation = (lat: number, lng: number) => {
         setGeolocation([lat, lng]);
-        setContent({ text: null, img: null, geolocation: { latitude: lat, longitude: lng } });
+        setContent({ text: null, img: null, video: null, geolocation: { latitude: lat, longitude: lng } });
     }
 
 
@@ -218,6 +276,34 @@ const SquealCreator = () => {
                             <input
                                 className="md:h-[10vh]"
                                 accept="image/*"
+                                id="icon-button-file"
+                                type="file"
+                                capture="environment"
+                                onChange={(e) => {
+                                    handleContent(e);
+                                }}
+                            />
+                        </AnimatedTabContent>
+                    }
+                />
+                <Tab
+                    label="Video"
+                    content={
+                        <AnimatedTabContent>
+                            <div className="flex justify-center">
+                                {
+                                    video && (
+                                        <video className='rounded-lg imgPreview ml-24'
+                                            src={video}
+                                            controls={true}
+                                        />
+                                    )
+                                }
+                            </div>
+                            <p className="mt-4 mb-4">OR</p>
+                            <input
+                                className="md:h-[10vh]"
+                                accept="video/*"
                                 id="icon-button-file"
                                 type="file"
                                 capture="environment"

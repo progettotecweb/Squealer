@@ -9,7 +9,7 @@
     -->
     <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.css">
     <script src="/bootstrap/js/bootstrap.js"></script>
-    
+
     <link rel="stylesheet" type="text/css" href="/leaflet/leaflet.css">
     <script src="/leaflet/leaflet.js"></script>
 
@@ -18,7 +18,7 @@
 
 
     <script src="/js/moderator/moderator.js"></script>
-    
+
 </head>
 
 <body>
@@ -225,10 +225,6 @@
                                 <div class="channel-view-squeals">
                                 </div>
                             </div>
-                            <!--<div class="modal-footer">
-                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
-                                    id="btn-savechanges">Save changes</button>
-                            </div>-->
                         </div>
                     </div>
                 </div>
@@ -249,6 +245,7 @@
                                     <option value="alphabetical" selected>Alphabetical</option>
                                     <option value="owner">Owner name</option>
                                     <option value="popularity">Popularity</option>
+                                    <option value="squeal-number">Squeal number</option>
                                 </select>
 
                                 <span class="h6">Choose the type</span>
@@ -307,6 +304,35 @@
                                 <input type="number" class="form-number w-25" id="squeal-reactions-p2"
                                     data-bs-value_reactions_p2="0"><br>
 
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- SQUEALS FILTER MODAL-->
+                <div class="modal fade" id="squealFilterModal" tabindex="-1" aria-labelledby="squealFilterModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="squealFilterModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <span class="h6">Choose the order</span>
+                                <select class="form-select sort-select" id="filterSqueal-select-orderby">
+                                    <option value="date-newer" selected>Date newer</option>
+                                    <option value="date-older">Date older</option>
+                                    <option value="owner">Owner name</option>
+                                    <option value="recipient">Recipient name</option>
+                                </select>
+                                
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"

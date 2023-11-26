@@ -125,6 +125,16 @@ const squealSchema = new mongoose.Schema({
                 default: null
             },
         },
+        video: {
+            mimetype: {
+                type: String,
+                default: null
+            },
+            blob: {
+                type: String,
+                default: null
+            },
+        },
         geolocation: {
             latitude: {
                 type: Number,

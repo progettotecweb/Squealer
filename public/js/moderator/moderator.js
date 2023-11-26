@@ -254,6 +254,17 @@ window.onload = function () {
                             return 0;
                         });
                         break;
+                    case "squeal-number":
+                        data.sort((a, b) => {
+                            if (a.squeals.length < b.squeals.length) {
+                                return 1;
+                            }
+                            if (a.squeals.length > b.squeals.length) {
+                                return -1;
+                            }
+                            return 0;
+                        });
+                        break;
                 }
 
                 //create the cards for every channel
@@ -261,13 +272,15 @@ window.onload = function () {
                     //check the filter type and skip the channel if it doesn't match, or show all
                     if (filter.type != "All" && (data[i].official === true ? 'Official' : 'Unofficial') != filter.type) continue;
 
+                    let tot_squeal = data[i].squeals.length;
+
                     let mycard = "<div class='my-card my-card-grid-t-c12-b'>";
 
                     let name = '<div class="h5 channel-name my-card-grid-top2 text-center w-100">' + data[i].name + '</div>';
                     let description = '<div class="channel-description my-card-grid-center2 text-center w-100">' + data[i].description + '</div>';
                     let officialandowner = '<div class = "my-card-grid-b1"><div class="channel-official">' + (data[i].official === true ? "Official" : "Unofficial") + '</div>'
                         + '<div class = "channel-owner">' + (data[i].owner_id === null ? "" : ('Owner: ' + data[i].owner_id.name)) + '</div></div>';
-                    let followers = '<div class = "channel-followers my-card-grid-b2">' + data[i].followers.length + ' Follower(s)</div>';
+                    let followers = '<div class = "channel-followers my-card-grid-b2">' + data[i].followers.length + ` Follower(s)<br>${tot_squeal} squeal(s)</div>`;
                     mycard += name + description + officialandowner + followers;
 
                     let channelInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
@@ -340,19 +353,63 @@ window.onload = function () {
                 };
 
                 //sort the squeals
-                /*switch (filter.orderBy) {
+                switch (filter.orderBy) {
                     case "date":
+                    case "date-newer":
                         data.sort((a, b) => {
-                            if (a.date < b.date) {
+                            if (a.datetime < b.datetime) {
                                 return 1;
                             }
-                            if (a.date > b.date) {
+                            if (a.datetime > b.datetime) {
                                 return -1;
                             }
                             return 0;
                         });
                         break;
-                }*/
+                    case "date-older":
+                        data.sort((a, b) => {
+                            if (a.datetime < b.datetime) {
+                                return -1;
+                            }
+                            if (a.datetime > b.datetime) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        break;
+                    case "owner":
+                        data.sort((a, b) => {
+                            if (JSON.stringify(a.ownerID.name).toUpperCase < JSON.stringify(b.ownerID.name).toUpperCase) {
+                                return -1;
+                            }
+                            if (JSON.stringify(a.ownerID.name).toUpperCase > JSON.stringify(b.ownerID.name).toUpperCase) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        break;
+                    case "recipient":
+                        data.sort((a, b) => {
+                            // order by recipient name 
+                            const aRecipients = a.recipients ? a.recipients.map(recipient => recipient.id.name).sort() : [];
+                            const bRecipients = b.recipients ? b.recipients.map(recipient => recipient.id.name).sort() : [];
+
+                            // check if the arrays are empty
+                            if (aRecipients.length === 0 && bRecipients.length === 0) {
+                                return 0;
+                            } else if (aRecipients.length === 0) {
+                                return 1;
+                            } else if (bRecipients.length === 0) {
+                                return -1;
+                            } else {
+                                //get the last element of the arrays (the one who goes first in the alphabetical order) and compare them
+                                let lastAIndex = aRecipients.length - 1;
+                                let lastBIndex = bRecipients.length - 1;
+                                return aRecipients[lastAIndex].localeCompare(bRecipients[lastBIndex]);
+                            }
+                        });
+                        break;
+                }
 
                 //create the cards for every squeal
                 //console.log(data)
@@ -776,7 +833,26 @@ window.onload = function () {
         });
     }
 
-    //USER FILTER MODAL
+    //SQUEAL FILTER MODAL
+    const squealFilterModal = document.getElementById('squealFilterModal')
+    if (squealFilterModal) {
+        squealFilterModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget
+
+            // Update the modal's content
+            const modalTitle = squealFilterModal.querySelector('.modal-title');
+            const orderBy = squealFilterModal.querySelector('#filterSqueal-select-orderby');
+
+            const btnSave = squealFilterModal.querySelector("#btn-savechanges");
+            btnSave.addEventListener("click", (e) => {
+                button.setAttribute("data-bs-squealsFilter-orderby", orderBy.value);
+                loadSqueals();
+            });
+        })
+    }
+
+    //CHANNEL FILTER MODAL
     const channelFilterModal = document.getElementById('channelFilterModal')
     if (channelFilterModal) {
         channelFilterModal.addEventListener('show.bs.modal', event => {
@@ -1004,7 +1080,7 @@ function changeSectionClass(newSection) {
             btnFilter.setAttribute("data-bs-target", "#channelFilterModal");
             break;
         case "squealSection":
-            btnFilter.setAttribute("data-bs-target", "#squealsFilterModal");
+            btnFilter.setAttribute("data-bs-target", "#squealFilterModal");
             break;
     }
 
@@ -1241,6 +1317,8 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     //create the card
     let recipientsDiv = '';
     if (recipients != null) {
+        recipients.sort((a, b) => (JSON.stringify(a.id.name).toUpperCase > JSON.stringify(b.id.name).toUpperCase) ? -1 : 1);
+
         recipientsDiv = '<div class="squeal-recipients-div align-self-center">'
         for (let i = 0; i < recipients.length; i++) {
             recipientsDiv += '<span class="squeal-recipient ">'
@@ -1275,9 +1353,11 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
     let content = '<div class="squeal-content">';
     let text = '<p class="squeal-text">' + squeal.content.text + '</p>';
-    const blobsrc = "data:" + squeal.content.img.mimetype + ";base64," + squeal.content.img.blob;
+    const imgblobsrc = "data:" + squeal.content.img.mimetype + ";base64," + squeal.content.img.blob;
+    const videoblobsrc = "data:" + squeal.content.video.mimetype + ";base64," + squeal.content.video.blob;
     const alt = "Picture";
-    let img = `<div class='d-flex justify-content-center'><img src=${blobsrc} alt=${alt} class='img-squeal'/></div>`;
+    let img = `<div class='d-flex justify-content-center'><img src=${imgblobsrc} alt=${alt} class='img-squeal'/></div>`;
+    let video = `<div class='d-flex justify-content-center'><video class='video-squeal' controls><source src=${videoblobsrc} type=${squeal.content.video.mimetype}></video></div>`;
     let geolocation = `<div class="geo-squeal-container"><div class="geo-squeal" id=${"map-" + squeal._id}></div></div>`
     let replies = '<div class="squeal-replies">';
     replies += '</div>';
@@ -1288,6 +1368,9 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
             break;
         case "image":
             content += img;
+            break;
+        case "video":
+            content += video;
             break;
         case "geolocation":
             content += geolocation;
