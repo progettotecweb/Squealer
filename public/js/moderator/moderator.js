@@ -164,6 +164,7 @@ window.onload = function () {
                     mycard += img;
                     mycard += '<div class="user-content my-card-grid-tr">';
                     let content = "<p class='user-name h5'>" + data[i].name + "</p>";
+                    content += "<p class='user-role'>" + data[i].role + "</p>";
                     content += "<p class='user-popularity'>⭐" + data[i].popularity + "</p>";
                     mycard += content;
                     mycard += "</div>";
