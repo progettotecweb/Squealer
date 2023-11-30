@@ -736,6 +736,8 @@ window.onload = function () {
         const textarea = channelSquealsModal.querySelector("#channel-post-squeal-textarea");
         textarea.value = "";
 
+        //reload channels
+        loadChannels();
     });
 
     const squealsModal = document.getElementById('squealModal')
