@@ -286,7 +286,7 @@ window.onload = function () {
 
                     //check if the channel is searched
                     if (searchName != null && !(data[i].name.toLowerCase() == searchName.toLowerCase())) continue;
-                    
+
 
                     let tot_squeal = data[i].squeals.length;
 
@@ -437,15 +437,25 @@ window.onload = function () {
 
                 //create the cards for every squeal
                 //console.log(data)
+                let squealShownCount = 0
                 let geoSqueals = [];
                 for (let i = 0; i < data.length; i++) {
                     let geo = addSquealCard(data[i], data[i].recipients, boxContent, false, true);
-                    if (geo)
+                    if (geo) {
                         geoSqueals.push(geo);
+                    }
+
+                    squealShownCount++;
                 }
 
                 for (let i = 0; i < geoSqueals.length; i++) {
                     createGeoMap(geoSqueals[i].geolocation, geoSqueals[i].mapId);
+                }
+
+                if (squealShownCount === 0) {
+                    boxContent.innerHTML = `<div class='position-absolute d-flex justify-content-center noItems'>
+                    <p class="text-center align-self-center fst-italic">No squeals found</p>
+                    </div>`;
                 }
             })
             .catch(err => {
