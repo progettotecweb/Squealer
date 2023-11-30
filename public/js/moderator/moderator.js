@@ -1186,6 +1186,11 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
             }
         }
 
+        //the channel/user could be empty
+        if (namesArray[i] === "") {
+            found = true;
+        }
+
         if (!found) {
             //set wrong label
             correctLabel.classList.add("text-danger");
@@ -1210,7 +1215,6 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
 
         return false;
     });
-
 
     //console.log(usersId);
     //update data in input div
@@ -1565,6 +1569,7 @@ function getRecipientsFromModal() {
     const types = document.querySelector("#squeal-recipients").getAttribute("data-bs-ids-type").replace('\n', '').split(',');
 
     for (let i = 0; i < ids.length; i++) {
+        if (ids[i] === "") continue;
         recipients.push({ id: ids[i], type: types[i] });
     }
 
