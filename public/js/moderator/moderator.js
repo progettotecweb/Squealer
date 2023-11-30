@@ -97,7 +97,7 @@ window.onload = function () {
                 await loadChannels();
                 break;
             case "squealSection":
-                loadSqueals();
+                await loadSqueals();
                 break;
         }
     }
@@ -117,6 +117,9 @@ window.onload = function () {
                 const boxContent = document.getElementById("box-content");
                 //clear the box
                 boxContent.innerHTML = "";
+
+                //TODO: controlla search name e vedi se esiste, 
+                //se esiste metti l'attributo sul bottone search, poi qui filtri
 
                 //get the filters attributes from the filter btn
                 const btnFilter = document.querySelector("#btn-filter");
@@ -508,6 +511,9 @@ window.onload = function () {
         const btnBlock = userModal.querySelector("#btn-blockuser");
         btnBlock.disabled = false;
         btnBlock.setAttribute("data-bs-value_block", "false");
+
+        //reload users
+        loadUsers();
     });
 
     //change btn value when clicked
@@ -665,6 +671,9 @@ window.onload = function () {
         correctLabel.classList.remove("text-danger");
         correctLabel.classList.remove("text-success");
         correctLabel.innerHTML = "Insert @username(s) separated by a comma";
+
+        //reload channels
+        loadChannels();
     });
 
     //change btn value when clicked
@@ -824,6 +833,9 @@ window.onload = function () {
             correctLabel.classList.remove("text-danger");
             correctLabel.classList.remove("text-success");
             correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
+
+            //reload squeals
+            loadSqueals();
         });
     }
 
@@ -1062,6 +1074,26 @@ window.onload = function () {
 
     squealSection.addEventListener("click", (e) => {
         changeSectionClass(e.target);
+    });
+
+
+
+    //SEARCH FUNCTION
+
+    document.querySelector("#searchBtn").addEventListener("click", async (e) => {
+        //prevent the page from reloading
+        e.preventDefault();
+
+        //get the value from the input
+        const value = document.querySelector("#searchInput").value;
+
+        //check if the value starts with @ or §
+
+        //the value could either be a @username, a §channel name or an empty string
+        //check if the value exists in the db
+        switch (value) {
+
+        }
     });
 }
 
