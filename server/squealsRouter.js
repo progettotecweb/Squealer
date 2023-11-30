@@ -26,40 +26,39 @@ router.put("/:id", async (req, res) => {
 
     console.log("updatedSqueal", updatedSqueal);
 
-    await squealsDB.updateSquealByID(req.params.id, updatedSqueal);
+    await squealsDB.updateSquealByID(squeal._id, updatedSqueal);
 
     // Squeal distribution
     //first we have to remove the squeal from the old recipients
-    squeal.recipients.forEach(async (recipient) => {
+    for(const recipient of squeal.recipients){
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
-            const squealIndex = user.squeals.indexOf(req.params.id);
+            const squealIndex = user.squeals.indexOf(squeal._id);
             user.squeals.splice(squealIndex, 1);
             user.save();
         } else if (recipient.type === "Channel") {
             const channel = await channelsDB.searchChannelByID(recipient.id);
-            const squealIndex = channel.squeals.indexOf(req.params.id);
+            const squealIndex = channel.squeals.indexOf(squeal._id);
             channel.squeals.splice(squealIndex, 1);
             channel.save();
         }
-    });
+    }
 
     //then we add the squeal to the new recipients
     const recipients = updatedSqueal.recipients;
-    recipients.forEach(async (recipient) => {
+    for(const recipient of recipients){
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
-            user.squeals.push(req.params.id);
+            user.squeals.push(squeal._id);
             user.save();
         } else if (recipient.type === "Channel") {
             const channel = await channelsDB.searchChannelByID(recipient.id);
-            channel.squeals.push(req.params.id);
+            channel.squeals.push(squeal._id);
             channel.save();
         }
-    });
+    }
 
-
-
+    
     res.status(200).json({ ok: true });
 })
 

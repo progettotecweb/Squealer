@@ -406,3 +406,15 @@
         font-size: x-large !important;
     }
 }
+
+#loading-screen{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+

@@ -981,12 +981,13 @@ window.onload = function () {
                 })
                     .then(res => {
                         if (res.ok) {
-                            //console.log("Data updated!");
+                            isLoading = false;
                         } else {
                             console.log("Error while updating data!");
                         }
                     })
                     .catch(err => {
+                        isLoading = false;
                         console.log(err);
                     });
                 break;
