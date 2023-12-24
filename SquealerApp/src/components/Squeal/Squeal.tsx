@@ -14,6 +14,8 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 import GeolocationSqueal from "./GeolocationSqueal";
+import { useSWRConfig } from "swr";
+import { useInView } from "react-cool-inview";
 
 function formatDate(date) {
     const d = new Date(date);
@@ -59,28 +61,83 @@ export interface SquealProps {
         p1: number;
         p2: number;
     };
+    squealData: any;
+    className?: string;
 }
 
-const Squeal: React.FC<SquealProps> = ({ type, content, owner, date, reactions, id }) => {
-
+const Squeal: React.FC<SquealProps> = ({
+    type,
+    content,
+    owner,
+    date,
+    reactions,
+    id,
+    squealData,
+    className,
+}) => {
     const [reactions_, setReactions] = useState(reactions);
 
     const { data: session } = useSession();
 
-    const updateSquealReaction = (id: string, reaction: string, userid?: string) => {
+    const { observe } = useInView({
+        threshold: [0.2, 0.4, 0.6, 0.8, 1],
+        onEnter: ({ unobserve }) => {
+            unobserve();
+            //retrieve array of viewed squeals from sessionStorage
+            //if it doesn't exist, create it
+            //if it does exist, check if the current squeal is in it
+
+            //if it is, do nothing
+            //if it isn't, add it to the array and update sessionStorage
+            if (!sessionStorage.getItem("views"))
+                sessionStorage.setItem("views", JSON.stringify([]));
+
+            if (sessionStorage.getItem("views")) {
+                const views = JSON.parse(
+                    sessionStorage.getItem("views") as string
+                );
+                if (!views.includes(id)) {
+                    views.push(id);
+                    sessionStorage.setItem("views", JSON.stringify(views));
+                }
+
+                fetch(`/api/squeals/${id}/view`, {
+                    method: "POST",
+                    body: JSON.stringify({ userid: session?.user.id }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }).then((res) => res.json())
+                .then((data) => {
+                    if (data.status === 200) console.log("Viewed!")
+                })
+            }
+        },
+    });
+
+    const updateSquealReaction = (
+        id: string,
+        reaction: string,
+        userid?: string
+    ) => {
         fetch(`/api/squeals/reaction/${id}`, {
             method: "PUT",
             body: JSON.stringify({ reaction, userid }),
             headers: {
-                "Content-Type": "application/json"
-            }
-        }).then((res) => res.json()).then((data) => {
-            if (data.success) setReactions(data.squeal.reactions);
+                "Content-Type": "application/json",
+            },
         })
-    }
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success) setReactions(data.squeal.reactions);
+            });
+    };
 
     return (
-        <Card className=" mx-2 bg-slate-800 text-slate-50">
+        <Card
+            className={` mx-2 bg-slate-800 text-slate-50 shadow-none ${className}`}
+            ref={observe}
+        >
             <CardHeader
                 disableTypography
                 avatar={
@@ -98,51 +155,176 @@ const Squeal: React.FC<SquealProps> = ({ type, content, owner, date, reactions, 
                 }
                 subheader={<Typography>{formatDate(date)}</Typography>}
             />
-            <CardContent>
+            <CardContent className="text-left">
                 {(() => {
                     switch (type) {
-                        case 'text':
-                            return <Typography variant="body2">{content?.text}</Typography>;
-                        case 'image':
+                        case "text":
+                            return (
+                                <Typography variant="body2" className="text-lg">
+                                    {content?.text}
+                                </Typography>
+                            );
+                        case "image":
                             if (content?.img && content?.img.blob)
-                                return <img src={`data:${content?.img.mimetype};base64,${content?.img.blob}`} alt="FOTO" />;
+                                return (
+                                    <img
+                                        src={`data:${content?.img.mimetype};base64,${content?.img.blob}`}
+                                        alt="FOTO"
+                                    />
+                                );
                             else return;
-                        case 'video':
+                        case "video":
                             if (content?.video && content?.video.blob)
-                                return <video controls src={`data:${content?.video.mimetype};base64,${content?.video.blob}`} className="video-squeal h-1/3 w-2/3" />;
+                                return (
+                                    <video
+                                        controls
+                                        src={`data:${content?.video.mimetype};base64,${content?.video.blob}`}
+                                        className="video-squeal h-1/3 w-2/3"
+                                    />
+                                );
                             else return;
-                        case 'geolocation':
-                            return <div><GeolocationSqueal geolocation={[content?.geolocation?.latitude, content?.geolocation?.longitude]} squealID={id.toString()}></GeolocationSqueal></div>;
+                        case "geolocation":
+                            return (
+                                <div>
+                                    <GeolocationSqueal
+                                        geolocation={[
+                                            content?.geolocation?.latitude,
+                                            content?.geolocation?.longitude,
+                                        ]}
+                                        squealID={id.toString()}
+                                    ></GeolocationSqueal>
+                                </div>
+                            );
                         default:
                             return;
                     }
                 })()}
-
-
             </CardContent>
-            <CardActions className="text-slate-50 fill-slate-50" disableSpacing>
-                <SquealButton onClick={() => updateSquealReaction(id, "m2", session?.user.id)}>😡 {reactions_.m2}</SquealButton>
-                <SquealButton onClick={() => updateSquealReaction(id, "m1", session?.user.id)}>😒 {reactions_.m1}</SquealButton>
-                <SquealButton onClick={() => updateSquealReaction(id, "p1", session?.user.id)}>😄 {reactions_.p1}</SquealButton>
-                <SquealButton onClick={() => updateSquealReaction(id, "p2", session?.user.id)}>😝 {reactions_.p2}</SquealButton>
-                <IconButton aria-label="share" className="ml-auto">
-                    <ReplyOutlinedIcon className="text-slate-50" />
-                </IconButton>
+            <CardActions
+                className="text-slate-50 fill-slate-50 p-0"
+                disableSpacing
+            >
+                <SquealButton
+                    onClick={() =>
+                        updateSquealReaction(id, "m2", session?.user.id)
+                    }
+                >
+                    😡 {reactions_.m2}
+                </SquealButton>
+                <SquealButton
+                    onClick={() =>
+                        updateSquealReaction(id, "m1", session?.user.id)
+                    }
+                >
+                    😒 {reactions_.m1}
+                </SquealButton>
+                <SquealButton
+                    onClick={() =>
+                        updateSquealReaction(id, "p1", session?.user.id)
+                    }
+                >
+                    😄 {reactions_.p1}
+                </SquealButton>
+                <SquealButton
+                    onClick={() =>
+                        updateSquealReaction(id, "p2", session?.user.id)
+                    }
+                >
+                    😝 {reactions_.p2}
+                </SquealButton>
+
+                <div className="ml-auto">
+                    impressions: {squealData?.impressions}
+                </div>
             </CardActions>
-        </Card >
+            {!squealData.isAReply && (
+                <SquealReplyier session={session} parent={squealData} />
+            )}
+            <div className="flex flex-row p-2">
+                <div className="border-l-2 border-l-solid" />
+                <section className="flex flex-col gap-2">
+                    {squealData?.replies?.map((reply) => (
+                        <Squeal
+                            key={reply._id}
+                            id={reply._id}
+                            type={reply.type}
+                            content={reply.content}
+                            owner={reply.ownerID}
+                            date={reply.datetime}
+                            reactions={reply.reactions}
+                            squealData={reply}
+                            className="w-full"
+                        />
+                    ))}
+                </section>
+            </div>
+        </Card>
     );
 };
 
+const SquealReplyier = (props: { parent; session }) => {
+    const [reply, setReply] = useState("");
+    const { mutate } = useSWRConfig();
 
+    const submitReply = () => {
+        fetch("/api/squeals/post", {
+            method: "POST",
+            body: JSON.stringify({
+                ownerID: props.session?.user.id,
+                type: "text",
+                content: {
+                    text: reply,
+                    img: null,
+                    video: null,
+                    geolocation: null,
+                },
+                recipients: [...props.parent.recipients],
+                isAReply: true,
+                replyingTo: props.parent._id,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then((res) => {
+            mutate(`/api/squeals/${props.session.user.id}`);
+        });
 
-const SquealButton = (props: { children: React.ReactNode, onClick?: () => void }) => {
+        setReply("");
+    };
+
     return (
-        <motion.div whileHover={{ scale: 1.1 }}>
+        <CardActions>
+            <input
+                className="w-full bg-slate-700 rounded-md text-slate-50 p-2"
+                placeholder="Reply..."
+                value={reply}
+                onChange={(e) => setReply(e.target.value)}
+            />
+            <SquealButton
+                aria-label="share"
+                className="ml-auto"
+                onClick={() => {
+                    submitReply();
+                }}
+            >
+                <ReplyOutlinedIcon className="text-slate-50" />
+            </SquealButton>
+        </CardActions>
+    );
+};
+
+const SquealButton = (props: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    className?: string;
+}) => {
+    return (
+        <motion.div whileHover={{ scale: 1.1 }} className={props.className}>
             <IconButton className="text-slate-50" onClick={props.onClick}>
                 {props.children}
             </IconButton>
         </motion.div>
-    )
-}
+    );
+};
 
 export default Squeal;

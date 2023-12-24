@@ -2,6 +2,7 @@
  *  Users database model
  */
 
+const { CronJob } = require("cron");
 const mongoose = require("mongoose");
 
 const DAILY_MSG_QUOTA = 1000;
@@ -57,6 +58,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
+
 exports.searchUserByID = async function (id) {
     const user = await User.findById(id);
     return user;
@@ -87,10 +89,58 @@ exports.getAllUsers = async function () {
 
 //update user
 exports.updateUser = async function (id, updatedUserData) {
-    User.findByIdAndUpdate(id, updatedUserData, { new: true }).then((user) => {
-        return user;
-    })
+    User.findByIdAndUpdate(id, updatedUserData, { new: true })
+        .then((user) => {
+            return user;
+        })
         .catch((err) => {
             console.log(err);
         });
+};
+
+const dailyJob = CronJob.from({
+    cronTime: "0 0 0 * * *",
+    onTick: this.resetMsgQuotaDaily,
+    start: true,
+    timeZone: "Europe/Bucharest",
+});
+
+const weeklyJob = CronJob.from({
+    cronTime: "0 0 0 * * 1",
+    onTick: this.resetMsgQuotaWeekly,
+    start: true,
+    timeZone: "Europe/Bucharest",
+});
+
+const monthlyJob = CronJob.from({
+    cronTime: "0 0 0 1 * *",
+    onTick: this.resetMsgQuotaMonthly,
+    start: true,
+    timeZone: "Europe/Bucharest",
+});
+
+
+
+exports.resetMsgQuotaDaily = async function () {
+    const users = await User.find();
+    users.forEach((user) => {
+        user.msg_quota.daily = DAILY_MSG_QUOTA + user.msg_quota.extra;
+        user.save();
+    });
+}
+
+exports.resetMsgQuotaWeekly = async function () {
+    const users = await User.find();
+    users.forEach((user) => {
+        user.msg_quota.weekly = WEEKLY_MSG_QUOTA + user.msg_quota.extra * 6;
+        user.save();
+    });
+}
+
+exports.resetMsgQuotaMonthly = async function () {
+    const users = await User.find();
+    users.forEach((user) => {
+        user.msg_quota.monthly = MONTHLY_MSG_QUOTA + user.msg_quota.extra * 24;
+        user.save();
+    });
 }

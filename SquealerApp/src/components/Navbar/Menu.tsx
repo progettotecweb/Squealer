@@ -26,9 +26,9 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
             {user && (
                 <>
                     <section className="m-3 flex flex-col gap-2">
-                        <div>Daily: 987/1000</div>
-                        <div>Weekly: 4768/6000</div>
-                        <div>Monthly: 12389/24000</div>
+                        <div>Daily: {user.msg_quota.daily}/1000</div>
+                        <div>Weekly: {user.msg_quota.weekly}/6000</div>
+                        <div>Monthly: {user.msg_quota.monthly}/24000</div>
                     </section>
 
                     <Divider />
