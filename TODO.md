@@ -30,8 +30,8 @@
 -   [ ] <span class="orange">alcuni canali non sono mai silenziabili</span>
 -   [x] Impressioni; numero di utenti, registrati o meno che hanno visualizzato uno squeal.
 -   [x] Reazioni agli squeal: ne abbiamo 4
--   [ ] Massa critica: 0.25* numero di visualizzazioni. Se le reazioni positive sono maggiori della massa critica, lo squeal viene etichettato come "popolare"; se le reazioni negative sono maggiori della massa critica, lo squeal viene etichettato come "impopolare"; se sia le reazioni positive che quelle negative superano la massa critica, lo squeal viene etichettato come "controverso".
--   [ ] Ogni tot messaggi popolari l'utente vede incrementata la sua quota; ogni tot messaggi impopolari l'utente vede decrementata la sua quota (ogni 3, ogni 5, da decidere). Gli squeal controversi non influenzano la quota ma appaiono nel canale §CONTROVERSIAL.
+-   [x] Massa critica: 0.25* numero di visualizzazioni. Se le reazioni positive sono maggiori della massa critica, lo squeal viene etichettato come "popolare"; se le reazioni negative sono maggiori della massa critica, lo squeal viene etichettato come "impopolare"; se sia le reazioni positive che quelle negative superano la massa critica, lo squeal viene etichettato come "controverso".
+-   [x] Ogni tot messaggi popolari l'utente vede incrementata la sua quota; ogni tot messaggi impopolari l'utente vede decrementata la sua quota (ogni 3, ogni 5, da decidere). Gli squeal controversi non influenzano la quota ma appaiono nel canale §CONTROVERSIAL.
 -   [x] Metadati di uno squeal: 
     -   corpo del messaggio (testo | immagine | video | geolocazione),
     -   destinatari (individui | canali | keywords),
@@ -129,3 +129,13 @@
 
 - [X] Impression degli squeal
 
+## TODO TODAY 26/12
+
+- [x] push notifications (opzionali)
+  
+- [ ] finire pagina profilo
+  - [ ] cambia password, immagine profilo, descrizione profilo
+  - [ ] cancella profilo
+  - [ ] compra abbonamento vip
+  - [ ] compra caratteri extra
+- [ ] tutte le robe dei canali (aggiungere acquisto canale privato, aggiungi amministratore) (da fare prima le robe sopra)

@@ -280,9 +280,7 @@ const SquealCreator = () => {
                                         id="repeat"
                                         name="repeat"
                                         checked={repeatMessage}
-                                        onClick={() => {
-                                            setRepeatMessage(!repeatMessage);
-                                        }}
+                                        onChange={() => setRepeatMessage(!repeatMessage)}
                                     />
                                     <label htmlFor="repeat">Repeat</label>
                                     {repeatMessage && (

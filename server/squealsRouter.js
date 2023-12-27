@@ -5,7 +5,8 @@ const usersDB = require("../db/users");
 const channelsDB = require("../db/channels");
 const squealsDB = require("../db/squeals");
 const keywordsDB = require("../db/keywords");
-const { CronJob } = require("cron");
+const webpush = require("web-push");
+const subscriptionsDB = require("../db/subscriptions");
 let PipelineSingleton;
 
 (async () => {
@@ -93,6 +94,10 @@ const validateChars = (len, owner) => {
     return true;
 };
 
+function truncate(str, n) {
+    return str.length > n ? str.slice(0, n - 1) + "..." : str;
+}
+
 // squeal posting route
 /**
  * TODO: add chars validation (DONE)
@@ -164,6 +169,51 @@ router.post("/post", async (req, res) => {
         owner.msg_quota.weekly -= len;
         owner.msg_quota.monthly -= len;
 
+        // mentions
+        // mentions begin with @
+        const regexp_mention = /@\w+/g;
+        const mentions = message.match(regexp_mention);
+        console.log(mentions);
+
+        if (mentions) {
+            mentions.forEach(async (mention) => {
+                const mentionUser = await usersDB.searchUserByName(mention.slice(1));
+
+                if (mentionUser) {
+                    const subs = await subscriptionsDB.getSubscriptionByUser(
+                        mentionUser._id
+                    );
+
+                    subs.forEach(async (s) => {
+                        const payload = JSON.stringify({
+                            title: `@${owner.name} mentioned you in a squeal`,
+                            body: `${truncate(message, 20)}`,
+                        });
+                        const res = await webpush.sendNotification(
+                            s.subscription,
+                            payload
+                        );
+                        if (res.statusCode === 410) {
+                            console.log("Subscription has expired or is no longer valid: ", res.statusCode)
+                            // GONE (subscription no longer valid)
+                            await subscriptionsDB.removeSubscription(s._id);
+                        }
+                    });
+
+                    mentionUser.notifications.push({
+                        notificationType: "mention",
+                        text: `@${owner.name} mentioned you in a squeal.`,
+                        link: `/Home/squeal/${newSqueal._id}`,
+                        expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days
+                        author: owner._id,
+                        createdAt: Date.now(),
+                    });
+
+                    await mentionUser.save();
+                }
+            });
+        }
+
         // keywords begin with #
         const regexp = /#\w+/g;
         const keywords = message.match(regexp);
@@ -206,6 +256,7 @@ router.post("/post", async (req, res) => {
 
     // Squeal distribution
     const recipients = squeal.recipients;
+    console.log(squeal.recipients);
     recipients.forEach(async (recipient) => {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
@@ -218,8 +269,12 @@ router.post("/post", async (req, res) => {
         }
     });
 
-    if(newSqueal.automatic) {
-        squealsDB.scheduleSqueal(newSqueal._id, newSqueal.cronJobExpr, owner._id);
+    if (newSqueal.automatic) {
+        squealsDB.scheduleSqueal(
+            newSqueal._id,
+            newSqueal.cronJobExpr,
+            owner._id
+        );
     }
 
     await newSqueal.save();
@@ -286,17 +341,17 @@ router.get("/cron/:id", async (req, res) => {
     const id = req.params.id;
     const squeals = await squealsDB.getAllScheduledActiveSquealsByID(id);
     res.status(200).json(squeals);
-})
+});
 
 router.delete("/cron/:id", async (req, res) => {
     const id = req.params.id;
     await squealsDB.stopSquealScheduling(id);
     res.status(200).json({ success: true });
-})
+});
 
 router.post("/:id/view", async (req, res) => {
     await squealsDB.updateSquealImpressions(req.params.id);
     res.status(200).json({ success: true });
-})
+});
 
 module.exports = router;

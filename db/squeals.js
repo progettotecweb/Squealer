@@ -97,12 +97,9 @@ const squealSchema = new mongoose.Schema({
         Rp: { type: Number, default: 0 },
         Rm: { type: Number, default: 0 },
         label: {
-            type: {
-                type: String,
-                enum: ["popular", "impopular", "controversial", "neutral"],
-                default: "neutral",
-            },
-            //description: { type: String, default: ""},
+            type: String,
+            enum: ["popular", "impopular", "controversial", "neutral"],
+            default: "neutral",
         },
     },
     impressions: { type: Number, default: 0 },
@@ -172,7 +169,7 @@ exports.getAllSquealsByOwnerID = async function (ownerID) {
                 );
             }
         }
-    })
+    });
 
     return res;
 };
@@ -250,11 +247,19 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
     return res;
 };
 
+const MIN_IMPRESSION_COUNT = 10
+
 const updateSquealMetadata = async (squeal) => {
+
+    if (squeal.impressions < MIN_IMPRESSION_COUNT) return;
+
     squeal.cm.Rp = squeal.reactions.p1 + 2 * squeal.reactions.p2;
     squeal.cm.Rm = squeal.reactions.m1 + 2 * squeal.reactions.m2;
 
-    if (squeal.cm.Rm > squeal.impressions * 0.25 && squeal.cm.Rp > squeal.impressions * 0.25) {
+    if (
+        squeal.cm.Rm > squeal.impressions * 0.25 &&
+        squeal.cm.Rp > squeal.impressions * 0.25
+    ) {
         squeal.cm.label = "controversial";
         const contr = Channel.findOne({ name: "Controversial" }, "_id");
         squeal.recipients.push({ id: contr._id, type: "Channel" });
@@ -269,9 +274,7 @@ const updateSquealMetadata = async (squeal) => {
     if (squeal.cm.Rm > squeal.impressions * 0.25) {
         squeal.cm.label = "impopular";
     }
-
-    
-}
+};
 
 exports.getAllSqueals = async function () {
     const res = await Squeal.find({})
@@ -352,4 +355,4 @@ exports.updateSquealImpressions = async function (id) {
     squeal.impressions += 1;
     await updateSquealMetadata(squeal);
     await squeal.save();
-}
+};

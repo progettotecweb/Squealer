@@ -3,8 +3,10 @@
 import Divider from "@/components/Divider";
 import PageContainer from "@/components/PageContainer";
 import Squeal from "@/components/Squeal/Squeal";
+import Tabs, { AnimatedTabContent, Tab } from "@/components/Tabs/Tabs";
 import { Button } from "@mui/material";
 import { useSession } from "next-auth/react";
+import Popup from "reactjs-popup";
 import useSWR from "swr";
 
 interface Squeal {
@@ -67,15 +69,13 @@ const UserCard = ({ session }) => {
                         <h2>Following</h2>
                     </h1>
                 </div>
-                <div className="self-start">
-                    Bio - Descrizione (TODO)
-                </div>
+                <div className="self-start">Bio - Descrizione (TODO)</div>
             </section>
         </section>
     );
 };
 
-const ScheduledSquealsSection = (session) => {
+const ScheduledSquealsSection = ({ session }) => {
     const {
         data: scheduledSqueals,
         isLoading: scheduledSquealsLoading,
@@ -83,6 +83,8 @@ const ScheduledSquealsSection = (session) => {
     } = useSWR(`/api/squeals/cron/${session?.user?.id}`, fetcher);
 
     if (scheduledSquealsLoading) return <div>Loading...</div>;
+
+    // if(scheduledSqueals.length === 0) return <div>No scheduled squeals</div>
 
     return (
         <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw]">
@@ -161,15 +163,24 @@ const AccountPage = () => {
         return (
             <PageContainer key="account">
                 <UserCard session={session} />
-                <div>
-                    <h1>Scheduled Squeals</h1>
-                    <ScheduledSquealsSection session={session} />
-                </div>
-                <Divider />
-                <div>
-                    <h1>Squeals</h1>
-                    <SquealsSection session={session} />
-                </div>
+                <Tabs>
+                    <Tab
+                        label="Squeals"
+                        content={
+                            <AnimatedTabContent>
+                                <SquealsSection session={session} />
+                            </AnimatedTabContent>
+                        }
+                    />
+                    <Tab
+                        label="Scheduled Squeals"
+                        content={
+                            <AnimatedTabContent>
+                                <ScheduledSquealsSection session={session} />
+                            </AnimatedTabContent>
+                        }
+                    />
+                </Tabs>
             </PageContainer>
         );
 };

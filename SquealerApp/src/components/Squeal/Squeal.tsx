@@ -65,6 +65,39 @@ export interface SquealProps {
     className?: string;
 }
 
+const formatText = (text: string) => {
+    if (!text) return "";
+
+    // substite mentions with a span with custom class
+    const mentions = text.match(/@\w+/g);
+    if (mentions)
+        mentions.forEach((mention) => {
+            text = text.replace(
+                mention,
+                `<span class="text-blue-400">${mention}</span>`
+            );
+        });
+    // substitute hashtags with a span with custom class
+    const hashtags = text.match(/#\w+/g);
+    if (hashtags)
+        hashtags.forEach((hashtag) => {
+            text = text.replace(
+                hashtag,
+                `<span class="text-blue-400">${hashtag}</span>`
+            );
+        });
+
+    return text;
+};
+
+const SquealText = (props: { text: string }) => {
+    return (
+        <Typography variant="body2" className="text-lg">
+            <div dangerouslySetInnerHTML={{ __html: formatText(props.text) }} />
+        </Typography>
+    );
+};
+
 const Squeal: React.FC<SquealProps> = ({
     type,
     content,
@@ -99,18 +132,19 @@ const Squeal: React.FC<SquealProps> = ({
                 if (!views.includes(id)) {
                     views.push(id);
                     sessionStorage.setItem("views", JSON.stringify(views));
-                }
 
-                fetch(`/api/squeals/${id}/view`, {
-                    method: "POST",
-                    body: JSON.stringify({ userid: session?.user.id }),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }).then((res) => res.json())
-                .then((data) => {
-                    if (data.status === 200) console.log("Viewed!")
-                })
+                    fetch(`/api/squeals/${id}/view`, {
+                        method: "POST",
+                        body: JSON.stringify({ userid: session?.user.id }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.status === 200) console.log("Viewed!");
+                        });
+                }
             }
         },
     });
@@ -160,9 +194,7 @@ const Squeal: React.FC<SquealProps> = ({
                     switch (type) {
                         case "text":
                             return (
-                                <Typography variant="body2" className="text-lg">
-                                    {content?.text}
-                                </Typography>
+                                <SquealText text={content?.text as string} />
                             );
                         case "image":
                             if (content?.img && content?.img.blob)
@@ -267,6 +299,7 @@ const SquealReplyier = (props: { parent; session }) => {
     const { mutate } = useSWRConfig();
 
     const submitReply = () => {
+        console.log(props.parent.recipients);
         fetch("/api/squeals/post", {
             method: "POST",
             body: JSON.stringify({

@@ -22,6 +22,9 @@ const mymongo = require("./db/mongo.js");
 const channelRouter = require("./server/channelRouter.js");
 const usersRouter = require("./server/usersRouter.js");
 const apiRouter = require("./server/api.js");
+const subscriptionRouter = require("./server/subscriptionRouter.js")
+
+const webpush = require("web-push")
 
 
 
@@ -72,6 +75,17 @@ appNext
         app.use(express.json());
         app.use(cookieParser());
 
+        
+        const vapidKeys = {
+            public: "BKd0FOnmkngVtRSf7N3ogMcnnDQGtu5PSMcbzmt_uvrcDTpL424TE6W92qpnMGZPeh1XqHi1rA_MT0iUL0gBXuY",
+            private: "GyXqHJJVtw7uXgCx9mXw9QK65SsCnALClWNHpPHy2pQ",
+        }
+
+        webpush.setVapidDetails(
+            'mailto:squealer@noreply.com',
+            vapidKeys.public,
+            vapidKeys.private
+        )
 
 
         mymongo.connectToDB();
@@ -87,6 +101,12 @@ appNext
             checkRole(["SMM", "Mod"]),
             express.static(path.join(__dirname, "SquealerSMMDashboard", "dist"))
         );
+
+        app.get("/manifest.json", async function (req, res) {
+            res.sendFile(path.join(__dirname, "SquealerApp", "public", "manifest.json"))
+        })
+
+        
 
         // https://stackoverflow.com/questions/40459511/in-express-js-req-protocol-is-not-picking-up-https-for-my-secure-link-it-alwa
         app.enable("trust proxy");
@@ -132,6 +152,7 @@ appNext
         app.use("/api", apiRouter);
         app.use("/api/channels", channelRouter);
         app.use("/api/users", usersRouter);
+        app.use("/api/push", subscriptionRouter)
 
         /* APP SSR */
         app.post("/Home/api/*", async (req, res) => {

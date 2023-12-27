@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
     --tw-bg-opacity: 1;
     background-color: rgb(17 27 33 / var(--tw-bg-opacity));
@@ -12,7 +11,7 @@
     text-align: start;
 }
 
-.imgPreview{
+.imgPreview {
     max-width: 20vw !important;
     height: auto;
 }
@@ -21,7 +20,7 @@
     animation: cameraBtnAnimation 1s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-.mapSqueal{
+.mapSqueal {
     height: 50vh !important;
     width: 100%;
 }
@@ -40,5 +39,22 @@
     100% {
         transform: scale(2);
         opacity: 0;
+    }
+}
+
+.secondary-menu {
+    transform: translate(100%, 0);
+    animation: secondaryMenuAnimation .4s;
+}
+
+@keyframes secondaryMenuAnimation {
+    0% {
+        transform: translate(-10%, 0);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: translate(100%, 0);
+        opacity: 1;
     }
 }
