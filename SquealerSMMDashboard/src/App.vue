@@ -53,7 +53,7 @@ user.value.then((data: any) => {
                   :id="account"></user_box>
           </div>
           <div><!--componente con info degli account, si vede se variabile x False -->
-            <user_profile></user_profile>
+            <user_profile></user_profile> <!--https://vuejs.org/api/sfc-script-setup.html-->
           </div>
 
         </div>
