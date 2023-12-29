@@ -1,14 +1,12 @@
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 
 import Tabs, { Tab, AnimatedTabContent } from "@/components/Tabs/Tabs";
-import { AnimatePresence, motion } from "framer-motion";
-import useSWR, { Fetcher } from "swr";
+import { motion } from "framer-motion";
 import AsyncSelect from "react-select/async";
-import { set } from "mongoose";
 import { useSession } from "next-auth/react";
-import { formControlLabelClasses } from "@mui/material";
 import Camera from "./Camera";
 import Geolocation from "./Geolocation";
+import { useSWRConfig } from "swr";
 
 const MAX_LEN = 50;
 
@@ -41,17 +39,25 @@ const SquealCreator = () => {
         } | null;
     }
 
+    const { mutate } = useSWRConfig();
+
     const [message, setMessage] = useState("");
     const [img, setImg] = useState<string | null>(null);
     const [video, setVideo] = useState<string | null>(null);
-    const [geolocation, setGeolocation] = useState<[number, number] | null>(null);
+    const [geolocation, setGeolocation] = useState<[number, number] | null>(
+        null
+    );
     const [content, setContent] = useState<Content>({
         text: null,
         img: null,
         video: null,
         geolocation: null,
     });
-    const [type, setType] = useState<"text" | "image" | "video" | "geolocation">("text");
+    const [repeatMessage, setRepeatMessage] = useState<boolean>(false);
+    const [repetitionExpr, setRepetitionExpr] = useState<string>("");
+    const [type, setType] = useState<
+        "text" | "image" | "video" | "geolocation"
+    >("text");
     const [query, setQuery] = useState<string>("");
     const { data: session } = useSession();
     const [activeTabNumber, setActiveTabNumber] = useState<number>(0);
@@ -84,11 +90,17 @@ const SquealCreator = () => {
                 type: type,
                 content: content,
                 recipients: selected.map((res) => res.value),
+                automatic: repeatMessage,
+                cronJobExpr: repetitionExpr || undefined,
             }),
             headers: {
                 "Content-Type": "application/json",
             },
-        });
+        }).then((res) => {
+            if (res.status === 200) {
+                mutate(`/api/squeals/${session?.user.id}`);
+            }
+        })
 
         setMessage("");
         setContent({
@@ -100,6 +112,8 @@ const SquealCreator = () => {
         setActiveTabNumber(0);
         setSelected([]);
         setQuery("");
+        setRepetitionExpr("");
+        setRepeatMessage(false);
     };
 
     const [selected, setSelected] = useState<any[]>([]);
@@ -118,7 +132,12 @@ const SquealCreator = () => {
                 setImg(imgDataUrl);
 
                 if (setContentToUpdate) {
-                    setContent({ text: null, img: formatImg(imgDataUrl), video: null, geolocation: null });
+                    setContent({
+                        text: null,
+                        img: formatImg(imgDataUrl),
+                        video: null,
+                        geolocation: null,
+                    });
                 }
 
                 resolve(imgDataUrl); // resolve promise
@@ -141,7 +160,12 @@ const SquealCreator = () => {
                 setVideo(videoDataUrl);
 
                 if (setContentToUpdate) {
-                    setContent({ text: null, img: null, video: formatImg(videoDataUrl), geolocation: null });
+                    setContent({
+                        text: null,
+                        img: null,
+                        video: formatImg(videoDataUrl),
+                        geolocation: null,
+                    });
                 }
 
                 resolve(videoDataUrl); // resolve promise
@@ -166,8 +190,7 @@ const SquealCreator = () => {
                 //check if file uploaded is an image
                 if (!e.target.files[0].type.startsWith("image")) {
                     alert("File must be an image");
-                }
-                else {
+                } else {
                     await handleImg(e.target, true);
                 }
                 break;
@@ -175,8 +198,7 @@ const SquealCreator = () => {
                 //check if file uploaded is a video
                 if (!e.target.files[0].type.startsWith("video")) {
                     alert("File must be a video");
-                }
-                else {
+                } else {
                     await handleVideo(e.target, true);
                 }
                 break;
@@ -192,7 +214,7 @@ const SquealCreator = () => {
         const imgSplit = img.split(",");
         const imgType = imgSplit[0].split(";")[0].split(":")[1];
         const imgBlob = imgSplit[1];
-        myImg = { mimetype: imgType, blob: imgBlob }
+        myImg = { mimetype: imgType, blob: imgBlob };
 
         return myImg;
     };
@@ -200,17 +222,25 @@ const SquealCreator = () => {
     const handleCapture = (img: string) => {
         console.log(img);
         setImg(img);
-        setContent({ text: null, img: formatImg(img), video: null, geolocation: null });
-    }
+        setContent({
+            text: null,
+            img: formatImg(img),
+            video: null,
+            geolocation: null,
+        });
+    };
 
     const handleLocation = (lat: number, lng: number) => {
         setGeolocation([lat, lng]);
-        setContent({ text: null, img: null, video: null, geolocation: { latitude: lat, longitude: lng } });
-    }
-
+        setContent({
+            text: null,
+            img: null,
+            video: null,
+            geolocation: { latitude: lat, longitude: lng },
+        });
+    };
 
     return (
-
         <div className="flex flex-col h-full w-full bg-grey-500 p-4 md:bg-[#111B21] md:rounded-lg md:mb-2">
             <AsyncSelect
                 isMulti
@@ -244,6 +274,36 @@ const SquealCreator = () => {
                     content={
                         <AnimatedTabContent>
                             <form name="squeal-post" className="md:h-[10vh]">
+                                <p>
+                                    <input
+                                        type="checkbox"
+                                        id="repeat"
+                                        name="repeat"
+                                        checked={repeatMessage}
+                                        onChange={() => setRepeatMessage(!repeatMessage)}
+                                    />
+                                    <label htmlFor="repeat">Repeat</label>
+                                    {repeatMessage && (
+                                        <p>
+                                            <input
+                                                type="text"
+                                                id="repeat"
+                                                name="repeat"
+                                                placeholder="Cron job"
+                                                value={repetitionExpr}
+                                                onChange={(e) => {
+                                                    setRepetitionExpr(
+                                                        e.target.value
+                                                    );
+                                                }}
+                                                className="text-slate-700"
+                                            />
+                                            <label htmlFor="repeat">
+                                                Cron job
+                                            </label>
+                                        </p>
+                                    )}
+                                </p>
                                 <motion.textarea
                                     maxLength={MAX_LEN}
                                     //onChange={(e) => { setMessage(e.target.value) }}
@@ -264,13 +324,12 @@ const SquealCreator = () => {
                         <AnimatedTabContent>
                             <div className="flex justify-center">
                                 <Camera onCapture={handleCapture} />
-                                {
-                                    img && (
-                                        <img className='rounded-lg imgPreview ml-24'
-                                            src={img}
-                                        />
-                                    )
-                                }
+                                {img && (
+                                    <img
+                                        className="rounded-lg imgPreview ml-24"
+                                        src={img}
+                                    />
+                                )}
                             </div>
                             <p className="mt-4 mb-4">OR</p>
                             <input
@@ -291,14 +350,13 @@ const SquealCreator = () => {
                     content={
                         <AnimatedTabContent>
                             <div className="flex justify-center">
-                                {
-                                    video && (
-                                        <video className='rounded-lg imgPreview ml-24'
-                                            src={video}
-                                            controls={true}
-                                        />
-                                    )
-                                }
+                                {video && (
+                                    <video
+                                        className="rounded-lg imgPreview ml-24"
+                                        src={video}
+                                        controls={true}
+                                    />
+                                )}
                             </div>
                             <p className="mt-4 mb-4">OR</p>
                             <input

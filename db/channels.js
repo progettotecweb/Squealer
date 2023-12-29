@@ -39,6 +39,7 @@ const channelSchema = new mongoose.Schema({
 });
 
 const Channel = mongoose.model("Channel", channelSchema);
+exports.Channel = Channel;
 
 function readJsonData(fileName) {
     return (jsonData = JSON.parse(

@@ -1,4 +1,3 @@
-
 async function signout() {
     await fetch("/Home/api/auth/signout?callbackUrl=/Login", {
         method: "POST",
@@ -97,14 +96,14 @@ window.onload = function () {
                 await loadChannels();
                 break;
             case "squealSection":
-                loadSqueals();
+                await loadSqueals();
                 break;
         }
     }
 
 
 
-    async function loadUsers(showSelf = true) {
+    async function loadUsers(searchName = null, showSelf = true) {
         const allUsers = await fetch("/api/users/all", {
             method: "POST",
             headers: {
@@ -151,12 +150,16 @@ window.onload = function () {
                         break;
                 }
 
+                let userShownCount = 0
+
                 //create the cards for every user
                 for (let i = 0; i < data.length; i++) {
                     //check the filter type and skip the user if it doesn't match, or show all
                     if (filter.type != "All" && data[i].role != filter.type) continue;
 
-                    //check if the user is the moderator and if he wants to see himself
+                    //check if the user is searched
+                    if (searchName != null && !(data[i].name.toLowerCase() == searchName.toLowerCase())) continue;
+
                     let mycard = "<div class='my-card my-card-grid-tl-tr-b'>";
 
                     const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
@@ -178,9 +181,15 @@ window.onload = function () {
                     mycard += footer;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;
+
+                    userShownCount++;
                 }
 
-                //return data;
+                if (userShownCount === 0) {
+                    boxContent.innerHTML = `<div class='position-absolute d-flex justify-content-center noItems'>
+                    <p class="text-center align-self-center fst-italic">No users found</p>
+                    </div>`;
+                }
             })
             .catch(err => {
                 console.log(err);
@@ -188,7 +197,7 @@ window.onload = function () {
     }
 
 
-    async function loadChannels(waitForNewSqueal = false, squeal = null) {
+    async function loadChannels(searchName = null, squeal = null) {
         const allChannels = await fetch("/api/channels/allChannels", {
             method: "POST",
             headers: {
@@ -268,10 +277,16 @@ window.onload = function () {
                         break;
                 }
 
+                let channelShownCount = 0
+
                 //create the cards for every channel
                 for (let i = 0; i < data.length; i++) {
                     //check the filter type and skip the channel if it doesn't match, or show all
                     if (filter.type != "All" && (data[i].official === true ? 'Official' : 'Unofficial') != filter.type) continue;
+
+                    //check if the channel is searched
+                    if (searchName != null && !(data[i].name.toLowerCase() == searchName.toLowerCase())) continue;
+
 
                     let tot_squeal = data[i].squeals.length;
 
@@ -324,6 +339,14 @@ window.onload = function () {
                     mycard += footer;
                     mycard += "</div>";
                     boxContent.innerHTML += mycard;
+
+                    channelShownCount++;
+                }
+
+                if (channelShownCount === 0) {
+                    boxContent.innerHTML = `<div class='position-absolute d-flex justify-content-center noItems'>
+                    <p class="text-center align-self-center fst-italic">No channels found</p>
+                    </div>`;
                 }
             })
             .catch(err => {
@@ -414,15 +437,25 @@ window.onload = function () {
 
                 //create the cards for every squeal
                 //console.log(data)
+                let squealShownCount = 0
                 let geoSqueals = [];
                 for (let i = 0; i < data.length; i++) {
                     let geo = addSquealCard(data[i], data[i].recipients, boxContent, false, true);
-                    if (geo)
+                    if (geo) {
                         geoSqueals.push(geo);
+                    }
+
+                    squealShownCount++;
                 }
 
                 for (let i = 0; i < geoSqueals.length; i++) {
                     createGeoMap(geoSqueals[i].geolocation, geoSqueals[i].mapId);
+                }
+
+                if (squealShownCount === 0) {
+                    boxContent.innerHTML = `<div class='position-absolute d-flex justify-content-center noItems'>
+                    <p class="text-center align-self-center fst-italic">No squeals found</p>
+                    </div>`;
                 }
             })
             .catch(err => {
@@ -508,6 +541,9 @@ window.onload = function () {
         const btnBlock = userModal.querySelector("#btn-blockuser");
         btnBlock.disabled = false;
         btnBlock.setAttribute("data-bs-value_block", "false");
+
+        //reload users
+        loadUsers();
     });
 
     //change btn value when clicked
@@ -665,6 +701,9 @@ window.onload = function () {
         correctLabel.classList.remove("text-danger");
         correctLabel.classList.remove("text-success");
         correctLabel.innerHTML = "Insert @username(s) separated by a comma";
+
+        //reload channels
+        loadChannels();
     });
 
     //change btn value when clicked
@@ -736,6 +775,8 @@ window.onload = function () {
         const textarea = channelSquealsModal.querySelector("#channel-post-squeal-textarea");
         textarea.value = "";
 
+        //reload channels
+        loadChannels();
     });
 
     const squealsModal = document.getElementById('squealModal')
@@ -822,6 +863,9 @@ window.onload = function () {
             correctLabel.classList.remove("text-danger");
             correctLabel.classList.remove("text-success");
             correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
+
+            //reload squeals
+            loadSqueals();
         });
     }
 
@@ -979,7 +1023,6 @@ window.onload = function () {
                 })
                     .then(res => {
                         if (res.ok) {
-                            //console.log("Data updated!");
                         } else {
                             console.log("Error while updating data!");
                         }
@@ -1061,6 +1104,47 @@ window.onload = function () {
 
     squealSection.addEventListener("click", (e) => {
         changeSectionClass(e.target);
+    });
+
+
+
+    //SEARCH Listenters
+    document.querySelector("#searchBtn").addEventListener("click", async (e) => {
+        //prevent the page from reloading
+        e.preventDefault();
+
+        //get the value from the input
+        const value = document.querySelector("#searchInput").value;
+
+        //get the active section
+        const activeSection = document.querySelector(".active-section");
+
+
+        //the value could either be a @username, a §channel name or an empty string
+        //check if the value exists in the db
+        switch (value.charAt(0)) {
+            case "@": //user
+                //set user as active section
+                changeSectionClass(userSection);
+
+                loadUsers(value.split('@')[1]);
+                break;
+            case "§": //channel
+                //set channel as active section
+                changeSectionClass(channelSection);
+
+                loadChannels(value.split('§')[1]);
+                break;
+        }
+    });
+
+    document.querySelector("#searchInput").addEventListener("input", async (e) => {
+        const value = document.querySelector("#searchInput").value;
+        if (value === "") {
+            //reload the selected section
+            const activeSection = document.querySelector(".active-section");
+            await loadSection(activeSection);
+        }
     });
 }
 
@@ -1186,6 +1270,11 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
             }
         }
 
+        //the channel/user could be empty
+        if (namesArray[i] === "") {
+            found = true;
+        }
+
         if (!found) {
             //set wrong label
             correctLabel.classList.add("text-danger");
@@ -1210,7 +1299,6 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
 
         return false;
     });
-
 
     //console.log(usersId);
     //update data in input div
@@ -1565,6 +1653,7 @@ function getRecipientsFromModal() {
     const types = document.querySelector("#squeal-recipients").getAttribute("data-bs-ids-type").replace('\n', '').split(',');
 
     for (let i = 0; i < ids.length; i++) {
+        if (ids[i] === "") continue;
         recipients.push({ id: ids[i], type: types[i] });
     }
 

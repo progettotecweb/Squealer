@@ -2,6 +2,7 @@
  *  Users database model
  */
 
+const { CronJob } = require("cron");
 const mongoose = require("mongoose");
 
 const DAILY_MSG_QUOTA = 1000;
@@ -14,7 +15,7 @@ const userSchema = new mongoose.Schema({
     salt: String,
     role: {
         type: String,
-        enum: ["User", "Pro", "SMM", "Mod", "User"],
+        enum: ["User", "Pro", "SMM", "Mod"],
         default: "User",
     },
     msg_quota: {
@@ -53,23 +54,45 @@ const userSchema = new mongoose.Schema({
             ref: "Squeal",
         },
     ],
+    notifications: [
+        {
+            notificationType: {
+                type: String,
+                enum: ["mention", "reply", "new", "general"],
+            },
+            text: String,
+            link: String,
+            author: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+            createdAt: Date,
+        },
+    ],
 });
 
 const User = mongoose.model("User", userSchema);
 
 exports.searchUserByID = async function (id) {
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate(
+        "notifications.author",
+        "name img"
+    );
     return user;
 };
 
 exports.searchUserByName = async function (name) {
-    const user = await User.findOne({ name: name });
+    const user = await User.findOne({ name: name }).populate(
+        "notifications.author",
+        "name img"
+    );
     return user;
 };
 
 exports.searchUser = async function (property, query) {
     const user = await User.where(property)
         .equals(new RegExp(query, "i"))
+        .populate("notifications.author", "name img")
         .exec();
     return user;
 };
@@ -87,10 +110,56 @@ exports.getAllUsers = async function () {
 
 //update user
 exports.updateUser = async function (id, updatedUserData) {
-    User.findByIdAndUpdate(id, updatedUserData, { new: true }).then((user) => {
-        return user;
-    })
+    User.findByIdAndUpdate(id, updatedUserData, { new: true })
+        .then((user) => {
+            return user;
+        })
         .catch((err) => {
             console.log(err);
         });
-}
+};
+
+const dailyJob = CronJob.from({
+    cronTime: "0 0 0 * * *",
+    onTick: this.resetMsgQuotaDaily,
+    start: true,
+    timeZone: "Europe/Bucharest",
+});
+
+const weeklyJob = CronJob.from({
+    cronTime: "0 0 0 * * 1",
+    onTick: this.resetMsgQuotaWeekly,
+    start: true,
+    timeZone: "Europe/Bucharest",
+});
+
+const monthlyJob = CronJob.from({
+    cronTime: "0 0 0 1 * *",
+    onTick: this.resetMsgQuotaMonthly,
+    start: true,
+    timeZone: "Europe/Bucharest",
+});
+
+exports.resetMsgQuotaDaily = async function () {
+    const users = await User.find();
+    users.forEach((user) => {
+        user.msg_quota.daily = DAILY_MSG_QUOTA + user.msg_quota.extra;
+        user.save();
+    });
+};
+
+exports.resetMsgQuotaWeekly = async function () {
+    const users = await User.find();
+    users.forEach((user) => {
+        user.msg_quota.weekly = WEEKLY_MSG_QUOTA + user.msg_quota.extra * 6;
+        user.save();
+    });
+};
+
+exports.resetMsgQuotaMonthly = async function () {
+    const users = await User.find();
+    users.forEach((user) => {
+        user.msg_quota.monthly = MONTHLY_MSG_QUOTA + user.msg_quota.extra * 24;
+        user.save();
+    });
+};

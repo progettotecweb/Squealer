@@ -34,8 +34,9 @@ exports.addSquealToKeyword = async function (keyword, squeal) {
         const newKeyword = new Keywords({name: keyword});
         newKeyword.squeals.push(squeal);
         newKeyword.save();
-        return;
+        return newKeyword._id;
     }
     keywordObj.squeals.push(squeal);
     keywordObj.save();
+    return keywordObj._id;
 }

@@ -6,17 +6,13 @@ import Squeal from "@/components/Squeal/Squeal";
 import { useSession } from "next-auth/react";
 import useSWR, { Fetcher } from "swr";
 
-
-
-const squeals = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-
 const Homepage = () => {
 
     const { data: session } = useSession();
 
     interface Squeal {
         _id: string;
-        type: "text" | "image" | "geolocation";
+        type: "text" | "image" | "geolocation" | "video";
         content: {
             text: string | null;
             img: {
@@ -27,6 +23,10 @@ const Homepage = () => {
                 latitude: number;
                 longitude: number;
             };
+            video: {
+                mimetype: string;
+                blob: string;
+            } | null;
         };
         geolocation: string | null;
         ownerID: any;
@@ -52,7 +52,7 @@ const Homepage = () => {
                     isLoading && <div>Loading...</div>
                 } {
                     data && data.results.map((squeal, index) => {
-                        return <Squeal type={squeal.type} key={index} id={squeal._id} content={squeal.content} owner={squeal?.ownerID} date={squeal?.datetime} reactions={squeal?.reactions} />
+                        return <Squeal  squealData={squeal} type={squeal.type} key={index} id={squeal._id} content={squeal.content} owner={squeal?.ownerID} date={squeal?.datetime} reactions={squeal?.reactions} />
                     })
                 }
             </section>

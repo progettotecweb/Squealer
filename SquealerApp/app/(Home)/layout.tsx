@@ -17,11 +17,11 @@ export default function GeneralLayout({
 }) {
     return (
         <>
-            <div className="md:grid md:grid-cols-4 xl:grid-cols-12">
+            <div className="flex flex-row">
                 <div className="hidden md:block md:h-screen md:z-[1001] md:sticky md:top-0 md:col-span-1 xl:col-span-2">
                     <Menu />
                 </div>
-                <main className="md:col-span-3 xl:col-span-10">
+                <main className="md:col-span-3 xl:col-span-10 w-full">
                     <Header />
                     <LayoutWrapper>{children}</LayoutWrapper>
                 </main>
