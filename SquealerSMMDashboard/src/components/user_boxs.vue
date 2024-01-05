@@ -2,8 +2,10 @@
 import { ref } from 'vue'
 import { getMyData } from './fetch';
 
+
 const user = ref<any>(null)
 const id = defineProps(['id'])
+//define user_id, it will be shared with the father
 
 
 
@@ -17,8 +19,8 @@ const id = defineProps(['id'])
 
 
 <template>
-    <div id="user-box">
-        <div id="user-img-box">
+    <div class="user-box">
+        <div class="user-img-box">
             <img :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" class="img-fluid img-thumbnail"/> 
         </div>
         <h1>{{ user.name}}</h1>
@@ -27,8 +29,7 @@ const id = defineProps(['id'])
 
 <style>
 
-
-    #user-box{
+    .user-box{
         background-color: #3e5870;
         border-radius: 10px;
         padding: 10px;
@@ -42,7 +43,7 @@ const id = defineProps(['id'])
         color: aliceblue;
     }
 
-    #user-img-box{
+    .user-img-box{
         width: 60%;
         height: 60%;
     }
