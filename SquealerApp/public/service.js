@@ -11,3 +11,10 @@ self.addEventListener('push', async (event) => {
       icon: '/ios/256.png',
     })
   }
+
+  self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+    event.waitUntil(
+      clients.openWindow('localhost:8000/Home/')
+    );
+  })

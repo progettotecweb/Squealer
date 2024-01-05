@@ -8,6 +8,7 @@ const authOptions: NextAuthOptions = {
 
     pages: {
         signIn: "/Home/Login",
+        error: "/Home/Login?error=",
     },
 
     callbacks: {

@@ -6,7 +6,6 @@ const subscriptionsDB = require("../db/subscriptions");
 
 router.post("", async function (req, res) {
     const subscription = req.body;
-    console.log("subscription", subscription);
 
     const user = await usersDB.searchUserByName(subscription.user);
 

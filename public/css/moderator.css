@@ -29,6 +29,7 @@
     border-radius: 50%;
     margin-right: .5em;
     box-shadow: 0px 0px 5px 0px #000000;
+    object-fit: cover;
 }
 
 .navbar-div {
@@ -191,6 +192,7 @@
 .squeal-owner-div .user-pic {
     width: 3em;
     height: 3em;
+    object-fit: cover;
 }
 
 .squeal-text {
@@ -277,6 +279,7 @@
     height: 5em;
     border-radius: 50%;
     box-shadow: 0px 0px 5px 0px #000000;
+    object-fit: cover;
 }
 
 .user-content {

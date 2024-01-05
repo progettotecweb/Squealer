@@ -112,6 +112,8 @@ router.post("/post", async (req, res) => {
     // #TODO: squeal validation
     console.log("squeal", squeal);
 
+    const owner = await usersDB.searchUserByID(squeal.ownerID);
+
     // Squeal creation
     const newSqueal = await squealsDB.createNewSqueal(squeal);
 
@@ -121,10 +123,47 @@ router.post("/post", async (req, res) => {
         );
         parentSqueal.replies.push(newSqueal._id);
         parentSqueal.save();
+
+        const parentOwner = await usersDB.searchUserByID(parentSqueal.ownerID);
+
+        if (parentOwner._id.toString() !== owner._id.toString()) {
+            parentOwner.notifications.push({
+                notificationType: "reply",
+                text: `@${owner.name} replied to your squeal.`,
+                link: `/Home/Squeal/${newSqueal._id}`,
+                author: owner._id,
+                createdAt: Date.now(),
+                expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days
+            });
+            await parentOwner.save();
+
+            const subs = await subscriptionsDB.getSubscriptionByUser(
+                parentOwner._id
+            );
+
+            subs.forEach(async (s) => {
+                const payload = JSON.stringify({
+                    title: `@${owner.name} replied to your squeal`,
+                    body: `${truncate(newSqueal.content.text, 20)}`,
+                });
+                const res = await webpush.sendNotification(
+                    s.subscription,
+                    payload
+                );
+                if (res.statusCode === 410) {
+                    console.log(
+                        "Subscription has expired or is no longer valid: ",
+                        res.statusCode
+                    );
+                    // GONE (subscription no longer valid)
+                    await subscriptionsDB.removeSubscription(s._id);
+                }
+            });
+        }
     }
 
     //console.log("newSqueal", newSqueal);
-    const owner = await usersDB.searchUserByID(squeal.ownerID);
+
     if (!owner) {
         res.status(400).json({ success: false, error: "User not found" });
     }
@@ -177,7 +216,9 @@ router.post("/post", async (req, res) => {
 
         if (mentions) {
             mentions.forEach(async (mention) => {
-                const mentionUser = await usersDB.searchUserByName(mention.slice(1));
+                const mentionUser = await usersDB.searchUserByName(
+                    mention.slice(1)
+                );
 
                 if (mentionUser) {
                     const subs = await subscriptionsDB.getSubscriptionByUser(
@@ -194,7 +235,10 @@ router.post("/post", async (req, res) => {
                             payload
                         );
                         if (res.statusCode === 410) {
-                            console.log("Subscription has expired or is no longer valid: ", res.statusCode)
+                            console.log(
+                                "Subscription has expired or is no longer valid: ",
+                                res.statusCode
+                            );
                             // GONE (subscription no longer valid)
                             await subscriptionsDB.removeSubscription(s._id);
                         }
@@ -266,6 +310,10 @@ router.post("/post", async (req, res) => {
             const channel = await channelsDB.searchChannelByID(recipient.id);
             channel.squeals.push(newSqueal._id);
             channel.save();
+        } else if (recipient.type === "Keyword") {
+            const keyword = await keywordsDB.searchKeywordByID(recipient.id);
+            keyword.squeals.push(newSqueal._id);
+            keyword.save();
         }
     });
 

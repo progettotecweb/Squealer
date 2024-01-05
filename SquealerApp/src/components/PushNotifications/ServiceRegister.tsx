@@ -16,60 +16,64 @@ const registerServiceWorker = async () => {
 };
 
 const unregisterServiceWorkers = async () => {
-    const registrations = await navigator.serviceWorker.getRegistrations()
-    await Promise.all(registrations.map((r) => r.unregister()))
-  }
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((r) => r.unregister()));
+};
 
 const subscribe = async (user: string) => {
-  //await unregisterServiceWorkers()
+    //await unregisterServiceWorkers()
 
-  const swRegistration = await registerServiceWorker()
-  await window?.Notification.requestPermission()
+    const swRegistration = await registerServiceWorker();
+    await window?.Notification.requestPermission();
 
-  try {
-    const options = {
-      applicationServerKey: publicVapidKey,
-      userVisibleOnly: true,
+    try {
+        const options = {
+            applicationServerKey: publicVapidKey,
+            userVisibleOnly: true,
+        };
+        const subscription = await swRegistration.pushManager.subscribe(
+            options
+        );
+
+        await saveSubscription(subscription, user);
+
+        console.log({ subscription });
+    } catch (err) {
+        console.error("Error", err);
     }
-    const subscription = await swRegistration.pushManager.subscribe(options)
+};
 
-    await saveSubscription(subscription, user)
+const saveSubscription = async (
+    subscription: PushSubscription,
+    user: string
+) => {
+    const ORIGIN = window.location.origin;
+    const BACKEND_URL = `${ORIGIN}/api/push`;
 
-    console.log({ subscription })
-  } catch (err) {
-    console.error('Error', err)
-  }
-}
-
-const saveSubscription = async (subscription: PushSubscription, user: string) => {
-    const ORIGIN = window.location.origin
-    const BACKEND_URL = `${ORIGIN}/api/push`
-  
     const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({subscription, user}),
-    })
-    return response.json()
-  }
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ subscription, user }),
+    });
+    return response.json();
+};
 
 const ServiceRegister = () => {
-    
-  const {data: session, status} = useSession();
-  
-  useEffect(() => {
+    const { data: session, status } = useSession();
+
+    useEffect(() => {
         (async () => {
-          if(status !== "authenticated") return
-          if(!notificationsSupported()) return  
-          subscribe(session.user.name)
+            if (status !== "authenticated") return;
+            if (!notificationsSupported()) return;
+            subscribe(session.user.name);
         })();
     }, [status]);
 
     if (!notificationsSupported()) {
         return (
-            <div className="text-slate-50">
+            <div className="text-gray-50">
                 Error: notifications not supported
             </div>
         );

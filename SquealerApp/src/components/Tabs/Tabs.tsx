@@ -19,10 +19,11 @@ export const Tab: React.FC<TabProps> = ({
 }) => {
     return (
         <button
-            className={`py-2 px-4 text-sm font-medium text-center text-slate-50 focus:outline-none border-solid border-b-4 ${activeTab === index
-                ? " border-b-blue-500"
-                : "border-transparent"
-                }`}
+            className={`py-2 px-4 text-sm font-medium text-center text-gray-50 focus:outline-none border-solid border-b-4 ${
+                activeTab === index
+                    ? " border-b-blue-500"
+                    : "border-transparent"
+            }`}
             onClick={() => setActiveTab?.(index ? index : 0)}
         >
             {label}
@@ -51,7 +52,7 @@ export const AnimatedTabContent: React.FC<{ children: React.ReactNode }> = ({
     return (
         <motion.div
             key="tab-content"
-            className="text-slate-50"
+            className="text-gray-50"
             variants={variants}
             initial="initial"
             animate="animate"
@@ -84,8 +85,6 @@ const Tabs: React.FC<TabsProps> = ({
         setActiveTab(index);
         if (onTabChange) onTabChange(index);
     };
-
-    
 
     return (
         <>

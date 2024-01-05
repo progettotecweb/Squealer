@@ -40,3 +40,8 @@ exports.addSquealToKeyword = async function (keyword, squeal) {
     keywordObj.save();
     return keywordObj._id;
 }
+
+exports.searchKeywordByID = async function (id) {
+    const keyword = await Keywords.findById(id);
+    return keyword;
+}

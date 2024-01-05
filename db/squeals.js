@@ -16,7 +16,7 @@ const squealSchema = new mongoose.Schema({
             },
             type: {
                 type: String,
-                enum: ["User", "Channel"],
+                enum: ["User", "Channel", "Keyword"],
             },
         },
     ],
@@ -65,6 +65,12 @@ const squealSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Keywords",
+        },
+    ],
+    mentions: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
         },
     ],
     visibility: {
@@ -177,7 +183,13 @@ exports.getAllSquealsByOwnerID = async function (ownerID) {
 exports.getAllSquealsByRecipientID = function (type, recipientID) {
     const res = Squeal.find({
         recipients: { $elemMatch: { type: type, id: recipientID } },
-    });
+    }).populate("ownerID", "name img")
+    .populate({
+        path: "replies",
+        populate: { path: "ownerID", select: "name img" },
+        select: " type ownerID content datetime _id reactions isAReply impressions",
+    })
+    .exec();
     return res;
 };
 
@@ -356,3 +368,233 @@ exports.updateSquealImpressions = async function (id) {
     await updateSquealMetadata(squeal);
     await squeal.save();
 };
+
+exports.getGlobalFeed = async function (page = 0, limit = 10) {
+    const skip = page * limit;
+
+    const publicSqueals = await Channel.aggregate([
+        {
+            $match: {
+                official: true
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                squeals: 1,
+            },
+        },
+        {
+            $unwind: "$squeals",
+        },
+        {
+            $lookup: {
+                from: "squeals",
+                localField: "squeals",
+                foreignField: "_id",
+                as: "squeals",
+            },
+        },
+        {
+            $unwind: "$squeals",
+        },
+        {
+            $lookup: {
+                from: "users",
+                // Assuming the users collection contains the user data
+                localField: "squeals.ownerID",
+                foreignField: "_id",
+                as: "squeals.ownerID",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1,
+                            img: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $unwind: "$squeals.ownerID",
+        },
+        {
+            $addFields: {
+                "squealDetails.ownerID": {
+                    name: "$squealDetails.ownerID.name",
+                    img: "$squealDetails.ownerID.img",
+                },
+            },
+        },
+        {
+            $lookup: {
+                from: "squeals",
+                // Assuming the replies collection contains the reply data
+                localField: "squeals.replies",
+                foreignField: "_id",
+                as: "squeals.replies",
+                pipeline: [
+                    {
+                        $project: {
+                            type: 1,
+                            content: 1,
+                            ownerID: 1,
+                            createdAt: 1,
+                            datetime: 1,
+                            _id: 1,
+                            reactions: 1,
+                            isAReply: 1,
+                            impressions: 1,
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "ownerID",
+                            foreignField: "_id",
+                            as: "ownerID",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        name: 1,
+                                        img: 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $unwind: "$ownerID",
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "keywords",
+                localField: "squeals.recipients.id",
+                foreignField: "_id",
+                as: "squeals.recipientsFromCollection1",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1,
+                            id: "$id",
+                            type: "Keyword",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "squeals.recipients.id",
+                foreignField: "_id",
+                as: "squeals.recipientsFromCollection2",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1,
+                            id: "$id",
+                            type: "User",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "channels",
+                localField: "squeals.recipients.id",
+                foreignField: "_id",
+                as: "squeals.recipientsFromCollection3",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1,
+                            id: "$id",
+                            type: "Channel",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                "squeals.recipients": {
+                    $setUnion: [
+                        "$squeals.recipientsFromCollection1",
+                        "$squeals.recipientsFromCollection2",
+                        "$squeals.recipientsFromCollection3",
+                    ],
+                },
+            },
+        },
+        {
+            $project: {
+                "squeals.recipientsFromCollection1": 0,
+                "squeals.recipientsFromCollection2": 0,
+                "squeals.recipientsFromCollection3": 0,
+            },
+        },
+        {
+            $sort: {
+                "squeals.createdAt": -1,
+            },
+        },
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+        {
+            $group: {
+                _id: null,
+                squeals: {
+                    $push: "$squeals",
+                },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                squeals: 1,
+            },
+        },
+        {
+            $addFields: {
+                squeals: {
+                    $filter: {
+                        input: "$squeals",
+                        as: "squeal",
+                        cond: {
+                            $or: [
+                                { $eq: ["$$squeal.isAReply", false] },
+                                {
+                                    $not: {
+                                        $in: [
+                                            "$$squeal.replyingTo",
+                                            {
+                                                $map: {
+                                                    input: "$squeals",
+                                                    as: "s",
+                                                    in: "$$s._id",
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        },
+    ])
+
+    const feed = publicSqueals[0]?.squeals || []
+
+    return feed;
+}

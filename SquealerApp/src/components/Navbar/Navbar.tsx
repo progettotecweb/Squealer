@@ -12,12 +12,11 @@ import CustomIcon from "@/components/CustomIcon";
 import Menu from "@/components/Navbar/Menu";
 import SquealCreator from "@/components/Navbar/SquealCreator";
 import Searchbar from "@/components/Navbar/Searchbar";
-import Drawer from "@/components/Drawer/Drawer";
 import { useUser } from "@/hooks/useUser";
 import { Drawer as MUIDrawer } from "@mui/material";
 
 const Navbar = () => {
-    const {user} = useUser();
+    const { user } = useUser();
 
     const [open, setOpen] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
@@ -27,30 +26,25 @@ const Navbar = () => {
         <>
             <nav className="fixed bottom-0 h-16 bg-[#111B21] w-full flex justify-evenly items-center md:hidden">
                 <CustomIcon
-                    icon={<SearchIcon className="h-8 w-8 text-slate-50" />}
+                    icon={<SearchIcon className="h-8 w-8 text-gray-50" />}
                     onClick={() => setOpenSearch(!openSearch)}
                 />
                 <CustomIcon
-                    icon={<IconAdd className="h-8 w-8 text-slate-50" />}
+                    icon={<IconAdd className="h-8 w-8 text-gray-50" />}
                     onClick={() => setOpenDialog(!openDialog)}
                 />
                 <CustomIcon
                     icon={
-                        <IconAccountCircle className="h-8 w-8 text-slate-50" />
+                        <IconAccountCircle className="h-8 w-8 text-gray-50" />
                     }
                     onClick={() => setOpen(!open)}
                 />
             </nav>
 
-            
             {/*<Drawer open={open} anchor="left" onClose={() => setOpen(false)}>
                 <Menu user={user}/>
             </Drawer>*/}
-            <MUIDrawer
-                anchor="left"
-                open={open}
-                onClose={() => setOpen(false)}
-            >
+            <MUIDrawer anchor="left" open={open} onClose={() => setOpen(false)}>
                 <Menu onOpen={() => setOpen(false)} />
             </MUIDrawer>
             <MUIDrawer

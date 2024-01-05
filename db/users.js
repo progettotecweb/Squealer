@@ -4,6 +4,8 @@
 
 const { CronJob } = require("cron");
 const mongoose = require("mongoose");
+const { Channel } = require("./channels");
+const squealsDB = require("./squeals");
 
 const DAILY_MSG_QUOTA = 1000;
 const WEEKLY_MSG_QUOTA = DAILY_MSG_QUOTA * 6;
@@ -11,6 +13,7 @@ const MONTHLY_MSG_QUOTA = DAILY_MSG_QUOTA * 24;
 
 const userSchema = new mongoose.Schema({
     name: { type: String, unique: true },
+    bio: { type: String, default: "" },
     password: String,
     salt: String,
     role: {
@@ -46,6 +49,12 @@ const userSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Channels",
+        },
+    ],
+    followers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
         },
     ],
     squeals: [
@@ -163,3 +172,275 @@ exports.resetMsgQuotaMonthly = async function () {
         user.save();
     });
 };
+
+// feed is comprised of personal messages (squeals that have only the user as a recipient) and squeals of followed channels
+exports.getFeed = async function (user, page = 0, limit = 10) {
+    const skip = page * limit;
+    // get all squeals that have only the user as a recipient
+
+    // get all squeals of followed channels (the output should be a single array of squeals)
+    const followedChannelsSqueals = await Channel.aggregate([
+        {
+            $match: {
+                _id: {
+                    $in: user.following,
+                },
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                squeals: 1,
+            },
+        },
+        {
+            $unwind: "$squeals",
+        },
+        {
+            $lookup: {
+                from: "squeals",
+                localField: "squeals",
+                foreignField: "_id",
+                as: "squeals",
+            },
+        },
+        {
+            $unionWith: {
+                coll: "squeals",
+                pipeline: [
+                    {
+                        $match: {
+                            recipients: {
+                                $elemMatch: {
+                                    type: "User",
+                                    id: new mongoose.Types.ObjectId(
+                                        user._id
+                                    ),
+                                },
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            squeals: {
+                                $push: "$$ROOT",
+                            },
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            squeals: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $unwind: "$squeals",
+        },
+        {
+            $lookup: {
+                from: "users",
+                // Assuming the users collection contains the user data
+                localField: "squeals.ownerID",
+                foreignField: "_id",
+                as: "squeals.ownerID",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1,
+                            img: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $unwind: "$squeals.ownerID",
+        },
+        {
+            $addFields: {
+                "squealDetails.ownerID": {
+                    name: "$squealDetails.ownerID.name",
+                    img: "$squealDetails.ownerID.img",
+                },
+            },
+        },
+        {
+            $lookup: {
+                from: "squeals",
+                // Assuming the replies collection contains the reply data
+                localField: "squeals.replies",
+                foreignField: "_id",
+                as: "squeals.replies",
+                pipeline: [
+                    {
+                        $project: {
+                            type: 1,
+                            content: 1,
+                            ownerID: 1,
+                            createdAt: 1,
+                            datetime: 1,
+                            _id: 1,
+                            reactions: 1,
+                            isAReply: 1,
+                            impressions: 1,
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "ownerID",
+                            foreignField: "_id",
+                            as: "ownerID",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        name: 1,
+                                        img: 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $unwind: "$ownerID",
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "keywords",
+                localField: "squeals.recipients.id",
+                foreignField: "_id",
+                as: "squeals.recipientsFromCollection1",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1,
+                            id: 1,
+                            type: "Keyword",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "squeals.recipients.id",
+                foreignField: "_id",
+                as: "squeals.recipientsFromCollection2",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1,
+                            id: 1,
+                            type: "User",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "channels",
+                localField: "squeals.recipients.id",
+                foreignField: "_id",
+                as: "squeals.recipientsFromCollection3",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1,
+                            id: 1,
+                            type: "Channel",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                "squeals.recipients": {
+                    $setUnion: [
+                        "$squeals.recipientsFromCollection1",
+                        "$squeals.recipientsFromCollection2",
+                        "$squeals.recipientsFromCollection3",
+                    ],
+                },
+            },
+        },
+        {
+            $project: {
+                "squeals.recipientsFromCollection1": 0,
+                "squeals.recipientsFromCollection2": 0,
+                "squeals.recipientsFromCollection3": 0,
+            },
+        },
+        {
+            $sort: {
+                "squeals.createdAt": -1,
+            },
+        },
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+        {
+            $group: {
+                _id: null,
+                squeals: {
+                    $push: "$squeals",
+                },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                squeals: 1,
+            },
+        },
+        {
+            $addFields: {
+                squeals: {
+                    $filter: {
+                        input: "$squeals",
+                        as: "squeal",
+                        cond: {
+                            $or: [
+                                { $eq: ["$$squeal.isAReply", false] },
+                                {
+                                    $not: {
+                                        $in: [
+                                            "$$squeal.replyingTo",
+                                            {
+                                                $map: {
+                                                    input: "$squeals",
+                                                    as: "s",
+                                                    in: "$$s._id",
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        },
+    ]);
+
+    const feed = followedChannelsSqueals[0]?.squeals || [];
+
+    return feed;
+};
+
+exports.deleteUser = async function (id) {
+    await User.findByIdAndDelete(id);
+}
