@@ -47,7 +47,7 @@ const LoginPage = () => {
         <PageContainer className="h-[calc(100vh-10rem)] flex items-center justify-center">
             <h1>Welcome to Squealer!</h1>
 
-            <form className="flex flex-col gap-2">
+            <form className="flex flex-col gap-2" name="login-form">
                 <input
                     className="text-gray-800 p-2 rounded-md"
                     id="Username"

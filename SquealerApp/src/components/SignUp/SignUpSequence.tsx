@@ -229,7 +229,7 @@ const SignUpSequence = () => {
                         key="step1"
                         layout
                     >
-                        <form className="flex flex-col items-start">
+                        <form className="flex flex-col items-start" name="register-form">
                             <label htmlFor="username">Username</label>
                             <input
                                 type="text"
@@ -326,7 +326,7 @@ const SignUpSequence = () => {
                             />
                         </div>
                         <label htmlFor="bio">Tell us more about yourself</label>
-                        <form>
+                        <form name="bio-form">
                             <textarea
                                 className={`${InputClassNames}`}
                                 rows={4}

@@ -36,8 +36,6 @@ const subscribe = async (user: string) => {
         );
 
         await saveSubscription(subscription, user);
-
-        console.log({ subscription });
     } catch (err) {
         console.error("Error", err);
     }

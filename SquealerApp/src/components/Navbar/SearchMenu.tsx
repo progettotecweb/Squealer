@@ -112,7 +112,7 @@ export default function SearchMenu() {
             <h1 className="text-xl">Search</h1>
 
             <div className="p-2 bg-gray-700 rounded-lg flex flex-row">
-                <form onSubmit={onSubmit}>
+                <form onSubmit={onSubmit} name="search-menu">
                     <input
                         type="text"
                         placeholder="Search"

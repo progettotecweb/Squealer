@@ -138,10 +138,10 @@ export const AccountUserCard = ({ id }) => {
                 </div>
                 <div className="flex text-lg gap-16">
                     <h1 className="flex">
-                        <h2>{data.squeals.length} Squeals</h2>
+                       {data.squeals.length} Squeals
                     </h1>
                     <h1 className="flex">
-                        <h2>{data.following.length} Following</h2>
+                        {data.following.length} Following
                     </h1>
                 </div>
                 <div className="self-start h-full flex items-center text-md">

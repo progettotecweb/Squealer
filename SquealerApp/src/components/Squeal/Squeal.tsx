@@ -221,7 +221,10 @@ const Squeal: React.FC<SquealProps> = ({
 
     return (
         <Card
-            className={` mx-2 bg-gray-800 text-gray-50 shadow-none ${className}`}
+            className={` mx-2 ${className}`}
+            classes={{
+                root: "bg-gray-800 text-gray-50 shadow-none"
+            }}
             ref={observe}
         >
             <div className="flex flex-row p-2 gap-2">
@@ -248,7 +251,8 @@ const Squeal: React.FC<SquealProps> = ({
                         className="bg-[#111B21] text-gray-50"
                     >
                         <img
-                            src={`data:${owner?.img.mimetype};base64,${owner?.img.blob}`}
+                            src={`data:${owner?.img?.mimetype};base64,${owner?.img?.blob}`}
+                            alt="Profile Picture"
                         />
                     </Avatar>
                 }
@@ -414,6 +418,7 @@ const SquealReplyier = (props: { parent; session }) => {
     return (
         <CardActions>
             <input
+                name="reply"
                 className="w-full bg-gray-700 rounded-md text-gray-50 p-2"
                 placeholder="Reply..."
                 value={reply}
