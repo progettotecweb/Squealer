@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {  ref } from 'vue'
 import user_boxs from './components/user_boxs.vue'
-import { getUserData , getMyDataAndPopulate } from './components/fetch.ts'
+import { getUserData } from './components/fetch.ts'
 import user_profile from './components/user_profile.vue';
 
 const active_name = ref<any>(null);
@@ -9,7 +9,7 @@ const active_name = ref<any>(null);
 const user = ref<any>(null); 
 const controlled_user = ref<any>(null);
 const waiting = ref(true);
-const tmp = ref<any>(null);
+
 
 
 user.value = getUserData()
@@ -17,13 +17,6 @@ user.value.then((data: any) => {
   user.value = data
   controlled_user.value = user.value.controls.user_id
   waiting.value = false
-})
-
-tmp.value = getMyDataAndPopulate("651fde888a066ec0334dabb3")
-tmp.value.then((data: any) => {
-  tmp.value = data
-  console.log(data)
-  console.log("ciao2")
 })
 
 

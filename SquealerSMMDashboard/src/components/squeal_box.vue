@@ -4,9 +4,8 @@
 
 
 //const user = ref<any>(null)
-const id = defineProps(['id'])
+const id = defineProps(['id', 'content'])
 //define user_id, it will be shared with the father
-
 
 
 
@@ -14,7 +13,7 @@ const id = defineProps(['id'])
 
 
 <template>
-    <p> {{ id }}</p>
+    <p> post text: {{ id.content}}</p>
 </template>
 
 <style>

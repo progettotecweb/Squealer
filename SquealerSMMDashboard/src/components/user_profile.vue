@@ -11,12 +11,14 @@ const waiting = ref(true);
 
 
 
+
 user.value = getMyDataAndPopulate(id.id)
 user.value.then((data: any) => {
     user.value = data
     user_squeals.value = user.value.squeals
-    //console.log(data)
+    
     waiting.value = false
+
 })
 
 
@@ -31,7 +33,9 @@ user.value.then((data: any) => {
         <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 200px; height: 200px;"/>
         <h3>new post: </h3>
         <squeal_box v-for="squeal in user_squeals"  
-                      :id="squeal" >
+                    :id="squeal"
+                    :content="squeal.content.text" >
+                   
         </squeal_box>
         <!--squils fatti -->
         <!--clicca uno squils per vedere le statistiche --> 
