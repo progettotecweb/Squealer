@@ -95,7 +95,7 @@
 - [ ] Statistiche sugli squeal postati dal SMM (visualizzazioni, reazioni, squeal a rischio impopolarità/controversia, etc).
 - [ ] <span class="orange">SMM può acquistare caratteri extra per i VIP</span>
 - [ ] <span class="orange">Grafici con andamenti dei post dei VIP</span>
-- [ ] <span class="green">Geolocazione fittizia per i VIP</span>
+- [ ] <span class="green">Geolocazione fittizia per i VIP ????????</span>
 
 ## REQUISITI DI PROGETTO
 

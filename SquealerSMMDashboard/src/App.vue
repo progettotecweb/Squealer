@@ -1,20 +1,29 @@
 <script setup lang="ts">
 import {  ref } from 'vue'
 import user_boxs from './components/user_boxs.vue'
-import { getUserData } from './components/fetch.ts'
+import { getUserData , getMyDataAndPopulate } from './components/fetch.ts'
 import user_profile from './components/user_profile.vue';
 
 const active_name = ref<any>(null);
 
 const user = ref<any>(null); 
 const controlled_user = ref<any>(null);
+const waiting = ref(true);
+const tmp = ref<any>(null);
 
 
 user.value = getUserData()
 user.value.then((data: any) => {
   user.value = data
   controlled_user.value = user.value.controls.user_id
-  
+  waiting.value = false
+})
+
+tmp.value = getMyDataAndPopulate("651fde888a066ec0334dabb3")
+tmp.value.then((data: any) => {
+  tmp.value = data
+  console.log(data)
+  console.log("ciao2")
 })
 
 
@@ -37,7 +46,7 @@ user.value.then((data: any) => {
     <div class="row flex-xl-nowrap">
       
       <div class="col-12 col-md-3 col-xl-2 sidebar d-none d-lg-block">
-        <img :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
+        <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
         <p>@{{ user.name }}</p>
         <a class="AppBtn" href="/"><h4>Home</h4></a>
       </div>
@@ -47,20 +56,24 @@ user.value.then((data: any) => {
       role="main">
         <h1>Dashboard</h1>
         <div>
+          <div v-if="active_name != null">
+            <button class="AppBtn" @click="active_name = null">Back</button>
+          </div>
           <div v-if="active_name == null" class="d-flex justify-content-around flex-wrap " > <!-- si vede se variabile Name == NULL-->
               <user_boxs
                   v-for="account in controlled_user"  
                   :id="account"
-                  @click="active_name = account"></user_boxs><!--devo poter cliccare user_boxs e aggiornare name in base a quale clicco-->
+                  @click="active_name = account"></user_boxs>
           </div>
           <div v-if="active_name != null" class="d-flex justify-content-around flex-wrap "><!--componente con info degli account, si vede se variabile name == nome valido -->
-            <user_profile :id="active_name"></user_profile> <!--quest: devo varicare una user_profile per ogni utente e mostrare dolo qualla giusta o posso caricarle dinamicamente ogni volta che la cambio ? -->
+            <user_profile :id="active_name"></user_profile> 
             <!--https://vuejs.org/api/sfc-script-setup.html-->
           </div>
 
         </div>
       </main>
 
+      
       <div class="col d-none d-xl-block col-xl-2 sidebar"></div>
 
     </div>

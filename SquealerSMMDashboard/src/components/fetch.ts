@@ -54,3 +54,22 @@ export async function getMyData(url: string) {
         });
     return userInfo;
 }
+
+export async function getMyDataAndPopulate(url: string) {
+    const userInfo = await fetch("/api/users/squeals/" + url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            //console.log(data); 
+            return data;
+        })
+        .catch(err => {
+            console.log(err);
+            //signout();
+        });
+    return userInfo;
+}
