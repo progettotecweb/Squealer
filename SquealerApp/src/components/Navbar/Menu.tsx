@@ -1,8 +1,5 @@
 "use client";
 
-import Divider from "@/components/Divider";
-import Container from "@mui/material/Container";
-
 import CustomLink from "@/components/CustomLink";
 import { useUser } from "@/hooks/useUser";
 import StorefrontIcon from "@mui/icons-material/Storefront";
@@ -19,6 +16,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { SearchOutlined } from "@mui/icons-material";
 import NotificationMenu from "./NotificationMenu";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import Dialog from "@mui/material/Dialog";
+import SquealCreator from "./SquealCreator";
+import SearchMenu from "./SearchMenu";
 
 const MenuItem = ({
     text,
@@ -36,7 +37,7 @@ const MenuItem = ({
     return (
         <CustomLink
             href={href}
-            className="mt-3 text-lg"
+            className="mt-5 text-lg"
             innerClassName="flex flex-row items-center gap-1"
             type={type}
         >
@@ -49,26 +50,11 @@ const MenuItem = ({
 };
 
 const secondaryMenus = {
-    search: <div>Search</div>,
+    search: <SearchMenu />,
     default: <div>DEFAULT</div>,
     notifications: <NotificationMenu />,
     more: (
-        <div className="p-2 rounded-md w-full text-slate-50 flex flex-col">
-            {/* <div>
-                {user ? (
-                    <button
-                        onClick={() =>
-                            signOut({
-                                callbackUrl: "/Home/Login",
-                            })
-                        }
-                    >
-                        Sign Out
-                    </button>
-                ) : (
-                    <CustomLink href="/Login">Sign In</CustomLink>
-                )}
-            </div> */}
+        <div className="p-2 rounded-md w-full text-gray-50 flex flex-col">
             <MenuItem
                 text="Settings"
                 href="/Settings"
@@ -97,6 +83,16 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
     const [secondaryMenuOpen, setSecondaryMenuOpen] = useState(false);
     const [secondaryMenuType, setSecondaryMenuType] = useState("default");
 
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     return (
         <div className="flex flex-row h-full">
             <AnimatePresence>
@@ -104,11 +100,10 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                     layout
                     key="primary-menu"
                     role="presentation"
-                    className="bg-slate-800 text-slate-50 h-full p-2 flex flex-col md:bg-[#111B21] border-r-slate-800 border-r-[1px]"
+                    className="bg-gray-800 text-gray-50 h-full p-6 flex flex-col md:bg-[#111B21] border-r-slate-800 border-r-[1px]"
                 >
                     {/* <section className="m-3">
                 <h1>{user ? "@" + user.name : "Welcome guest!"}</h1>
-                <ClientButton user={user} />
             </section>
 
             {user && (
@@ -120,12 +115,27 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                     </section>
                 </>
             )} */}
+                    <div>
+                        {user ? (
+                            <button
+                                onClick={() =>
+                                    signOut({
+                                        callbackUrl: "/Home/Login",
+                                    })
+                                }
+                            >
+                                Sign Out
+                            </button>
+                        ) : (
+                            <CustomLink href="/Login">Sign In</CustomLink>
+                        )}
+                    </div>
 
-                    <Container className="flex flex-col flex-1 p-2">
+                    <section className="flex flex-col flex-1 gap-6">
                         <MenuItem
                             text="Home"
                             href="/"
-                            icon={<HomeOutlinedIcon />}
+                            icon={<HomeOutlinedIcon className="w-8 h-8" />}
                         />
 
                         {user && (
@@ -136,7 +146,7 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                     <img
                                         src={`data:${user?.img.mimetype};base64,${user?.img.blob}`}
                                         alt="Profile Picture"
-                                        className="w-6 h-6 rounded-full"
+                                        className="w-8 h-8 rounded-full object-cover"
                                     />
                                 }
                             />
@@ -144,7 +154,7 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                         <MenuItem
                             text="Shop"
                             href="/Shop"
-                            icon={<StorefrontIcon />}
+                            icon={<StorefrontIcon className="w-8 h-8" />}
                         />
 
                         {user && user.role == "Mod" && (
@@ -152,7 +162,9 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 text="Moderator Dashboard"
                                 href="/Moderator"
                                 type="a"
-                                icon={<ManageAccountsIcon />}
+                                icon={
+                                    <ManageAccountsIcon className="w-8 h-8" />
+                                }
                             />
                         )}
                         {user && (user.role == "SMM" || user.role == "Mod") && (
@@ -160,7 +172,9 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 text="SMM Dashboard"
                                 href="/SMM"
                                 type="a"
-                                icon={<SupervisorAccountIcon />}
+                                icon={
+                                    <SupervisorAccountIcon className="w-8 h-8" />
+                                }
                             />
                         )}
                         <button
@@ -168,25 +182,34 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 setSecondaryMenuType("search");
                                 setSecondaryMenuOpen(!secondaryMenuOpen);
                             }}
-                            className="flex flex-row gap-1 items-center text-lg mt-3 cursor-pointer"
+                            className="flex flex-row gap-1 items-center text-lg mt-5 cursor-pointer"
                         >
-                            <SearchOutlined />
+                            <SearchOutlined className="w-8 h-8" />
                             <span className="hidden xl:block">Search</span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                handleClickOpen();
+                            }}
+                            className="flex flex-row gap-1 items-center text-lg mt-5 cursor-pointer"
+                        >
+                            <AddBoxOutlinedIcon className="w-8 h-8" />
+                            <span className="hidden xl:block">New Squeal</span>
                         </button>
                         <button
                             onClick={() => {
                                 setSecondaryMenuType("notifications");
                                 setSecondaryMenuOpen(!secondaryMenuOpen);
                             }}
-                            className="flex flex-row gap-1 items-center text-lg mt-3 cursor-pointer"
+                            className="flex flex-row gap-1 items-center text-lg mt-5 cursor-pointer"
                         >
-                            <NotificationsNoneIcon />
+                            <NotificationsNoneIcon className="w-8 h-8" />
                             <span className="hidden xl:block">
                                 Notifications
                             </span>
                         </button>
-                    </Container>
-                    <Container className="flex flex-col mb-1 p-2">
+                    </section>
+                    <section className="flex flex-col mb-1">
                         <div>
                             <button
                                 type="button"
@@ -196,19 +219,19 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 }}
                                 className="flex flex-row items-center gap-1 text-lg"
                             >
-                                <MenuIcon />
+                                <MenuIcon className="w-8 h-8" />
                                 <span className="hidden xl:block">More</span>
                             </button>
                         </div>
-                    </Container>
+                    </section>
                 </motion.div>
                 {secondaryMenuOpen && (
                     <>
                         <motion.div
                             key="secondary-menu"
                             exit={{ opacity: 0 }}
-                            // onClick={() => setSecondaryMenuOpen(false)}
-                            className="absolute top-0 right-0 h-full w-[300px] p-2 rounded-r-2xl text-slate-50 bg-[#111B21] z-[-1] border-solid secondary-menu border-r-slate-800 border-r-[1px]"
+                            //onClick={() => setSecondaryMenuOpen(false)}
+                            className="absolute top-0 right-0 h-full w-[300px] p-2 rounded-r-2xl text-gray-50 bg-[#111B21] z-[-1] border-solid secondary-menu border-r-slate-800 border-r-[1px]"
                         >
                             {secondaryMenus[secondaryMenuType]}
                         </motion.div>
@@ -219,6 +242,14 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                     </>
                 )}
             </AnimatePresence>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <SquealCreator />
+            </Dialog>
         </div>
     );
 };

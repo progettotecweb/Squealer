@@ -7,6 +7,7 @@ interface CustomLinkProps {
     className?: string;
     newTab?: boolean;
     innerClassName?: string;
+    outerComponent?: "div" | "span";
 }
 
 /**
@@ -24,13 +25,22 @@ const CustomLink: React.FC<CustomLinkProps> = ({
     className,
     innerClassName,
     newTab = false,
+    outerComponent = "div",
 }) => {
     const LinkComponent = type === "Link" ? Link : "a";
+    const OuterComponent = outerComponent === "div" ? "div" : "span";
 
     return (
-        <div className={`hover:text-slate-300 ${className}`}>
-            <LinkComponent href={href} target={newTab ? "_blank" : "_self"} rel={newTab ? "noreferrer noopener" : ""} className={innerClassName}>{children}</LinkComponent>
-        </div>
+        <OuterComponent className={`hover:text-gray-300 ${className}`}>
+            <LinkComponent
+                href={href}
+                target={newTab ? "_blank" : "_self"}
+                rel={newTab ? "noreferrer noopener" : ""}
+                className={innerClassName}
+            >
+                {children}
+            </LinkComponent>
+        </OuterComponent>
     );
 };
 

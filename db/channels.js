@@ -87,3 +87,13 @@ exports.getAllChannels = async function () {
     const channels = await Channel.find({}).populate("owner_id", "name");
     return channels;
 }
+
+exports.getAllChannelsByFollowerID = async function (id) {
+    const channels = await Channel.find({ recipients: id }).populate("owner_id", "name");
+    return channels;
+}
+
+exports.getOfficialChannels = async function () {
+    const channels = await Channel.find({ official: true }, "_id");
+    return channels;
+}

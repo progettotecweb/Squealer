@@ -53,18 +53,18 @@
 
 - [ ] Accounting
   - [x] creazione account
-  - [ ] cambio password
+  - [x] cambio password
   - [ ] reset password
-  - [ ] eliminazione account
+  - [x] eliminazione account
   - [x] tipo di account: normale, <span class="orange">verificato</span>, professional, moderator.
   - [ ] scelta di un social media manager, rimozione SMM (sia utente che SMM devono essere professional).
   - [ ] <span class="orange">aquisto caratteri aggiuntivi giornalieri, settimanali, mensili (solo per verificati e PRO)</span>
   - [ ] <span class="orange">acquisto di canali personalizzati</span>
   - [ ] <span class="orange">aggiunta di amministratori a canali privati</span>
-- [ ] LETTURA SENZA LOGIN: solo canali ufficiali squealer
+- [x] LETTURA SENZA LOGIN: solo canali ufficiali squealer
 - [ ] LETTURA CON LOGIN: 
-  - [ ] feed con messaggi personali, canali a cui sono iscritto, canali ufficiali.
-  - [ ] solo destinatari § o #, mai @.
+  - [x] feed con messaggi personali, canali a cui sono iscritto, canali ufficiali.
+  - [x] destinarati @, § e #.
   - [x] ricerca per canale, keyword e menzione (corpo del testo).
   - [x] Reazioni: like, dislike, love, hate.
   - [ ] Iscrizione e rimozione da canali non ufficiali a scelta dell'utente.

@@ -77,15 +77,14 @@ user.value.then((data: any) => {
   </footer>
 </template>
 
-<style >
-
-header{
-  background-color: #374e64;
-  color: aliceblue;
+<style>
+header {
+    background-color: #374e64;
+    color: aliceblue;
 }
-.logo{
-  width: 30pt;
-  height: 30pt;
+.logo {
+    width: 30pt;
+    height: 30pt;
 }
 .AppBtn{
   background-color: #374e64;
@@ -94,5 +93,4 @@ header{
   border-radius: 5px;
   padding: 5px;
 }
-
-</style>      
+</style>

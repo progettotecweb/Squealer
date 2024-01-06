@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const default_img = require("../utils/default_image.json")
+const default_img = require("../utils/default_image.json");
 const bcrypt = require("bcrypt");
 const usersDB = require("../db/users");
+const channelsDB = require("../db/channels");
 
 router.post("/register", async (req, res) => {
     const user = await usersDB.searchUserByName(req.body.username);
@@ -20,14 +21,16 @@ router.post("/register", async (req, res) => {
     //hash password with salt and bcrypt
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
+    const officialChannels = await channelsDB.getOfficialChannels();
+
     const newUser = {
         name: req.body.username,
         password: hashedPassword,
         salt: salt,
-        img: default_img,
+        img: req.body.img || default_img,
+        bio: req.body.bio,
+        following: officialChannels,
     };
-
-    console.log(newUser);
 
     await usersDB.createNewUser(newUser);
 
@@ -40,14 +43,27 @@ router.post("/login", async (req, res) => {
     const user = await usersDB.searchUserByName(req.body.username);
 
     if (!user) {
-        res.status(401).json({
+        res.status(400).json({
             ok: false,
             error: "Username not found",
         });
         return;
     }
 
-    if (!bcrypt.compare(req.body.password, user.password)) {
+    // bcrypt.compare(req.body.password, user.password, (err, result) => {
+    //     if (err || !result) {
+    //         res.status(400).json({
+    //             ok: false,
+    //             error: "Wrong password",
+    //         });
+    //         return;
+    //     }
+    // })
+
+    const secondTry = bcrypt.compareSync(req.body.password, user.password);
+    console.log("second try: " + secondTry);
+
+    if (!secondTry) {
         res.status(400).json({
             ok: false,
             error: "Wrong password",
@@ -137,7 +153,7 @@ router.put("/:id", async (req, res) => {
         msg_quota: req.body.msg_quota,
         popularity: req.body.popularity,
         following: req.body.following,
-        squeals: req.body.squeals
+        squeals: req.body.squeals,
     };
 
     await usersDB.updateUser(req.params.id, updatedUser);
@@ -146,5 +162,83 @@ router.put("/:id", async (req, res) => {
         ok: true,
     });
 });
+
+router.put("/:id/edit", async (req, res) => {
+    const user = await usersDB.searchUserByID(req.params.id);
+    if (!user) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    const updatedUser = {
+        img: req.body.img,
+        bio: req.body.bio,
+    };
+
+    console.log(req.body);
+
+    if (req.body.newPassword) {
+        const matches = bcrypt.compareSync(req.body.oldPassword, user.password);
+        if (!matches) {
+            res.status(400).json({
+                ok: false,
+                error: "Wrong password",
+            });
+            return;
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        //hash password with salt and bcrypt
+        const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+        updatedUser.password = hashedPassword;
+        updatedUser.salt = salt;
+    }
+
+    console.log(updatedUser);
+
+    await usersDB.updateUser(req.params.id, updatedUser);
+
+    res.status(200).json({
+        ok: true,
+    });
+});
+
+// feed
+router.get("/:id/feed", async (req, res) => {
+    const user = await usersDB.searchUserByID(req.params.id);
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    if (!user) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    const feed = await usersDB.getFeed(user, page, limit);
+    res.status(200).json(feed);
+});
+
+router.delete("/:id", async (req, res) => {
+    const user = await usersDB.searchUserByID(req.params.id);
+    if (!user) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    await usersDB.deleteUser(req.params.id);
+
+    res.status(200).json({
+        ok: true,
+    });
+})
 
 module.exports = router;

@@ -36,4 +36,9 @@ router.get("/search", async (req, res) => {
     }
 })
 
+router.get("/globalFeed", async (req, res) => {
+    const feed = await squealsDB.getGlobalFeed()
+    res.json(feed)
+})
+
 module.exports = router;

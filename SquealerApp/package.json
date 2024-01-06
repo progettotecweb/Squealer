@@ -20,6 +20,7 @@
     "react-select": "^5.7.7",
     "react-webcam": "^7.2.0",
     "reactjs-popup": "^2.0.6",
+    "regexify-string": "^1.0.19",
     "swr": "^2.2.4"
   },
   "engines": {

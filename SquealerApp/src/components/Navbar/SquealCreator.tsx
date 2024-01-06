@@ -8,20 +8,6 @@ import Camera from "./Camera";
 import Geolocation from "./Geolocation";
 import { useSWRConfig } from "swr";
 
-const MAX_LEN = 50;
-
-const Counter: React.FC<{ current_len: number }> = ({ current_len }) => {
-    const color =
-        MAX_LEN - current_len < MAX_LEN ? "text-red-500" : "text-slate-50";
-
-    return (
-        <div className="text-center">
-            <span className={`${color}`}>{MAX_LEN - current_len}</span>
-            <span>/{MAX_LEN}</span>
-        </div>
-    );
-};
-
 const SquealCreator = () => {
     interface Content {
         text: string | null;
@@ -100,7 +86,7 @@ const SquealCreator = () => {
             if (res.status === 200) {
                 mutate(`/api/squeals/${session?.user.id}`);
             }
-        })
+        });
 
         setMessage("");
         setContent({
@@ -241,8 +227,9 @@ const SquealCreator = () => {
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-grey-500 p-4 md:bg-[#111B21] md:rounded-lg md:mb-2">
+        <div className="flex flex-col h-full w-full bg-gray-500 p-4 md:bg-[#111B21]">
             <AsyncSelect
+                className="text-gray-700"
                 isMulti
                 cacheOptions
                 value={selected}
@@ -266,8 +253,6 @@ const SquealCreator = () => {
                     });
                 }}
             />
-
-            <Counter current_len={message.length} />
             <Tabs onTabChange={handleTabChange}>
                 <Tab
                     label="Text"
@@ -280,7 +265,9 @@ const SquealCreator = () => {
                                         id="repeat"
                                         name="repeat"
                                         checked={repeatMessage}
-                                        onChange={() => setRepeatMessage(!repeatMessage)}
+                                        onChange={() =>
+                                            setRepeatMessage(!repeatMessage)
+                                        }
                                     />
                                     <label htmlFor="repeat">Repeat</label>
                                     {repeatMessage && (
@@ -296,7 +283,7 @@ const SquealCreator = () => {
                                                         e.target.value
                                                     );
                                                 }}
-                                                className="text-slate-700"
+                                                className="text-gray-700"
                                             />
                                             <label htmlFor="repeat">
                                                 Cron job
@@ -305,13 +292,12 @@ const SquealCreator = () => {
                                     )}
                                 </p>
                                 <motion.textarea
-                                    maxLength={MAX_LEN}
                                     //onChange={(e) => { setMessage(e.target.value) }}
                                     onChange={handleContent}
                                     value={message}
                                     id="message"
-                                    rows={4}
-                                    className="block p-2.5 w-full text-sm bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"
+                                    rows={5}
+                                    className="block p-2.5 w-full text-sm bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="What's happening?"
                                 ></motion.textarea>
                             </form>

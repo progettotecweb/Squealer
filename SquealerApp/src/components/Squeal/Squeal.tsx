@@ -6,8 +6,6 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Avatar from "@mui/material/Avatar";
 
-import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
-import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
@@ -16,17 +14,32 @@ import { useState } from "react";
 import GeolocationSqueal from "./GeolocationSqueal";
 import { useSWRConfig } from "swr";
 import { useInView } from "react-cool-inview";
+import { Skeleton } from "@mui/material";
+import CustomLink from "../CustomLink";
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import regexifyString from "regexify-string";
+import Link from "next/link";
 
 function formatDate(date) {
     const d = new Date(date);
-    const month = d.getMonth(); //+1
-    const day = d.getDate();
+    const month = (d.getMonth() + 1).toString(); //+1
+    const day = d.getDate().toString().padStart(2, "0");
     const year = d.getFullYear();
-    const hour = d.getHours();
-    const minutes = d.getMinutes();
+    const hour = d.getHours().toString().padStart(2, "0");
+    const minutes = d.getMinutes().toString().padStart(2, "0");
     const seconds = d.getSeconds();
 
-    return day + "/" + month + "/" + year + " " + hour + ":" + minutes;
+    return (
+        day +
+        "/" +
+        month.padStart(2, "0") +
+        "/" +
+        year +
+        " " +
+        hour +
+        ":" +
+        minutes
+    );
 }
 
 export interface SquealProps {
@@ -63,38 +76,76 @@ export interface SquealProps {
     };
     squealData: any;
     className?: string;
+    recipients?: [
+        {
+            name: string;
+            id: string;
+            type: "Channel" | "User" | "Keyword";
+        }
+    ];
 }
-
-const formatText = (text: string) => {
-    if (!text) return "";
-
-    // substite mentions with a span with custom class
-    const mentions = text.match(/@\w+/g);
-    if (mentions)
-        mentions.forEach((mention) => {
-            text = text.replace(
-                mention,
-                `<span class="text-blue-400">${mention}</span>`
-            );
-        });
-    // substitute hashtags with a span with custom class
-    const hashtags = text.match(/#\w+/g);
-    if (hashtags)
-        hashtags.forEach((hashtag) => {
-            text = text.replace(
-                hashtag,
-                `<span class="text-blue-400">${hashtag}</span>`
-            );
-        });
-
-    return text;
-};
 
 const SquealText = (props: { text: string }) => {
     return (
         <Typography variant="body2" className="text-lg">
-            <div dangerouslySetInnerHTML={{ __html: formatText(props.text) }} />
+            {regexifyString({
+                pattern: /@\w+|#\w+/g,
+                decorator: (match, index) => {
+                    const link = match.startsWith("@");
+
+                    return link ? (
+                        <CustomLink
+                            href={`/Users/${match.slice(1)}`}
+                            key={index}
+                            outerComponent="span"
+                            className="text-blue-400"
+                        >
+                            {match}
+                        </CustomLink>
+                    ) : (
+                        <span key={index} className="text-blue-400">
+                            {match}
+                        </span>
+                    );
+                },
+                input: props.text,
+            })}
         </Typography>
+    );
+};
+
+export const SquealSkeleton = () => {
+    return (
+        <Card className={" mx-2 bg-gray-800 text-gray-50 shadow-none"}>
+            <CardHeader
+                avatar={
+                    <Skeleton
+                        variant="circular"
+                        animation="wave"
+                        height={32}
+                        width={32}
+                    />
+                }
+                title={
+                    <Skeleton
+                        variant="text"
+                        animation="wave"
+                        className="w-[40%]"
+                    />
+                }
+                subheader={
+                    <Skeleton
+                        variant="text"
+                        animation="wave"
+                        className="w-[25%]"
+                    />
+                }
+            />
+            <CardContent>
+                <Skeleton variant="rectangular" animation="wave" height={80} />
+                <Skeleton animation="wave" />
+            </CardContent>
+        </Card>
     );
 };
 
@@ -107,10 +158,11 @@ const Squeal: React.FC<SquealProps> = ({
     id,
     squealData,
     className,
+    recipients,
 }) => {
     const [reactions_, setReactions] = useState(reactions);
 
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
 
     const { observe } = useInView({
         threshold: [0.2, 0.4, 0.6, 0.8, 1],
@@ -169,25 +221,53 @@ const Squeal: React.FC<SquealProps> = ({
 
     return (
         <Card
-            className={` mx-2 bg-slate-800 text-slate-50 shadow-none ${className}`}
+            className={` mx-2 ${className}`}
+            classes={{
+                root: "bg-gray-800 text-gray-50 shadow-none"
+            }}
             ref={observe}
         >
+            <div className="flex flex-row p-2 gap-2">
+                {recipients?.map((recipient, index) => {
+                    return (
+                        <span className="text-blue-400 bg-gray-700 p-2 rounded-xl " key={index}>
+                            {recipient.type === "Channel"
+                                ? "§"
+                                : recipient.type === "User"
+                                ? "@"
+                                : recipient.type === "Keyword"
+                                ? "#"
+                                : ""}
+                            {recipient.name}
+                        </span>
+                    );
+                })}
+            </div>
             <CardHeader
                 disableTypography
                 avatar={
                     <Avatar
                         aria-label="recipe"
-                        className="bg-[#111B21] text-slate-50"
+                        className="bg-[#111B21] text-gray-50"
                     >
                         <img
-                            src={`data:${owner?.img.mimetype};base64,${owner?.img.blob}`}
+                            src={`data:${owner?.img?.mimetype};base64,${owner?.img?.blob}`}
+                            alt="Profile Picture"
                         />
                     </Avatar>
                 }
                 title={
-                    <Typography className="mr-auto">@{owner?.name}</Typography>
+                    <CustomLink href={`/Users/${owner?.name}`}>
+                        <Typography className="mr-auto">
+                            @{owner?.name}
+                        </Typography>
+                    </CustomLink>
                 }
-                subheader={<Typography>{formatDate(date)}</Typography>}
+                subheader={
+                    <Typography className="text-gray-400">
+                        {formatDate(date)}
+                    </Typography>
+                }
             />
             <CardContent className="text-left">
                 {(() => {
@@ -233,10 +313,11 @@ const Squeal: React.FC<SquealProps> = ({
                 })()}
             </CardContent>
             <CardActions
-                className="text-slate-50 fill-slate-50 p-0"
+                className="text-gray-50 fill-slate-50 p-0"
                 disableSpacing
             >
                 <SquealButton
+                    disabled={status === "unauthenticated"}
                     onClick={() =>
                         updateSquealReaction(id, "m2", session?.user.id)
                     }
@@ -244,6 +325,7 @@ const Squeal: React.FC<SquealProps> = ({
                     😡 {reactions_.m2}
                 </SquealButton>
                 <SquealButton
+                    disabled={status === "unauthenticated"}
                     onClick={() =>
                         updateSquealReaction(id, "m1", session?.user.id)
                     }
@@ -251,6 +333,7 @@ const Squeal: React.FC<SquealProps> = ({
                     😒 {reactions_.m1}
                 </SquealButton>
                 <SquealButton
+                    disabled={status === "unauthenticated"}
                     onClick={() =>
                         updateSquealReaction(id, "p1", session?.user.id)
                     }
@@ -258,6 +341,7 @@ const Squeal: React.FC<SquealProps> = ({
                     😄 {reactions_.p1}
                 </SquealButton>
                 <SquealButton
+                    disabled={status === "unauthenticated"}
                     onClick={() =>
                         updateSquealReaction(id, "p2", session?.user.id)
                     }
@@ -265,16 +349,16 @@ const Squeal: React.FC<SquealProps> = ({
                     😝 {reactions_.p2}
                 </SquealButton>
 
-                <div className="ml-auto">
-                    impressions: {squealData?.impressions}
+                <div className="ml-auto mr-4">
+                    {squealData?.impressions} <RemoveRedEyeOutlinedIcon />
                 </div>
             </CardActions>
             {!squealData.isAReply && (
                 <SquealReplyier session={session} parent={squealData} />
             )}
-            <div className="flex flex-row p-2">
+            <div className="flex flex-row p-2 w-full">
                 <div className="border-l-2 border-l-solid" />
-                <section className="flex flex-col gap-2">
+                <section className="flex flex-col gap-2 w-full">
                     {squealData?.replies?.map((reply) => (
                         <Squeal
                             key={reply._id}
@@ -311,7 +395,12 @@ const SquealReplyier = (props: { parent; session }) => {
                     video: null,
                     geolocation: null,
                 },
-                recipients: [...props.parent.recipients],
+                //remove _id from recipients
+                recipients: [
+                    ...props.parent.recipients.map((r) => {
+                        return { id: r.id, type: r.type };
+                    }),
+                ],
                 isAReply: true,
                 replyingTo: props.parent._id,
             }),
@@ -320,6 +409,7 @@ const SquealReplyier = (props: { parent; session }) => {
             },
         }).then((res) => {
             mutate(`/api/squeals/${props.session.user.id}`);
+            mutate(`/api/squeals/${props.session.user.id}/feed`);
         });
 
         setReply("");
@@ -328,19 +418,22 @@ const SquealReplyier = (props: { parent; session }) => {
     return (
         <CardActions>
             <input
-                className="w-full bg-slate-700 rounded-md text-slate-50 p-2"
+                name="reply"
+                className="w-full bg-gray-700 rounded-md text-gray-50 p-2"
                 placeholder="Reply..."
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
+                disabled={!props.session}
             />
             <SquealButton
+                disabled={!props.session}
                 aria-label="share"
                 className="ml-auto"
                 onClick={() => {
                     submitReply();
                 }}
             >
-                <ReplyOutlinedIcon className="text-slate-50" />
+                <ReplyOutlinedIcon className="text-gray-50" />
             </SquealButton>
         </CardActions>
     );
@@ -350,10 +443,15 @@ const SquealButton = (props: {
     children: React.ReactNode;
     onClick?: () => void;
     className?: string;
+    disabled?: boolean;
 }) => {
     return (
         <motion.div whileHover={{ scale: 1.1 }} className={props.className}>
-            <IconButton className="text-slate-50" onClick={props.onClick}>
+            <IconButton
+                className="text-gray-50 disabled:text-gray-50"
+                onClick={props.onClick}
+                disabled={props.disabled}
+            >
                 {props.children}
             </IconButton>
         </motion.div>

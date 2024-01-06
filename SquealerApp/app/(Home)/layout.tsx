@@ -18,10 +18,10 @@ export default function GeneralLayout({
     return (
         <>
             <div className="flex flex-row">
-                <div className="hidden md:block md:h-screen md:z-[1001] md:sticky md:top-0 md:col-span-1 xl:col-span-2">
+                <div className="hidden md:block md:h-screen md:z-[1001] md:sticky md:top-0">
                     <Menu />
                 </div>
-                <main className="md:col-span-3 xl:col-span-10 w-full">
+                <main className="w-full">
                     <Header />
                     <LayoutWrapper>{children}</LayoutWrapper>
                 </main>

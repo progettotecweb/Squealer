@@ -17,10 +17,17 @@ const SubscriptionModel = mongoose.model("Subscription", Subscription);
 exports.SubscriptionModel = SubscriptionModel;
 
 exports.saveSubscriptionToDb = async (subscription, user) => {
+    
     const sub = new SubscriptionModel({
         subscription,
         user
     });
+
+    const existingSub = await SubscriptionModel.findOne({ subscription: subscription });
+    if (existingSub) {
+        return existingSub;
+    }
+
     return await sub.save();
 }
 

@@ -7,7 +7,7 @@ export default function NotificationMenu() {
 
     if (status === "unauthenticated") return <div>You need to log in!</div>;
 
-    if (isLoading) return <div className="text-slate-50">Loading...</div>;
+    if (isLoading) return <div className="text-gray-50">Loading...</div>;
 
     //sort array into three different arrays: today, this week, this month
     //sort array into three different arrays: today, this week, this month
@@ -46,7 +46,7 @@ export default function NotificationMenu() {
             {today.length > 0 && (
                 <div className="flex flex-col">
                     <h2 className="text-md">Today</h2>
-                    {today.map((notif, index) => (
+                    {today.reverse().map((notif, index) => (
                         <Notification notif={notif} key={index} />
                     ))}
                 </div>
@@ -54,7 +54,7 @@ export default function NotificationMenu() {
             {thisWeek.length > 0 && (
                 <div className="flex flex-col">
                     <h2 className="text-md">This Week</h2>
-                    {thisWeek.map((notif, index) => (
+                    {thisWeek.reverse().map((notif, index) => (
                         <Notification notif={notif} key={index} />
                     ))}
                 </div>
@@ -62,7 +62,7 @@ export default function NotificationMenu() {
             {thisMonth.length > 0 && (
                 <div className="flex flex-col">
                     <h2 className="text-md">This Month</h2>
-                    {thisMonth.map((notif, index) => (
+                    {thisMonth.reverse().map((notif, index) => (
                         <Notification notif={notif} key={index} />
                     ))}
                 </div>
@@ -76,7 +76,7 @@ const Notification = ({ notif }: any) => (
         <img
             src={`data:${notif.author?.img.mimetype};base64,${notif.author?.img.blob}`}
             alt="Profile Picture"
-            className="w-8 h-8 rounded-full"
+            className="w-8 h-8 rounded-full object-cover"
         />
         <p className="text-sm">{notif.text}</p>
 
