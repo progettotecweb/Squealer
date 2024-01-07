@@ -90,16 +90,7 @@ exports.searchUserByID = async function (id) {
     return user;
 };
 
-exports.searchUserByIDAndPopulateSqueals = async function (id) {
-        const user = await User.findById(id).populate({
-            path: 'squeals',
-            select: 'content reactions replies impressions controversial',
-            
-            
-        });
-        return user;
-    
-};
+
 
 exports.searchUserByName = async function (name) {
     const user = await User.findOne({ name: name }).populate(

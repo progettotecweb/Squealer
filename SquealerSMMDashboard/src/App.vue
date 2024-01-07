@@ -30,7 +30,7 @@ user.value.then((data: any) => {
         <img src="/public/squealer.png" alt="squealer-logo" class="img-fluid logo" />
       </div>
       <div class="d-none d-lg-block">
-        <a class="AppBtn" href="">Bottone</a>
+        <a href=""><button class="AppBtn">Bottone</button></a>
       </div>
     </div>
 
@@ -41,16 +41,15 @@ user.value.then((data: any) => {
       <div class="col-12 col-md-3 col-xl-2 sidebar d-none d-lg-block">
         <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
         <p>@{{ user.name }}</p>
-        <a class="AppBtn" href="/"><h4>Home</h4></a>
+        <a href="/home"><button class="AppBtn ">Home</button></a>
       </div>
 
       <main 
       class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 flex flex-col justify-center items-center text-center text-w undefined text-slate-50"
       role="main">
-        <h1>Dashboard</h1>
         <div>
           <div v-if="active_name != null">
-            <button class="AppBtn" @click="active_name = null">Back</button>
+            <button class="AppBtn " @click="active_name = null">Back</button>
           </div>
           <div v-if="active_name == null" class="d-flex justify-content-around flex-wrap " > <!-- si vede se variabile Name == NULL-->
               <user_boxs
@@ -71,10 +70,6 @@ user.value.then((data: any) => {
 
     </div>
   </div>
-  <footer class="py-4 py-md-4 bg-dark fixed-bottom d-none d-lg-block">
-    <div class="container py-4 py-md-4 px-4 px-md-3">
-    </div>
-  </footer>
 </template>
 
 <style>

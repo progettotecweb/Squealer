@@ -1,6 +1,4 @@
 // fetch.js
-//import { ref } from 'vue'
-
 
 
 export async function getUserData() {
@@ -55,8 +53,10 @@ export async function getMyData(url: string) {
     return userInfo;
 }
 
-export async function getMyDataAndPopulate(url: string) {
-    const userInfo = await fetch("/api/users/squeals/" + url, {
+
+
+export async function getSquealData(url: string) {
+    const userInfo = await fetch("/api/squeals/info/" + url, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
