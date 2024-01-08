@@ -19,13 +19,14 @@ squeal.value.then((data: any) => {
 
 
 <template>
-    <div class="squeal-box container">
+
+
+
+    <div class="squeal-box container text-start">
         <div class="row">
-            <div class="col-1" id="squeal-user-img">
-                    <img v-if="waiting == false"   :src="`data:${squeal.ownerID.img.mimetype};base64,${squeal.ownerID.img.blob}`" alt="user-img" class="img-fluid img-thumbnail"/> 
-            </div>
-            <div class="col-11">
-                <p v-if="waiting == false"> {{ squeal.ownerID.name }} </p>
+            
+            <div class="col-6">
+                <p v-if="waiting == false"> @{{ squeal.ownerID.name }} </p>
                 <p v-if="waiting == false"> {{ squeal.date }} </p>
             </div>
 
@@ -51,14 +52,11 @@ squeal.value.then((data: any) => {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
+            align-items: left;
             color: aliceblue;
         }
     
-        #squeal-user-img{
-            width: 60px;
-            height: 60px;
-        }
+       
 
 </style>
 

@@ -48,7 +48,7 @@ user.value.then((data: any) => {
       class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 flex flex-col justify-center items-center text-center text-w undefined text-slate-50"
       role="main">
         <div>
-          <div v-if="active_name != null">
+          <div class="container text-end" v-if="active_name != null">
             <button class="AppBtn " @click="active_name = null">Back</button>
           </div>
           <div v-if="active_name == null" class="d-flex justify-content-around flex-wrap " > <!-- si vede se variabile Name == NULL-->
@@ -57,7 +57,7 @@ user.value.then((data: any) => {
                   :id="account"
                   @click="active_name = account"></user_boxs>
           </div>
-          <div v-if="active_name != null" class="d-flex justify-content-around flex-wrap "><!--componente con info degli account, si vede se variabile name == nome valido -->
+          <div v-if="active_name != null" class="d-flex justify-content-around flex-wrap "><!--componente con info degli account, si vede se variabile name == nome utente-->
             <user_profile :id="active_name"></user_profile> 
             <!--https://vuejs.org/api/sfc-script-setup.html-->
           </div>

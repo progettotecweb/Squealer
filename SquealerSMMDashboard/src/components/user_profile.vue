@@ -27,24 +27,58 @@ user.value.then((data: any) => {
 
 
 <template>
-    <div class="w-100 container" >
+    <div class="w-100 container  text-start" >
         <div class="row">
-            <img class="col-2" v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 80px; height: 80px;"/>
-            <p class="col-2">{{ user.name }}</p>
-            <h3 class="col-12">new post: </h3>
+
+            <div class="col-3">
+                <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 80px; height: 80px;"/>
+            </div>
+
+            <div class="col-3">
+                <h6>@{{ user.name }}</h6>
+                <h6>popularity: {{ user.popularity }}</h6>
+                <h6>followers (TODO)</h6>
+                
+
+            </div>
+
+            <div class="col-3">
+                <h6 v-if="waiting == false">posts: {{ user.squeals.length }}</h6>
+                
+            </div>
+
+            <div class="col-3">
+                <h6>remaining characters</h6>
+                <h6>daily:{{ user.msg_quota.daily }} </h6>
+                <h6>weekly:{{ user.msg_quota.weekly }} </h6>
+                <h6>monthly:{{ user.msg_quota.monthly }} </h6>     
+            </div>
+
         </div>
-        
-        <squeal_box class="row" v-for="squeal in user_squeals"  
-                    :id="squeal">
-        </squeal_box>
-        <!--squils fatti -->
-        <!--clicca uno squils per vedere le statistiche --> 
-        <!-- acuista caratteri-->  
+
+        <div class="row">
+            <button class="AppBtn col-auto" @click="">
+                create new post
+            </button>
+            <button class="AppBtn col-auto" @click="">
+                buy characters
+            </button>
+        </div >
+        <div class="container ">
+            <squeal_box class="m-3" v-for="squeal in user_squeals"  
+                        :id="squeal">
+            </squeal_box>
+            <!--clicca uno squils per vedere le statistiche --> 
+            <!-- acuista caratteri-->  
+        </div>
     </div>
 </template>
 
 <style>
 
+.squeal-box{
+    margin: auto;
+}
 
 </style>
 
