@@ -5,6 +5,8 @@
 :root {
     --tw-bg-opacity: 1;
     background-color: rgb(17 27 33 / var(--tw-bg-opacity));
+
+    scroll-behavior: smooth;
 }
 
 .MuiCardHeader-content {

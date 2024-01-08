@@ -87,7 +87,7 @@ export interface SquealProps {
 
 const SquealText = (props: { text: string }) => {
     return (
-        <Typography variant="body2" className="text-lg">
+        <p className="text-md ml-4 mt-2">
             {regexifyString({
                 pattern: /@\w+|#\w+/g,
                 decorator: (match, index) => {
@@ -110,7 +110,7 @@ const SquealText = (props: { text: string }) => {
                 },
                 input: props.text,
             })}
-        </Typography>
+        </p>
     );
 };
 
@@ -220,17 +220,17 @@ const Squeal: React.FC<SquealProps> = ({
     };
 
     return (
-        <Card
-            className={` mx-2 ${className}`}
-            classes={{
-                root: "bg-gray-800 text-gray-50 shadow-none"
-            }}
+        <div
+            className={`${className} flex flex-col bg-gray-800 text-gray-50 shadow-none mx-2 p-4 rounded-md gap-2 `}
             ref={observe}
         >
-            <div className="flex flex-row p-2 gap-2">
+            <div className="flex flex-row gap-2 text-md">
                 {recipients?.map((recipient, index) => {
                     return (
-                        <span className="text-blue-400 bg-gray-700 p-2 rounded-xl " key={index}>
+                        <span
+                            className="text-blue-400 bg-gray-700 py-1 px-4 rounded-xl "
+                            key={index}
+                        >
                             {recipient.type === "Channel"
                                 ? "§"
                                 : recipient.type === "User"
@@ -243,33 +243,36 @@ const Squeal: React.FC<SquealProps> = ({
                     );
                 })}
             </div>
-            <CardHeader
-                disableTypography
-                avatar={
-                    <Avatar
-                        aria-label="recipe"
-                        className="bg-[#111B21] text-gray-50"
-                    >
-                        <img
-                            src={`data:${owner?.img?.mimetype};base64,${owner?.img?.blob}`}
-                            alt="Profile Picture"
-                        />
-                    </Avatar>
-                }
-                title={
-                    <CustomLink href={`/Users/${owner?.name}`}>
-                        <Typography className="mr-auto">
-                            @{owner?.name}
-                        </Typography>
-                    </CustomLink>
-                }
-                subheader={
+            <div className="flex gap-2 items-center">
+                <Avatar
+                    aria-label="recipe"
+                    className="bg-[#111B21] text-gray-50 border-solid border-2 border-gray-200"
+                >
+                    <img
+                        src={
+                            owner
+                                ? `data:${owner?.img?.mimetype};base64,${owner?.img?.blob}`
+                                : "/deleted.webp"
+                        }
+                        alt="Profile Picture"
+                    />
+                </Avatar>
+                <div className="flex flex-col items-start">
+                    {owner ? (
+                        <CustomLink href={`/Users/${owner?.name}`}>
+                            <Typography className="mr-auto">
+                                @{owner?.name}
+                            </Typography>
+                        </CustomLink>
+                    ) : (
+                        <Typography className="mr-auto text-gray-400">user deleted</Typography>
+                    )}
                     <Typography className="text-gray-400">
                         {formatDate(date)}
                     </Typography>
-                }
-            />
-            <CardContent className="text-left">
+                </div>
+            </div>
+            <div className="text-left">
                 {(() => {
                     switch (type) {
                         case "text":
@@ -311,11 +314,8 @@ const Squeal: React.FC<SquealProps> = ({
                             return;
                     }
                 })()}
-            </CardContent>
-            <CardActions
-                className="text-gray-50 fill-slate-50 p-0"
-                disableSpacing
-            >
+            </div>
+            <div className="text-gray-50 fill-slate-50 flex items-center text-sm ">
                 <SquealButton
                     disabled={status === "unauthenticated"}
                     onClick={() =>
@@ -352,29 +352,31 @@ const Squeal: React.FC<SquealProps> = ({
                 <div className="ml-auto mr-4">
                     {squealData?.impressions} <RemoveRedEyeOutlinedIcon />
                 </div>
-            </CardActions>
+            </div>
             {!squealData.isAReply && (
                 <SquealReplyier session={session} parent={squealData} />
             )}
-            <div className="flex flex-row p-2 w-full">
-                <div className="border-l-2 border-l-solid" />
-                <section className="flex flex-col gap-2 w-full">
-                    {squealData?.replies?.map((reply) => (
-                        <Squeal
-                            key={reply._id}
-                            id={reply._id}
-                            type={reply.type}
-                            content={reply.content}
-                            owner={reply.ownerID}
-                            date={reply.datetime}
-                            reactions={reply.reactions}
-                            squealData={reply}
-                            className="w-full"
-                        />
-                    ))}
-                </section>
-            </div>
-        </Card>
+            {squealData?.replies?.length > 0 && (
+                <div className="flex flex-row w-full">
+                    <div className="border-l-2 border-l-solid" />
+                    <section className="flex flex-col gap-2 w-full">
+                        {squealData?.replies?.map((reply) => (
+                            <Squeal
+                                key={reply._id}
+                                id={reply._id}
+                                type={reply.type}
+                                content={reply.content}
+                                owner={reply.ownerID}
+                                date={reply.datetime}
+                                reactions={reply.reactions}
+                                squealData={reply}
+                                className="w-full p-1"
+                            />
+                        ))}
+                    </section>
+                </div>
+            )}
+        </div>
     );
 };
 
@@ -416,7 +418,7 @@ const SquealReplyier = (props: { parent; session }) => {
     };
 
     return (
-        <CardActions>
+        <div className="flex">
             <input
                 name="reply"
                 className="w-full bg-gray-700 rounded-md text-gray-50 p-2"
@@ -435,7 +437,7 @@ const SquealReplyier = (props: { parent; session }) => {
             >
                 <ReplyOutlinedIcon className="text-gray-50" />
             </SquealButton>
-        </CardActions>
+        </div>
     );
 };
 
@@ -446,9 +448,12 @@ const SquealButton = (props: {
     disabled?: boolean;
 }) => {
     return (
-        <motion.div whileHover={{ scale: 1.1 }} className={props.className}>
+        <motion.div
+            whileHover={{ scale: 1.1 }}
+            className={`${props.className} text-sm flex items-center`}
+        >
             <IconButton
-                className="text-gray-50 disabled:text-gray-50"
+                className="text-gray-50 disabled:text-gray-50 text-md"
                 onClick={props.onClick}
                 disabled={props.disabled}
             >

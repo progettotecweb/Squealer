@@ -32,7 +32,14 @@ router.post("/register", async (req, res) => {
         following: officialChannels,
     };
 
-    await usersDB.createNewUser(newUser);
+    
+
+    const u = await usersDB.createNewUser(newUser);
+
+    officialChannels.forEach(async (channel) => {
+        channel.followers.push(u._id);
+        await channel.save();
+    });
 
     res.status(200).json({
         ok: true,
@@ -61,7 +68,6 @@ router.post("/login", async (req, res) => {
     // })
 
     const secondTry = bcrypt.compareSync(req.body.password, user.password);
-    console.log("second try: " + secondTry);
 
     if (!secondTry) {
         res.status(400).json({

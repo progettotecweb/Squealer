@@ -1,12 +1,14 @@
 import { useState } from "react";
 
 import Tabs, { Tab, AnimatedTabContent } from "@/components/Tabs/Tabs";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import AsyncSelect from "react-select/async";
 import { useSession } from "next-auth/react";
 import Camera from "./Camera";
 import Geolocation from "./Geolocation";
-import { useSWRConfig } from "swr";
+import useSWR, { useSWRConfig } from "swr";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Squeal, { SquealSkeleton } from "../Squeal/Squeal";
 
 const SquealCreator = () => {
     interface Content {
@@ -48,6 +50,10 @@ const SquealCreator = () => {
     const { data: session } = useSession();
     const [activeTabNumber, setActiveTabNumber] = useState<number>(0);
 
+    const { data: user } = useSWR(
+        session ? `/api/users/${session?.user.id}` : null
+    );
+
     const handleTabChange = (index: number) => {
         //setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");
         switch (index) {
@@ -66,9 +72,14 @@ const SquealCreator = () => {
         }
     };
 
+    const [squealPostStatus, setSquealPostedLoading] =
+        useState<string>("not-posted");
+
+    const [newSqueal, setNewSqueal] = useState<any>(null);
+
     const submitSqueal = async (e) => {
         e.preventDefault();
-
+        setSquealPostedLoading("posting");
         fetch("/api/squeals/post", {
             method: "POST",
             body: JSON.stringify({
@@ -84,8 +95,14 @@ const SquealCreator = () => {
             },
         }).then((res) => {
             if (res.status === 200) {
-                mutate(`/api/squeals/${session?.user.id}`);
+                //mutate(`/api/squeals/${session?.user.id}`);
+                
             }
+            return res.json()
+        }).then((res) => {
+            setNewSqueal(res.squeal)
+            setSquealPostedLoading("posted");
+            mutate(`/api/users/${session?.user.id}`)
         });
 
         setMessage("");
@@ -226,157 +243,232 @@ const SquealCreator = () => {
         });
     };
 
+    const getContentSize = () => {
+        if (type === "text") return message.length;
+
+        return 125;
+    };
+
     return (
-        <div className="flex flex-col h-full w-full bg-gray-500 p-4 md:bg-[#111B21]">
-            <AsyncSelect
-                className="text-gray-700"
-                isMulti
-                cacheOptions
-                value={selected}
-                onChange={onChange}
-                onInputChange={(inputValue) => {
-                    setQuery(inputValue);
-                }}
-                loadOptions={async (inputValue) => {
-                    const res = await fetch(`/api/search?q=${inputValue}`);
-                    const data = await res.json();
-                    return data.results.map((res) => {
-                        return {
-                            value: {
-                                type: query.startsWith("@")
-                                    ? "User"
-                                    : "Channel",
-                                id: res.id,
-                            },
-                            label: res.name,
-                        };
-                    });
-                }}
-            />
-            <Tabs onTabChange={handleTabChange}>
-                <Tab
-                    label="Text"
-                    content={
-                        <AnimatedTabContent>
-                            <form name="squeal-post" className="md:h-[10vh]">
-                                <p>
-                                    <input
-                                        type="checkbox"
-                                        id="repeat"
-                                        name="repeat"
-                                        checked={repeatMessage}
-                                        onChange={() =>
-                                            setRepeatMessage(!repeatMessage)
-                                        }
-                                    />
-                                    <label htmlFor="repeat">Repeat</label>
-                                    {repeatMessage && (
-                                        <p>
-                                            <input
-                                                type="text"
-                                                id="repeat"
-                                                name="repeat"
-                                                placeholder="Cron job"
-                                                value={repetitionExpr}
-                                                onChange={(e) => {
-                                                    setRepetitionExpr(
-                                                        e.target.value
-                                                    );
-                                                }}
-                                                className="text-gray-700"
-                                            />
-                                            <label htmlFor="repeat">
-                                                Cron job
-                                            </label>
-                                        </p>
+        <>
+            <motion.div className="flex flex-col h-full w-full bg-gray-500 p-4 md:bg-[#111B21]" layout>
+                <motion.div className="flex flex-col" layout>
+                    <Counter
+                        quota={user?.msg_quota.daily}
+                        length={getContentSize()}
+                        maxLength={1000}
+                    />
+                    <Counter
+                        quota={user?.msg_quota.weekly}
+                        length={getContentSize()}
+                        maxLength={6000}
+                    />
+                    <Counter
+                        quota={user?.msg_quota.monthly}
+                        length={getContentSize()}
+                        maxLength={24000}
+                    />
+                </motion.div>
+                <AsyncSelect
+                    className="text-gray-700"
+                    isMulti
+                    cacheOptions
+                    value={selected}
+                    onChange={onChange}
+                    onInputChange={(inputValue) => {
+                        setQuery(inputValue);
+                    }}
+                    loadOptions={async (inputValue) => {
+                        const res = await fetch(`/api/search?q=${inputValue}`);
+                        const data = await res.json();
+                        return data.results.map((res) => {
+                            return {
+                                value: {
+                                    type: query.startsWith("@")
+                                        ? "User"
+                                        : "Channel",
+                                    id: res.id,
+                                },
+                                label: res.name,
+                            };
+                        });
+                    }}
+                />
+                <Tabs onTabChange={handleTabChange}>
+                    <Tab
+                        label="Text"
+                        content={
+                            <AnimatedTabContent>
+                                <form name="squeal-post" className="">
+                                    <p>
+                                        <input
+                                            type="checkbox"
+                                            id="repeat"
+                                            name="repeat"
+                                            checked={repeatMessage}
+                                            onChange={() =>
+                                                setRepeatMessage(!repeatMessage)
+                                            }
+                                        />
+                                        <label htmlFor="repeat">Repeat</label>
+                                        {repeatMessage && (
+                                            <p>
+                                                <input
+                                                    type="text"
+                                                    id="repeat"
+                                                    name="repeat"
+                                                    placeholder="Cron job"
+                                                    value={repetitionExpr}
+                                                    onChange={(e) => {
+                                                        setRepetitionExpr(
+                                                            e.target.value
+                                                        );
+                                                    }}
+                                                    className="text-gray-700"
+                                                />
+                                                <label htmlFor="repeat">
+                                                    Cron job
+                                                </label>
+                                            </p>
+                                        )}
+                                    </p>
+                                    <motion.textarea
+                                        //onChange={(e) => { setMessage(e.target.value) }}
+                                        onChange={handleContent}
+                                        value={message}
+                                        id="message"
+                                        rows={4}
+                                        className="block p-2.5 w-full text-sm bg-gray-600 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        placeholder="What's happening?"
+                                    ></motion.textarea>
+                                </form>
+                            </AnimatedTabContent>
+                        }
+                    />
+                    <Tab
+                        label="Image"
+                        content={
+                            <AnimatedTabContent>
+                                <div className="flex justify-center">
+                                    <Camera onCapture={handleCapture} />
+                                    {img && (
+                                        <img
+                                            className="rounded-lg imgPreview ml-24"
+                                            src={img}
+                                        />
                                     )}
-                                </p>
-                                <motion.textarea
-                                    //onChange={(e) => { setMessage(e.target.value) }}
-                                    onChange={handleContent}
-                                    value={message}
-                                    id="message"
-                                    rows={5}
-                                    className="block p-2.5 w-full text-sm bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    placeholder="What's happening?"
-                                ></motion.textarea>
-                            </form>
-                        </AnimatedTabContent>
-                    }
-                />
-                <Tab
-                    label="Image"
-                    content={
-                        <AnimatedTabContent>
-                            <div className="flex justify-center">
-                                <Camera onCapture={handleCapture} />
-                                {img && (
-                                    <img
-                                        className="rounded-lg imgPreview ml-24"
-                                        src={img}
-                                    />
-                                )}
-                            </div>
-                            <p className="mt-4 mb-4">OR</p>
-                            <input
-                                className="md:h-[10vh]"
-                                accept="image/*"
-                                id="icon-button-file"
-                                type="file"
-                                capture="environment"
-                                onChange={(e) => {
-                                    handleContent(e);
-                                }}
-                            />
-                        </AnimatedTabContent>
-                    }
-                />
-                <Tab
-                    label="Video"
-                    content={
-                        <AnimatedTabContent>
-                            <div className="flex justify-center">
-                                {video && (
-                                    <video
-                                        className="rounded-lg imgPreview ml-24"
-                                        src={video}
-                                        controls={true}
-                                    />
-                                )}
-                            </div>
-                            <p className="mt-4 mb-4">OR</p>
-                            <input
-                                className="md:h-[10vh]"
-                                accept="video/*"
-                                id="icon-button-file"
-                                type="file"
-                                capture="environment"
-                                onChange={(e) => {
-                                    handleContent(e);
-                                }}
-                            />
-                        </AnimatedTabContent>
-                    }
-                />
-                <Tab
-                    label="Geolocation"
-                    content={
-                        <AnimatedTabContent>
-                            <Geolocation onLocation={handleLocation} />
-                        </AnimatedTabContent>
-                    }
-                />
-            </Tabs>
-            <div className="flex justify-between items-center mt-4">
-                <button
-                    type="submit"
-                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                    onClick={submitSqueal}
-                >
-                    Post
-                </button>
-            </div>
-        </div>
+                                </div>
+                                <p className="mt-4 mb-4">OR</p>
+                                <input
+                                    className="md:h-[10vh]"
+                                    accept="image/*"
+                                    id="icon-button-file"
+                                    type="file"
+                                    capture="environment"
+                                    onChange={(e) => {
+                                        handleContent(e);
+                                    }}
+                                />
+                            </AnimatedTabContent>
+                        }
+                    />
+                    <Tab
+                        label="Video"
+                        content={
+                            <AnimatedTabContent>
+                                <div className="flex justify-center">
+                                    {video && (
+                                        <video
+                                            className="rounded-lg imgPreview ml-24"
+                                            src={video}
+                                            controls={true}
+                                        />
+                                    )}
+                                </div>
+                                <p className="mt-4 mb-4">OR</p>
+                                <input
+                                    className="md:h-[10vh]"
+                                    accept="video/*"
+                                    id="icon-button-file"
+                                    type="file"
+                                    capture="environment"
+                                    onChange={(e) => {
+                                        handleContent(e);
+                                    }}
+                                />
+                            </AnimatedTabContent>
+                        }
+                    />
+                    <Tab
+                        label="Geolocation"
+                        content={
+                            <AnimatedTabContent>
+                                <Geolocation onLocation={handleLocation} />
+                            </AnimatedTabContent>
+                        }
+                    />
+                </Tabs>
+                <div className="flex justify-between items-center mt-4">
+                    <button
+                        type="submit"
+                        className="items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                        onClick={submitSqueal}
+                    >
+                        Post
+                    </button>
+                </div>
+            </motion.div>
+            <motion.div layout>
+
+            {squealPostStatus === "posting" ? <SquealSkeleton />: squealPostStatus === "posted"? <Squeal 
+                squealData={newSqueal}
+                type={newSqueal.type}
+                id={newSqueal._id}
+                content={newSqueal.content}
+                owner={newSqueal?.ownerID}
+                date={newSqueal?.datetime}
+                reactions={newSqueal?.reactions}
+                recipients={newSqueal?.recipients}
+                
+                /> : ""}
+            </motion.div>
+        </>
+    );
+};
+
+const Counter = (props: {
+    quota: number;
+    length: number;
+    maxLength: number;
+}) => {
+    return (
+        <motion.div
+            className="text-2xl text-gray-50 flex justify-center gap-1"
+            layoutRoot
+            layout
+        >
+            <motion.span
+                layout
+                className={`${props.length > 0 ? "text-gray-400" : ""}`}
+            >
+                {props.quota}
+            </motion.span>
+            <AnimatePresence mode="popLayout">
+                {props.length > 0 && (
+                    <motion.span
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <ArrowForwardIcon />
+                        {props.quota - props.length}
+                    </motion.span>
+                )}
+            </AnimatePresence>
+            <motion.span layout> / </motion.span>
+            <motion.span layout>{props.maxLength}</motion.span>
+        </motion.div>
     );
 };
 
