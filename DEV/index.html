@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DEV</title>
+    <script >
+        window.onload = function() {
+        const tableRows = document.querySelectorAll('table tbody tr');
+        let doneTasks = 0;
+    
+        tableRows.forEach(row => {
+            const statusCell = row.cells[2];
+            if (statusCell && statusCell.textContent.trim() === '✅') {
+                doneTasks++;
+            }
+        });
+    
+        const tasksCount = tableRows.length - 4;
+        const tasksLeft = tasksCount - doneTasks;
+    
+    
+        const tasksDoneSpan = document.getElementById('done-tasks');
+        tasksDoneSpan.textContent = doneTasks;
+        const TotalTasksSpan = document.getElementById('total-tasks');
+        TotalTasksSpan.textContent = tasksCount;
+    
+        const tasksLeftSpan = document.getElementById('tasks-left');
+        tasksLeftSpan.textContent = tasksLeft;
+    
+        // count the tasks done per owner (column 2; the owner is inside a span tag)
+        const owner = document.querySelectorAll('table tbody tr td:nth-child(2) span');
+        const ownerMap = new Map();
+        owner.forEach(owner => {
+            if (ownerMap.has(owner.textContent)) {
+                ownerMap.set(owner.textContent, ownerMap.get(owner.textContent) + 1);
+            } else {
+                ownerMap.set(owner.textContent, 1);
+            }
+        });
+    
+        // add the owner tasks done to the table
+        const table = document.getElementById('table-owners');
+        const tfoot = document.createElement('tfoot');
+        const tfootRow = document.createElement('tr');
+        const tfootTitle = document.createElement('td');
+        tfootTitle.textContent = 'Owner';
+        const tfootTasks = document.createElement('td');
+        tfootTasks.textContent = 'Tasks Done';
+        const tfootPercentage = document.createElement('td');
+        tfootPercentage.textContent = 'Percentage';
+        tfootRow.appendChild(tfootTitle);
+        tfootRow.appendChild(tfootTasks);
+        tfootRow.appendChild(tfootPercentage);
+        tfoot.appendChild(tfootRow);
+    
+        ownerMap.forEach((value, key) => {
+            const row = document.createElement('tr');
+            const ownerCell = document.createElement('td');
+            ownerCell.textContent = key;
+            const tasksCell = document.createElement('td');
+            tasksCell.textContent = value;
+            const percentageCell = document.createElement('td');
+            percentageCell.textContent = Math.round(value / tasksCount * 100) + '%';
+            row.appendChild(ownerCell);
+            row.appendChild(tasksCell);
+            row.appendChild(percentageCell);
+            tfoot.appendChild(row);
+        });
+    
+        table.appendChild(tfoot);
+    
+        
+        //count the obligatory tasks
+        const obligatory = document.getElementsByClassName('green')
+        const optional = document.getElementsByClassName('orange')
+        
+        const optionalTasks = optional.length;
+        const obligatoryTasks =  tableRows.length - 4 - optionalTasks
+    
+        // count the number of tasks done per type
+        // a task is optional if it has the class orange (in column 1) while it's status is on column 3
+        // a task is obligatory if it has the class green (in column 1) while it's status is on column 3
+    
+        // select all rows that have a span with class orange in column 1 and a status of ✅ in column 3
+    
+        const selectedRows = Array.from(tableRows).filter(row => {
+            const column1Span = row.cells[0].querySelector('span.orange');
+            const column3Status = row.cells[2]
+                ? row.cells[2].textContent.trim()
+                : null;
+            return column1Span && column3Status === '✅';
+        });
+        
+        const optionalTasksDone = selectedRows.length;
+    
+        const obligatoryTasksDone = doneTasks - optionalTasksDone;
+    
+    
+        const typeTasksTable = document.getElementById('table-tasks');
+        const tfootType = document.createElement('tfoot');
+        const tfootTypeRow = document.createElement('tr');
+        const tfootTypeTitle = document.createElement('td');
+        tfootTypeTitle.textContent = 'Type';
+        const tfootTypeTasks = document.createElement('td');
+        tfootTypeTasks.textContent = 'Tasks Done';
+        const tfootTypePercentage = document.createElement('td');
+        tfootTypePercentage.textContent = 'Percentage';
+        tfootTypeRow.appendChild(tfootTypeTitle);
+        tfootTypeRow.appendChild(tfootTypeTasks);
+        tfootTypeRow.appendChild(tfootTypePercentage);
+        tfootType.appendChild(tfootTypeRow);
+    
+        const obligatoryRow = document.createElement('tr');
+        const obligatoryCell = document.createElement('td');
+        obligatoryCell.textContent = 'Obligatory';
+        const obligatoryTasksCell = document.createElement('td');
+        obligatoryTasksCell.textContent = `${obligatoryTasksDone} / ${obligatoryTasks}`;
+        const obligatoryPercentageCell = document.createElement('td');
+        obligatoryPercentageCell.textContent = Math.round(obligatoryTasksDone / obligatoryTasks * 100) + '%';
+        obligatoryRow.appendChild(obligatoryCell);
+        obligatoryRow.appendChild(obligatoryTasksCell);
+        obligatoryRow.appendChild(obligatoryPercentageCell);
+        tfootType.appendChild(obligatoryRow);
+    
+        const optionalRow = document.createElement('tr');
+        const optionalCell = document.createElement('td');
+        optionalCell.textContent = 'Optional';
+        const optionalTasksCell = document.createElement('td');
+        optionalTasksCell.textContent = `${optionalTasksDone} / ${optionalTasks}`
+        const optionalPercentageCell = document.createElement('td');
+        optionalPercentageCell.textContent = Math.round(optionalTasksDone / optionalTasks * 100) + '%';
+        optionalRow.appendChild(optionalCell);
+        optionalRow.appendChild(optionalTasksCell);
+        optionalRow.appendChild(optionalPercentageCell);
+        tfootType.appendChild(optionalRow);
+    
+        typeTasksTable.appendChild(tfootType);
+    }
+    </script>
+    <style>
+        body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        background-color: #424242;
+        color: gainsboro;
+        margin: 0;
+        padding: 1rem;
+    }
+    
+    .green {
+        color: rgba(0, 218, 0, 0.733);
+    }
+    
+    .orange {
+        color: orange;
+    }
+    
+    .owner {
+        padding: 2px 1rem;
+        border-radius: 1rem;
+        background-color: #f5f5f5;
+        color: black;
+    }
+    
+    .owner + .owner {
+        margin-left: 1rem;
+    }
+    
+    .subtitle {
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: left;
+    }
+    
+    table {
+        border-collapse: collapse;
+        border: 2px solid rgb(200, 200, 200);
+        letter-spacing: 1px;
+        font-size: 0.8rem;
+    }
+    td,
+    th {
+        border: 1px solid rgb(190, 190, 190);
+        padding: 10px 20px;
+    }
+    caption {
+        padding: 10px;
+    }
+    
+    tr > td:nth-child(1) {
+        width: 60%;
+    }
+    </style>
+</head>
+<body>
+    <h1>TASKLIST</h1>
+
+    <h2>Done tasks: <span id="done-tasks"></span>/<span id="total-tasks"></span></h2>
+
+    <h2>Tasks to do: <span id="tasks-left"></span></h2>
+
+    <table id="table-tasks"></table>
+    <div style="padding: 1rem"></div>
+
+    <table id="table-owners"></table>
+
+    <div style="padding: 1rem"></div>
+
+
+
+
+<table>
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Owner</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="subtitle" colspan="3">GENERALE</td></tr>
+      <tr>
+        <td>Numero massimo di caratteri, controllo prima di postare</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>meccanismo per resettare giornalmente / settimanalmente / mensilmente i counter</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Destinatari (singolo utente, canale, tutti (pubblico))</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Squeal contiene testo, immagine (125 caratteri), geolocazione (125 caratteri)</td>
+        <td><span class="owner">GIANLO</span></span><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><span class="green">quota parametrica da essere modificata velocemente</span></td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><span class="orange">possibilità da parte dell'utente che finisce i caratteri mentre digita di usare un certo numero di chars extra da pagare in seguito</span></td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>messaggi a privati (utenti) non consumano quota e sono sempre disponibili</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>l'utente può comprare chars extra oppure ottenendo apprezzamenti dal pubblico. Reazioni negative diminuiscono la quota</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>Destinatari dei messaggi: @ per gli utenti, §canale per i canali di proprietà degli utenti, §CANALE per i canali di proprietà di squealer, # per le keywords</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Canali ufficiali obbligatori: §CONTROVERSIAL, §TRENDING, §NEWS, §TOP_1000, etc.</td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><span class="orange">alcuni canali non sono mai silenziabili</span></td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>Impressioni; numero di utenti, registrati o meno che hanno visualizzato uno squeal.</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Reazioni agli squeal: ne abbiamo 4</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Massa critica: 0.25* numero di visualizzazioni. Se le reazioni positive sono maggiori della massa critica, lo squeal viene etichettato come "popolare"; se le reazioni negative sono maggiori della massa critica, lo squeal viene etichettato come "impopolare"; se sia le reazioni positive che quelle negative superano la massa critica, lo squeal viene etichettato come "controverso".</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Ogni tot messaggi popolari l'utente vede incrementata la sua quota; ogni tot messaggi impopolari l'utente vede decrementata la sua quota (ogni 3, ogni 5, da decidere). Gli squeal controversi non influenzano la quota ma appaiono nel canale §CONTROVERSIAL.</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>
+          Metadati di uno squeal
+        <ul>
+          <li> Corpo del messaggio (testo | immagine | video | geolocazione),</li>
+          <li>Destinatari (individui | canali | keywords), </li>
+          <li>data e ora di creazione, </li>
+          <li>reazioni positive</li>
+          <li>reazioni negative</li>
+          <li>categoria (popolare | impopolare | controverso | messaggio privato | messaggio pubblico)</li>
+          <li>numero di visualizzazioni</li>
+          <li>canali a cui appartiene</li>
+        </ul>
+        </ul></td>
+        <td><span class="owner">GIANLO</span></span><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Messaggi automatici e da sorgenti esterne
+        <ul>
+          <li>messaggi temporizzati (qua ci sta da lavora se vogliamo una cosa fatta per bene)</li>
+          <li><span class="orange">News lette da APi pubbliche</span></li>
+          <li><span class="orange">Immagini casuali tipo da unsplash</span></li>
+          <li><span class="orange">Pagine casuali da wikipedia</span></li>
+          <li>costruzione dinamica di mappe con squeal geolocalizzati emessi ogni tot minuti</li>
+          <li>servizi social con georeferenziazione (tipo dov'è il mio taxi/bus, caccia al tesoro, etc.)</li>
+        </ul>
+        </td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr><td class="subtitle" colspan="3">APP</td></tr>
+      <tr>
+        <td>Accounting</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>creazione account</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>cambio password</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>reset password</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>eliminazione account</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>tipo di account: normale, <span class="orange">verificato</span>, professional, moderator.</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>scelta di un social media manager, rimozione SMM (sia utente che SMM devono essere professional).</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td><span class="orange">aquisto caratteri aggiuntivi giornalieri, settimanali, mensili (solo per verificati e PRO)</span></td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td><span class="orange">acquisto di canali personalizzati</span></td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><span class="orange">aggiunta di amministratori a canali privati</span></td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>LETTURA SENZA LOGIN: solo canali ufficiali squealer</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>LETTURA CON LOGIN:</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>feed con messaggi personali, canali a cui sono iscritto, canali ufficiali.</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>destinarati @, § e #.</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>ricerca per canale, keyword e menzione (corpo del testo).</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Reazioni: like, dislike, love, hate.</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Iscrizione e rimozione da canali non ufficiali a scelta dell'utente.</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>SCRITTURA (SOLO LOGIN):</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>Creazione di un nuovo squeal (testo, immagine <span class="orange">da fotocamera</span>, geolocazione).</td>
+        <td><span class="owner">GIANLO</span></span><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Risposte a Squeal altrui (condivide destinatari e reazioni(???))</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+          <td>Counter sempre aggiornati con caratteri residui.</td>
+          <td><span class="owner">GIANLO</span></td>
+          <td>✅</td>
+      </tr>
+      <tr>
+        <td>Specifica dei destinatari (§canale, @utente, #keyword).</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+          <td>Ripetizione del messaggio ogni tot secondi (con parti variabili, beep acustico ad ogni ripetizione)</td>
+          <td><span class="owner">GIANLO</span></td>
+          <td>✅</td>
+      </tr>
+      <tr><td class="subtitle" colspan="3">MODERATOR DASHBOARD</td></tr>
+      <tr>
+        <td>Elencare utenti e filtrare per nome, tipo e popolarità.</td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Possibilità di bloccare e sbloccare utenti.</td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Possibilità di aumentare e diminuire la quota di caratteri di un utente.</td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Elencare Squeal e filtrare per utente, mittente, data e destinatari.</td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Possiilità di cambiare i destinatari (aggiungere canali ufficiali).</td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><span class="green">Possibilità di cambiare il numero di reazioni positive e negative</span></td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><span class="orange">Moderazione di canali privati: elencare canali privati e filtrarli per proprietari, numero di post, popolarità . Cambiare i proprietari e il nome del canale. Bloccare un canale</span></td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>Elencare canali ufficiali, aggiungerne di nuovi, cambiare la descrizione. Aggiungere uno squeal ad un canale ufficiale.</td>
+        <td><span class="owner">ENRI</td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><span class="orange">Aggiungere una regola che attribuisce automaticamente un post ad un canale se soddisfa un certo criterio.</span></td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr><td class="subtitle" colspan="3">SOCIAL MEDIA MANAGER DASHBOARD</td></tr>
+      <tr>
+        <td>sia VIP che SMM devono essere account pro</td>
+        <td><span class="owner">SIMO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td><span class="orange">SMM può gestire diversi account VIP</span></td>
+        <td><span class="owner">SIMO</span></td>
+        <td>✅</td>
+      </tr>
+      <tr>
+        <td>SMM posta squeal a nome e per conto del VIP.</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>Statistiche sugli squeal postati dal SMM (visualizzazioni, reazioni, squeal a rischio impopolarità/controversia, etc).</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td><span class="orange">SMM può acquistare caratteri extra per i VIP</span></td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td><span class="orange">Grafici con andamenti dei post dei VIP</span></td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td><span class="green">Geolocazione fittizia per i VIP</span></td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr><td class="subtitle" colspan="3">REQUISITI DI PROGETTO</td></tr>
+      <tr>
+        <td>Database già pienotto</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>6 account: fv, fvPro, fvSMM, fvMod + 2 di tipo pro (il primo molto popolare, il secondo molto impopolare); fvPro e gli altri due pro sono gestiti da fvSMM</td>
+        <td></td>
+        <td>❌</td>
+      </tr>
+      <tr>
+        <td>ACCESSIBILITÀ: il sito deve essere accessibile a persone con disabilità visive e motorie</td>
+        <td></td>
+        <td>❌</td>
+    </tbody>
+  </table>
+</body>
+</html>

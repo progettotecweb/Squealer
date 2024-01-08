@@ -89,53 +89,16 @@
 
 ## SOCIAL MEDIA MANAGER DASHBOARD
 
-- [ ] sia VIP che SMM devono essere account pro
-- [ ] <span class="orange">SMM può gestire diversi account VIP</span>
+- [x] sia VIP che SMM devono essere account pro
+- [x] <span class="orange">SMM può gestire diversi account VIP</span>
 - [ ] SMM posta squeal a nome e per conto del VIP.
 - [ ] Statistiche sugli squeal postati dal SMM (visualizzazioni, reazioni, squeal a rischio impopolarità/controversia, etc).
 - [ ] <span class="orange">SMM può acquistare caratteri extra per i VIP</span>
 - [ ] <span class="orange">Grafici con andamenti dei post dei VIP</span>
-- [ ] <span class="green">Geolocazione fittizia per i VIP</span>
+- [ ] <span class="green">Geolocazione fittizia per i VIP ????????</span>
 
 ## REQUISITI DI PROGETTO
 
 - [ ] <span class="green">Database già pienotto</span>
 - [ ] <span class="green">6 account: fv, fvPro, fvSMM, fvMod + 2 di tipo pro (il primo molto popolare, il secondo molto impopolare); fvPro e gli altri due pro sono gestiti da fvSMM</span>
 - [ ] <span class="green">ACCESIBILITÀ</span>
-
-
-## IDEE OPZIONALI
-
-- [ ] Sequenza di registrazione dove scegli username, descrizione del profilo, immagine, etc...
-
-
-
-## TODO TODAY 23/12
-
-- [ ] Finire profilo utente
-  - [x] guarda quali messaggi automatici hai attivi, possibilità di disattivarli.
-  - [x] contatore following
-  - [ ] contatore followers ???????
-  - [ ] possibilità di cancellare o modificare il profilo (pass, description)
-
-- [x] Risposte agli squeal
-  - [x] UI per rispondere ad uno squeal
-  - [x] backend per rispondere ad uno squeal
-
-## TODO TODAY 24/12
-
-- [x] Modifica delle variabili degli squeal
-  - [X] aggiornamento automatico della CM e del label
-
-- [X] Impression degli squeal
-
-## TODO TODAY 26/12
-
-- [x] push notifications (opzionali)
-  
-- [ ] finire pagina profilo
-  - [ ] cambia password, immagine profilo, descrizione profilo
-  - [ ] cancella profilo
-  - [ ] compra abbonamento vip
-  - [ ] compra caratteri extra
-- [ ] tutte le robe dei canali (aggiungere acquisto canale privato, aggiungi amministratore) (da fare prima le robe sopra)
