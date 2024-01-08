@@ -181,6 +181,7 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
     // get all squeals that have only the user as a recipient
 
     // get all squeals of followed channels (the output should be a single array of squeals)
+    try {
     const followedChannelsSqueals = await Channel.aggregate([
         {
             $match: {
@@ -246,10 +247,18 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
             $lookup: {
                 from: "users",
                 // Assuming the users collection contains the user data
-                localField: "squeals.ownerID",
-                foreignField: "_id",
                 as: "squeals.ownerID",
+                let: { temp: "$squeals.ownerID" },
+
                 pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ["$_id", "$$temp"],
+                            },
+                        },
+                        
+                    },
                     {
                         $project: {
                             name: 1,
@@ -274,10 +283,17 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
             $lookup: {
                 from: "squeals",
                 // Assuming the replies collection contains the reply data
-                localField: "squeals.replies",
-                foreignField: "_id",
+                let: { "temp": "$squeals.replies"},
                 as: "squeals.replies",
                 pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $in: ["$_id", "$$temp"],
+                            },
+                        },
+                        
+                    },
                     {
                         $project: {
                             type: 1,
@@ -294,10 +310,16 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                     {
                         $lookup: {
                             from: "users",
-                            localField: "ownerID",
-                            foreignField: "_id",
+                            let: { ownerID: "$ownerID" },
                             as: "ownerID",
                             pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $eq: ["$_id", "$$ownerID"],
+                                        },
+                                    },
+                                },
                                 {
                                     $project: {
                                         name: 1,
@@ -316,10 +338,16 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
         {
             $lookup: {
                 from: "keywords",
-                localField: "squeals.recipients.id",
-                foreignField: "_id",
+                let: { "temp": "$squeals.recipients.id" },
                 as: "squeals.recipientsFromCollection1",
                 pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $in: ["$_id", "$$temp"],
+                            },
+                        },
+                    },
                     {
                         $project: {
                             name: 1,
@@ -333,10 +361,16 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
         {
             $lookup: {
                 from: "users",
-                localField: "squeals.recipients.id",
-                foreignField: "_id",
+                let: { temp: "$squeals.recipients.id" },
                 as: "squeals.recipientsFromCollection2",
                 pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $in: ["$_id", "$$temp"],
+                            },
+                        },
+                    },
                     {
                         $project: {
                             name: 1,
@@ -350,10 +384,16 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
         {
             $lookup: {
                 from: "channels",
-                localField: "squeals.recipients.id",
-                foreignField: "_id",
+                let: { temp: "$squeals.recipients.id" },
                 as: "squeals.recipientsFromCollection3",
                 pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $in: ["$_id", "$$temp"],
+                            },
+                        },
+                    },
                     {
                         $project: {
                             name: 1,
@@ -440,7 +480,10 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
 
     const feed = followedChannelsSqueals[0]?.squeals || [];
 
-    return feed;
+    return feed;} catch(e) {
+        console.log(e);
+        res.status(500).json({error: e.message})
+    }
 };
 
 exports.deleteUser = async function (id) {

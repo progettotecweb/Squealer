@@ -213,23 +213,28 @@ create();
 
 function readJsonData(fileName) {
     //console.log("path:", path.resolve("../db/", fileName));
+    const patt = path.join(process.cwd(), "app/db/", fileName);
+    console.log("path:", patt);
     return (jsonData = JSON.parse(
-        fs.readFileSync(path.resolve("../Squealer/db/", fileName))
+        fs.readFileSync(patt)
     ));
 }
 
 async function connectToDB() {
     const uri =
         process.env.NODE_ENV === "production"
-            ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_SITE}/db?writeConcern=majority`
+            ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_SITE}/db?writeConcern=majority&directConnection=true&authSource=admin`
             : `mongodb://127.0.0.1:27017/db?writeConcern=majority`;
+
+            console.log("Connecting to MongoDB..." + (process.env.NODE_ENV === "production" ? " (production)" : "(development)"));
+            console.log("URI: " + uri);
 
     mongoose
         .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
         .then(() => console.log("Connected to MongoDB..."))
         .catch((err) => {
             console.log("Could not connect to MongoDB...", err);
-            exit(1);
+            process.exit(1);
         });
 };
 
@@ -238,12 +243,12 @@ async function create() {
     const db = mongoose.connection;
 
     try {
-        // Elimino le collezione esistenti
-        await db.dropCollection("users");
-        await db.dropCollection("channels");
-        await db.dropCollection("squeals");
-        await db.dropCollection("keywords");
-        await db.dropCollection("subscriptions");
+        // // Elimino le collezione esistenti
+        // await db.dropCollection("users");
+        // await db.dropCollection("channels");
+        // await db.dropCollection("squeals");
+        // await db.dropCollection("keywords");
+        // await db.dropCollection("subscriptions");
 
         //leggo le collezioni
         let usersData = readJsonData("users.json");
