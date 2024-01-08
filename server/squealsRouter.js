@@ -7,6 +7,7 @@ const squealsDB = require("../db/squeals");
 const keywordsDB = require("../db/keywords");
 const webpush = require("web-push");
 const subscriptionsDB = require("../db/subscriptions");
+const conditionsDB = require("../db/conditions");
 let PipelineSingleton;
 
 (async () => {
@@ -111,6 +112,8 @@ router.post("/post", async (req, res) => {
 
     // #TODO: squeal validation
     console.log("squeal", squeal);
+
+    
 
     const owner = await usersDB.searchUserByID(squeal.ownerID);
 
@@ -327,9 +330,20 @@ router.post("/post", async (req, res) => {
 
     await newSqueal.save();
 
+    await conditionsDB.executeAll(newSqueal, ["creation"]);
+
     res.json({
         success: true,
-        squeal: newSqueal,
+        squeal: {
+            
+            ...newSqueal._doc,
+            ownerID: {
+                _id: owner._id,
+                name: owner.name,
+                img: owner.img,
+            
+            },
+        },
     });
 });
 

@@ -82,8 +82,8 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-exports.searchUserByID = async function (id) {
-    const user = await User.findById(id).populate(
+exports.searchUserByID = async function (id, select="") {
+    const user = await User.findById(id, select).populate(
         "notifications.author",
         "name img"
     );

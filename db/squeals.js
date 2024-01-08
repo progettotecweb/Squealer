@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const usersDB = require("./users");
+const conditionsDB = require("./conditions");
 const { Channel } = require("./channels");
 const { CronJob } = require("cron");
 
@@ -190,6 +191,8 @@ exports.getAllSquealsByRecipientID = function (type, recipientID) {
         select: " type ownerID content datetime _id reactions isAReply impressions",
     })
     .exec();
+    
+
     return res;
 };
 
@@ -263,6 +266,8 @@ const MIN_IMPRESSION_COUNT = 10
 
 const updateSquealMetadata = async (squeal) => {
 
+    conditionsDB.executeAll(squeal, ["reaction", "view"])
+
     if (squeal.impressions < MIN_IMPRESSION_COUNT) return;
 
     squeal.cm.Rp = squeal.reactions.p1 + 2 * squeal.reactions.p2;
@@ -286,6 +291,8 @@ const updateSquealMetadata = async (squeal) => {
     if (squeal.cm.Rm > squeal.impressions * 0.25) {
         squeal.cm.label = "impopular";
     }
+
+    
 };
 
 exports.getAllSqueals = async function () {
