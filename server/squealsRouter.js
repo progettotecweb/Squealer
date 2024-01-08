@@ -70,6 +70,20 @@ router.put("/:id", async (req, res) => {
     res.status(200).json({ ok: true });
 });
 
+router.get("/info/:id", async (req, res) => {
+    const squeals = await squealsDB.getSquealByID(req.params.id);
+
+    if (!squeals) {
+        res.status(404).json({
+            ok: false,
+            error: "Squeals not found",
+        });
+        return;
+    }
+
+    res.status(200).json(squeals);
+});
+
 router.put("/reaction/:id", async (req, res) => {
     await squealsDB
         .updateSquealReactionByID(

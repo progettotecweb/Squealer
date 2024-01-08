@@ -90,6 +90,8 @@ exports.searchUserByID = async function (id, select="") {
     return user;
 };
 
+
+
 exports.searchUserByName = async function (name) {
     const user = await User.findOne({ name: name }).populate(
         "notifications.author",

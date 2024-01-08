@@ -1,6 +1,4 @@
 // fetch.js
-//import { ref } from 'vue'
-
 
 
 export async function getUserData() {
@@ -38,6 +36,27 @@ export async function getUserData() {
 
 export async function getMyData(url: string) {
     const userInfo = await fetch("/api/users/" + url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            //console.log(data); 
+            return data;
+        })
+        .catch(err => {
+            console.log(err);
+            //signout();
+        });
+    return userInfo;
+}
+
+
+
+export async function getSquealData(url: string) {
+    const userInfo = await fetch("/api/squeals/info/" + url, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"

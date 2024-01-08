@@ -8,12 +8,18 @@ const active_name = ref<any>(null);
 
 const user = ref<any>(null); 
 const controlled_user = ref<any>(null);
+const waiting = ref(true);
 
-user.value = getUserData();
+
+
+user.value = getUserData()
 user.value.then((data: any) => {
-    user.value = data;
-    controlled_user.value = user.value.controls.user_id;
-});
+  user.value = data
+  controlled_user.value = user.value.controls.user_id
+  waiting.value = false
+})
+
+
 </script>
 
 <template >
@@ -24,7 +30,7 @@ user.value.then((data: any) => {
         <img src="/public/squealer.png" alt="squealer-logo" class="img-fluid logo" />
       </div>
       <div class="d-none d-lg-block">
-        <a class="AppBtn" href="">Bottone</a>
+        <a href=""><button class="AppBtn">Bottone</button></a>
       </div>
     </div>
 
@@ -33,62 +39,37 @@ user.value.then((data: any) => {
     <div class="row flex-xl-nowrap">
       
       <div class="col-12 col-md-3 col-xl-2 sidebar d-none d-lg-block">
-        <img :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
+        <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
         <p>@{{ user.name }}</p>
-        <a class="AppBtn" href="/"><h4>Home</h4></a>
+        <a href="/home"><button class="AppBtn ">Home</button></a>
       </div>
 
       <main 
       class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 flex flex-col justify-center items-center text-center text-w undefined text-slate-50"
       role="main">
-        <h1>Dashboard</h1>
         <div>
+          <div class="container text-end" v-if="active_name != null">
+            <button class="AppBtn " @click="active_name = null">Back</button>
+          </div>
           <div v-if="active_name == null" class="d-flex justify-content-around flex-wrap " > <!-- si vede se variabile Name == NULL-->
               <user_boxs
                   v-for="account in controlled_user"  
                   :id="account"
-                  @click="active_name = account"></user_boxs><!--devo poter cliccare user_boxs e aggiornare name in base a quale clicco-->
+                  @click="active_name = account"></user_boxs>
           </div>
-          <div v-if="active_name != null" class="d-flex justify-content-around flex-wrap "><!--componente con info degli account, si vede se variabile name == nome valido -->
-            <user_profile :id="active_name"></user_profile> <!--quest: devo varicare una user_profile per ogni utente e mostrare dolo qualla giusta o posso caricarle dinamicamente ogni volta che la cambio ? -->
+          <div v-if="active_name != null" class="d-flex justify-content-around flex-wrap "><!--componente con info degli account, si vede se variabile name == nome utente-->
+            <user_profile :id="active_name"></user_profile> 
             <!--https://vuejs.org/api/sfc-script-setup.html-->
           </div>
 
         </div>
-    </header>
-    <div class="container-fluid">
-        <div class="row flex-xl-nowrap">
-            <div class="col-12 col-md-3 col-xl-2 sidebar d-none d-lg-block">
-                <img
-                    :src="`data:${user.img.mimetype};base64,${user.img.blob}`"
-                    alt="user-img"
-                    style="width: 120px; height: 120px"
-                />
-                <p>@{{ user.name }}</p>
-                <a class="btn" href="/"><h4>Home</h4></a>
-            </div>
+      </main>
 
-            <main
-                class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 flex flex-col justify-center items-center text-center text-w undefined text-gray-50"
-                role="main"
-            >
-                <h1>Dashboard</h1>
-                <div>
-                    <div class="d-flex justify-content-around flex-wrap">
-                        <user_box
-                            v-for="account in controlled_user"
-                            :id="account"
-                        ></user_box>
-                    </div>
-                </div>
-            </main>
+      
+      <div class="col d-none d-xl-block col-xl-2 sidebar"></div>
 
-            <div class="col d-none d-xl-block col-xl-2 sidebar"></div>
-        </div>
     </div>
-    <footer class="py-4 py-md-4 bg-dark fixed-bottom d-none d-lg-block">
-        <div class="container py-4 py-md-4 px-4 px-md-3"></div>
-    </footer>
+  </div>
 </template>
 
 <style>

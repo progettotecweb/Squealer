@@ -101,6 +101,8 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(user);
 });
 
+
+
 //get user from name
 router.get("/name/:name", async (req, res) => {
     const user = await usersDB.searchUserByName(req.params.name);
