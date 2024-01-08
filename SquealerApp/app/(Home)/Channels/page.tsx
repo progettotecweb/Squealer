@@ -2,45 +2,60 @@
 
 import CustomLink from "@/components/CustomLink";
 import PageContainer from "@/components/PageContainer";
+import { useSession } from "next-auth/react";
 import useSWR, { Fetcher } from "swr";
 
 interface ChannelProps {
     name: string;
     description: string;
     id: string;
+    session: any;
 }
 
-const followChannel = async (id: string) => {
-    const userData = await fetch("/Home/api/user", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    }).then((res) => res.json());
-    const res = await fetch("/api/channels/follow", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ channelID: id, userID: userData.id }),
-    });
+const ChannelCard = ({ name, description, id, session }: ChannelProps) => {
+    const followOrUnfollow = async (
+        isFollowing: boolean,
+        userid: string,
+        channelid: string
+    ) => {
+        await fetch(`/api/channels/${isFollowing ? "unfollow" : "follow"}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ channelID: channelid, userID: userid }),
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res);
+                mutate();
+            });
+    };
 
-    console.log(res);
-};
-
-const ChannelCard = ({ name, description, id }: ChannelProps) => {
-    return (
-        <div className="w-full border rounded-md flex flex-col gap-2 justify-start items-start p-2">
-            <CustomLink href={`/Channels/${name}`}>{name}</CustomLink>
-            <p>{description}</p>
-            <button
-                onClick={() => followChannel(id)}
-                className="border rounded-md p-2"
-            >
-                Follow
-            </button>
-        </div>
-    );
+    const {
+        data: user,
+        isLoading,
+        mutate,
+    } = useSWR(`/api/users/${session?.user?.id}`);
+    if (!isLoading)
+        return (
+            <div className="w-full rounded-md flex flex-col gap-4 justify-start items-start p-3 bg-gray-800">
+                <CustomLink href={`/Channels/${name}`} className="text-xl">§{name}</CustomLink>
+                <p className="flex-1">{description}</p>
+                {user && <button
+                    onClick={() =>
+                        followOrUnfollow(
+                            user.following.includes(id),
+                            session?.user.id,
+                            id
+                        )
+                    }
+                    className="rounded-md px-4 py-1 bg-gray-700 hover:bg-gray-600 transition-colors self-end"
+                >
+                    {!user.following.includes(id) ? "Follow" : "Unfollow"}
+                </button>}
+            </div>
+        );
 };
 
 const ChannelsPage = () => {
@@ -56,7 +71,9 @@ const ChannelsPage = () => {
         fetcher
     );
 
-    if (isLoading)
+    const { data: session, status } = useSession();
+
+    if (isLoading || status === "loading")
         return (
             <div
                 key="settings"
@@ -74,10 +91,9 @@ const ChannelsPage = () => {
         );
 
     return (
-        <PageContainer key="settings">
-            <h1>Channels</h1>
+        <PageContainer key="settings" className="p-2">
 
-            <div className="flex flex-col w-[80%]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8l w-[80%] ">
                 {data?.results.map((result, i) => {
                     return (
                         <ChannelCard
@@ -85,6 +101,7 @@ const ChannelsPage = () => {
                             name={result.name}
                             description={result.description}
                             id={result._id}
+                            session={session}
                         />
                     );
                 })}

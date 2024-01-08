@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 
 const channelsDB = require("../db/channels");
 const usersDB = require("../db/users");
 const squealsDB = require("../db/squeals");
+
+const { getToken } = require("../SquealerApp/node_modules/next-auth/jwt");
 
 router.get("/", async (req, res) => {
     const channels = await channelsDB.searchChannel("visibility", "public");
@@ -32,12 +35,48 @@ router.post("/follow", async (req, res) => {
                 await user.save();
             }
 
+            res.status(200).json({ ok: true });
             return;
         }
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: err });
     }
+
+    res.status(400).json({ error: "something went bad" });
+});
+
+router.post("/unfollow", async (req, res) => {
+    const channelID = req.body.channelID;
+    const userID = req.body.userID;
+
+    console.log("channelID", channelID);
+    console.log("userID", userID);
+
+    try {
+        const channel = await channelsDB.searchChannelByID(channelID);
+        console.log("Followers", channel.followers)
+        const isFollowing = channel.followers.includes(new mongoose.Types.ObjectId(userID));
+        console.log("isFollowing", isFollowing);
+        if (channel.followers.includes(userID)) {
+            channel.followers = channel.followers.filter((id) => id != userID);
+            await channel.save();
+
+            const user = await usersDB.searchUserByID(userID);
+            if (user.following.includes(channelID)) {
+                user.following = user.following.filter((id) => id != channelID);
+                await user.save();
+            }
+
+            res.status(200).json({ ok: true });
+            return;
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: err });
+    }
+
+    res.status(400).json({ error: "something went bad" });
 });
 
 router.get("/id/:id", async (req, res) => {
@@ -59,16 +98,35 @@ router.get("/:name", async (req, res) => {
 
     if (!channel) return res.status(404).json({ error: "Channel not found" });
 
-    const squeals = await squealsDB.getAllSquealsByRecipientID("channel", channel._id);
-    const results = squeals.map(async (squeal) => await squealsDB.transformSqueal(squeal))
-    for (let i = 0; i < results.length; i++) {
-        results[i] = await results[i]
+    const token = await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET,
+    })
+
+    if(!token && channel.visibility === "private") {
+        return res.status(401).json({ error: "Unauthorized" });
     }
+
+    if(token) {
+        const user = await usersDB.searchUserByID(token.id);
+        if(!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        if(channel.visibility === "private" && !channel.followers.includes(user._id) && !channel.administrators.includes(user._id) && user._id.toString() !== channel.owner_id.toString()) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+    }
+
+    const squeals = await squealsDB.getAllSquealsByRecipientID(
+        "Channel",
+        channel._id
+    );
 
     channel = {
         ...channel._doc,
-        squeals: results.reverse()
-    }
+        squeals: squeals,
+    };
 
     res.status(200).json(channel);
 });
@@ -82,7 +140,7 @@ router.put("/id/:id", async (req, res) => {
         });
         return;
     }
-    console.log("channel",req.body);
+    console.log("channel", req.body);
     const updatedChannel = {
         name: req.body.name,
         description: req.body.description,
@@ -91,7 +149,7 @@ router.put("/id/:id", async (req, res) => {
         can_user_post: req.body.can_user_post,
         squeals: req.body.squeals,
         followers: req.body.followers,
-        blocked: req.body.blocked
+        blocked: req.body.blocked,
     };
 
     await channelsDB.updateChannel(req.params.id, updatedChannel);
@@ -100,5 +158,34 @@ router.put("/id/:id", async (req, res) => {
         ok: true,
     });
 });
+
+router.post("/createprivate", async (req, res) => {
+    
+    const {name, description, img, isPublic, user} = req.body;
+
+    const channel = await channelsDB.searchChannelByName(name);
+    if (channel) {
+        res.status(404).json({
+            ok: false,
+            error: "Channel already exists",
+        });
+        return;
+    }
+
+    const newChannel = await channelsDB.createChannel({
+        name: name.toLowerCase(),
+        owner_id: user,
+        description: description,
+        visibility: isPublic ? "public" : "private",
+        banner: img,
+        administrators: [user],
+    });
+
+    res.status(200).json({
+        ok: true,
+        channel: newChannel,
+    });
+})
+
 
 module.exports = router;

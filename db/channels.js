@@ -35,7 +35,11 @@ const channelSchema = new mongoose.Schema({
         },
     ],
     official: { type: Boolean, default: false },
-    blocked: { type: Boolean, default: false }
+    blocked: { type: Boolean, default: false },
+    banner: {
+        mimetype: String,
+        blob: String,
+    }
 });
 
 const Channel = mongoose.model("Channel", channelSchema);
@@ -94,6 +98,12 @@ exports.getAllChannelsByFollowerID = async function (id) {
 }
 
 exports.getOfficialChannels = async function () {
-    const channels = await Channel.find({ official: true }, "_id");
+    const channels = await Channel.find({ official: true }, "_id followers");
     return channels;
+}
+
+exports.createChannel = async function (channel) {
+    const newChannel = new Channel(channel);
+    await newChannel.save();
+    return newChannel;
 }

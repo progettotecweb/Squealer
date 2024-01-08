@@ -17,6 +17,7 @@ import { SearchOutlined } from "@mui/icons-material";
 import NotificationMenu from "./NotificationMenu";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import ForumIcon from "@mui/icons-material/Forum";
 import Dialog from "@mui/material/Dialog";
 import SquealCreator from "./SquealCreator";
 import SearchMenu from "./SearchMenu";
@@ -151,6 +152,11 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 }
                             />
                         )}
+                        <MenuItem
+                            text="Channels"
+                            href="/Channels"
+                            icon={<ForumIcon />}
+                        />
                         <MenuItem
                             text="Shop"
                             href="/Shop"
