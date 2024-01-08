@@ -38,8 +38,11 @@ function readJsonData(fileName) {
 exports.connectToDB = async function () {
     const uri =
         process.env.NODE_ENV === "production"
-            ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_SITE}/db?writeConcern=majority`
+            ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_SITE}/db?writeConcern=majority&directConnection=true&authSource=admin`
             : `mongodb://127.0.0.1:27017/db?writeConcern=majority`;
+
+    console.log("Connecting to MongoDB..." + (process.env.NODE_ENV === "production" ? " (production)" : "(development)"));
+    console.log("URI: " + uri);
 
     mongoose
         .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
