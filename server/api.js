@@ -41,4 +41,49 @@ router.get("/globalFeed", async (req, res) => {
     res.json(feed)
 })
 
+//this should be a personal route
+router.post("/shop/:id", async (req, res) => {
+    const type = req.params.id
+
+    console.log(type)
+    const user = await usersDB.searchUserByID(req.body.user, "name msg_quota")
+
+    switch (type) {
+        case "daily": {
+            user.msg_quota.daily += 250;
+            break;
+        }
+        case "weekly": {
+            user.msg_quota.weekly += 1000;
+            break;
+        }
+        case "monthly": {
+            user.msg_quota.monthly += 5000;
+            break;
+        }
+        case "vip": {
+            user.role="Pro";
+            break;
+        }
+        case "maxi": {
+            user.msg_quota.monthly += 5000;
+            user.msg_quota.weekly += 1000;
+            user.msg_quota.daily += 250;
+            break;
+        }
+        default: {
+            break;
+        }
+        
+    }
+
+    await user.save();
+
+
+    console.log(user);
+
+    res.json({ success: true })
+
+})
+
 module.exports = router;
