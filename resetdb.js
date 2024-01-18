@@ -213,7 +213,7 @@ create();
 
 function readJsonData(fileName) {
     //console.log("path:", path.resolve("../db/", fileName));
-    const patt = path.join(process.cwd(), "app/db/", fileName);
+    const patt = path.join(process.cwd(), "/db/", fileName);
     console.log("path:", patt);
     return (jsonData = JSON.parse(
         fs.readFileSync(patt)
@@ -244,11 +244,11 @@ async function create() {
 
     try {
         // // Elimino le collezione esistenti
-        // await db.dropCollection("users");
-        // await db.dropCollection("channels");
-        // await db.dropCollection("squeals");
-        // await db.dropCollection("keywords");
-        // await db.dropCollection("subscriptions");
+        await db.dropCollection("users");
+        await db.dropCollection("channels");
+        await db.dropCollection("squeals");
+        await db.dropCollection("keywords");
+        await db.dropCollection("subscriptions");
 
         //leggo le collezioni
         let usersData = readJsonData("users.json");
