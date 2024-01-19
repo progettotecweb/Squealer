@@ -360,7 +360,7 @@ window.onload = function () {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }
+            } 
         })
             .then(res => res.json())
             .then(data => {
@@ -1605,7 +1605,6 @@ function formatRecipientsForAttribute(recipients) {
     }
     return recipientsFormatted;
 }
-
 function formatAdmin(admins) {
     if (admins === null) return '';
     //we need to format the @admins
@@ -1619,6 +1618,8 @@ function formatAdmin(admins) {
 
     return adminsFormatted;
 }
+
+
 
 function formatRecipientsIdsToAttribute(recipientsIds) {
     let recipientsFormatted = '';

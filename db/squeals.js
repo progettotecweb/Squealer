@@ -298,7 +298,8 @@ const updateSquealMetadata = async (squeal) => {
 exports.getAllSqueals = async function () {
     const res = await Squeal.find({})
         .populate("ownerID", "name img")
-        .populate({ path: "recipients.id", model: Channel });
+        .populate("recipients.id", "name")
+        //.populate({ path: "recipients.id", model: Channel });
     return res;
 };
 
