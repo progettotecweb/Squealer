@@ -63,7 +63,7 @@ exports.searchChannelByID = async function (id) {
 }
 
 exports.searchChannelByName = async function (name) {
-    const channel = await Channel.findOne({ name: name });
+    const channel = await Channel.findOne({ name: name }).populate("administrators", "name img _id");
     return channel;
 }
 
@@ -79,12 +79,11 @@ exports.createNewChannel = async function (channel) {
 }
 
 exports.updateChannel = async function (id, channel) {
-    Channel.findByIdAndUpdate(id, channel, { new: true }).then((channel) => {
-        return channel;
-    })
-        .catch((err) => {
-            console.log(err);
-        });
+    return await Channel.findByIdAndUpdate(id, channel, { new: true });
+}
+
+exports.updateChannelByName = async function (name, channel) {
+    return await Channel.findOneAndUpdate({ name: name }, channel, { new: true });
 }
 
 exports.getAllChannels = async function () {

@@ -229,7 +229,10 @@ const SignUpSequence = () => {
                         key="step1"
                         layout
                     >
-                        <form className="flex flex-col items-start" name="register-form">
+                        <form
+                            className="flex flex-col items-start"
+                            name="register-form"
+                        >
                             <label htmlFor="username">Username</label>
                             <input
                                 type="text"
@@ -299,27 +302,29 @@ const SignUpSequence = () => {
                         layout
                         layoutId="step1"
                     >
-                        <div>
-                            <div className="flex ">
-                                {/* <Camera onCapture={handleCapture} /> */}
-                                <div className="rounded-full bg-gray-800 w-24 h-24 overflow-hidden">
-                                    {!img ? (
-                                        <AccountCircleIcon className="w-10 h-10" />
-                                    ) : (
-                                        <img
-                                            className="object-cover rounded-full w-24 h-24 object-center"
-                                            src={img}
-                                        />
-                                    )}
-                                </div>
-                            </div>
-                            <p className="mt-4 mb-4">OR</p>
+                        <div className="flex flex-col relative rounded-full w-24 h-24">
+                            {!img ? (
+                                <div className="h-full w-full rounded-full object-cover bg-gray-700"></div>
+                            ) : (
+                                <img
+                                    className="object-cover rounded-full w-24 h-24 object-center"
+                                    src={img}
+                                />
+                            )}
+                            <motion.label
+                                whileHover={{ opacity: 1 }}
+                                htmlFor="profile-pic"
+                                className="mb-2 font-bold text-lg opacity-1 absolute z-10 w-full h-full cursor-pointer md:opacity-20 grid place-content-center text-center"
+                            >
+                                <AccountCircleIcon className="w-14 h-14" />
+                            </motion.label>
                             <input
-                                className="md:h-[10vh]"
+                                className="md:h-[10vh] hidden file:hidden"
                                 accept="image/*"
-                                id="icon-button-file"
                                 type="file"
                                 capture="environment"
+                                id="profile-pic"
+                                name="profile-pic"
                                 onChange={(e) => {
                                     handleContent(e);
                                 }}

@@ -1,5 +1,20 @@
 ﻿/* Utils */
-require("dotenv").config();
+/* Utils */
+const dotenv = require("dotenv")
+const path = require("path");
+const fs = require("fs");
+
+const env = fs.readFileSync( path.resolve(__dirname, ".env"))
+
+const buf = Buffer.from(env)
+
+const config = dotenv.parse(buf);
+
+console.log(config);
+
+process.env = {...process.env, ...config}
+
+console.log(process.env)
 
 
 const { server_log, checkRole, auth } = require("./utils/utils.js");
@@ -17,7 +32,6 @@ server_log("loading modules...");
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 const mymongo = require("./db/mongo.js");
 const channelRouter = require("./server/channelRouter.js");
 const usersRouter = require("./server/usersRouter.js");

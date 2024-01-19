@@ -120,7 +120,7 @@ export const AccountUserCard = ({ id }) => {
                 <img
                     src={`data:${data?.img.mimetype};base64,${data?.img.blob}`}
                     alt="Profile Picture"
-                    className="max-w-32 max-h-32 rounded-full object-cover"
+                    className="w-32 h-32 rounded-full object-cover"
                 />
             </div>
             <section className="col-span-3 p-4 flex flex-col h-full items-start gap-4 w-full">

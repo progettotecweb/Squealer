@@ -17,17 +17,21 @@ interface Result {
     official: boolean;
     banner: { mimetype: string; blob: string };
     followers: string[];
-    error?: string,
+    error?: string;
+    administrators: string[];
+    owner_id?: string;
 }
 
 export default function Page({ params }: { params: { name: string } }) {
     const fetcher: Fetcher<Result, string> = (...args) =>
-        fetch(...args).then((res) => {
-            return res.json();
-        }).then((res) => {
-            if(res.error) throw new Error(res.error);
-            return res;
-        });
+        fetch(...args)
+            .then((res) => {
+                return res.json();
+            })
+            .then((res) => {
+                if (res.error) throw new Error(res.error);
+                return res;
+            });
 
     const { data, isLoading, mutate, error } = useSWR(
         `/api/channels/${params.name}`,
@@ -60,12 +64,13 @@ export default function Page({ params }: { params: { name: string } }) {
         session ? `/api/users/${session?.user?.id}` : null
     );
 
-    if(error) return (
-        <PageContainer className="p-2" key="error">
-            <p>{error.message}</p>
-            <CustomLink href="/Channels">Go back</CustomLink>
-        </PageContainer>
-    )
+    if (error)
+        return (
+            <PageContainer className="p-2" key="error">
+                <p>{error.message}</p>
+                <CustomLink href="/Channels">Go back</CustomLink>
+            </PageContainer>
+        );
 
     return (
         <PageContainer className="p-2" key="channel-page">
@@ -81,8 +86,13 @@ export default function Page({ params }: { params: { name: string } }) {
                         <div className="w-full h-full rounded-t-md object-cover bg-slate-400"></div>
                     )}
 
-                    <div className="absolute bottom-0 m-4 shadow-xl shadow-neutral-950 rounded-md text-lg">
-                        <div className="px-4 py-1 rounded-lg bg-gray-500 flex items-center">
+                    <div className="absolute bottom-0 m-4 rounded-md text-lg flex flex-row gap-2">
+                        {data?.owner_id === user?._id && (
+                            <div className="px-4 py-1 rounded-lg bg-gray-500 flex items-center shadow-neutral-600 shadow-md">
+                                <span>👑 Owner</span>
+                            </div>
+                        )}
+                        <div className="px-4 py-1 rounded-lg bg-gray-500 flex items-center shadow-neutral-600 shadow-md">
                             {data?.official ? (
                                 <>
                                     <img
@@ -97,69 +107,93 @@ export default function Page({ params }: { params: { name: string } }) {
                             )}
                         </div>
                     </div>
+                    {(data?.owner_id === user?._id ||
+                        data?.administrators.includes(user?._id)) && (
+                        <div className="absolute right-0 bottom-0 m-4 rounded-md text-lg flex flex-row gap-2">
+                            <CustomLink
+                                className="px-4 py-1 rounded-lg bg-gray-500 flex items-center shadow-neutral-600 shadow-md hover:bg-gray-600 hover:shadow-neutral-700 transition-colors"
+                                href={`/Channels/${data?.name}/Edit`}
+                            >
+                                Edit
+                            </CustomLink>
+                        </div>
+                    )}
                 </section>
-
-                <AnimatePresence mode="wait">
-                    {data ? (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="flex gap-2 justify-start items-center p-4 md:w-[70vw] bg-gray-800 rounded-b-md w-full"
-                            key="data"
-                        >
-                            <div className="flex flex-col gap-2">
-                                <h1 className="flex flex-col sm:flex-row gap-2 text-3xl items-start sm:items-center ">
-                                    §{data.name}
-                                    <span className="hidden sm:block">|</span>
-                                    <span className="text-xl text-gray-400">
-                                        {data.description}
-                                    </span>
-                                </h1>
-                                <div className="flex gap-1">
-                                    <div className="flex items-center gap-1">
-                                        {data?.followers?.length}{" "}
-                                        <span className="text-gray-400">
-                                            followers
+                <div className="w-full flex flex-col">
+                    <AnimatePresence mode="wait">
+                        {data ? (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex gap-2 justify-start items-center p-4  bg-gray-800 rounded-b-md w-full"
+                                key="data"
+                            >
+                                <div className="flex flex-col gap-2">
+                                    <h1 className="flex flex-col sm:flex-row gap-2 text-3xl items-start sm:items-center ">
+                                        §{data.name}
+                                        <span className="hidden sm:block">
+                                            |
                                         </span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        {data?.squeals?.length}{" "}
-                                        <span className="text-gray-400">
-                                            squeals
+                                        <span className="text-xl text-gray-400">
+                                            {data.description}
                                         </span>
+                                    </h1>
+                                    <div className="flex gap-1">
+                                        <div className="flex items-center gap-1">
+                                            {data?.followers?.length}{" "}
+                                            <span className="text-gray-400">
+                                                followers
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            {data?.squeals?.length}{" "}
+                                            <span className="text-gray-400">
+                                                squeals
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            {session && session?.user && (
-                                <button
-                                    onClick={() =>
-                                        followOrUnfollow(
-                                            user.following.includes(data._id),
-                                            session?.user.id,
-                                            data._id
-                                        )
-                                    }
-                                    className="rounded-md px-4 py-1 bg-gray-700 hover:bg-gray-600 transition-colors ml-auto"
-                                >
-                                    {!user?.following.includes(data._id)
-                                        ? "Follow"
-                                        : "Unfollow"}
-                                </button>
-                            )}
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex flex-col gap-2 justify-start items-start p-4 md:w-[70vw] bg-gray-800 rounded-md"
-                            key="data-loading"
-                        >
-                            <Skeleton variant="text" width="100%" height={50} />
-                            <Skeleton variant="text" width="100%" height={50} />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                                {session && session?.user && (
+                                    <button
+                                        onClick={() =>
+                                            followOrUnfollow(
+                                                user.following.includes(
+                                                    data._id
+                                                ),
+                                                session?.user.id,
+                                                data._id
+                                            )
+                                        }
+                                        className="rounded-md px-4 py-1 bg-gray-700 hover:bg-gray-600 transition-colors ml-auto"
+                                    >
+                                        {!user?.following.includes(data._id)
+                                            ? "Follow"
+                                            : "Unfollow"}
+                                    </button>
+                                )}
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex flex-col gap-2 justify-start items-start p-4 md:w-[70vw] bg-gray-800 rounded-md"
+                                key="data-loading"
+                            >
+                                <Skeleton
+                                    variant="text"
+                                    width="100%"
+                                    height={50}
+                                />
+                                <Skeleton
+                                    variant="text"
+                                    width="100%"
+                                    height={50}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
                 <AnimatePresence mode="wait">
                     {data ? (
                         <motion.section
@@ -199,6 +233,7 @@ export default function Page({ params }: { params: { name: string } }) {
                     )}
                 </AnimatePresence>
             </div>
+            
         </PageContainer>
     );
 }

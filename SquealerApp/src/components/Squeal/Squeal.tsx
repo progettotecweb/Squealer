@@ -255,6 +255,7 @@ const Squeal: React.FC<SquealProps> = ({
                                 : "/deleted.webp"
                         }
                         alt="Profile Picture"
+                        className="object-fit w-full h-full"
                     />
                 </Avatar>
                 <div className="flex flex-col items-start">

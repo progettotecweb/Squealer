@@ -77,3 +77,14 @@
 ::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-800;
 }
+
+
+@layer utilities {
+
+    .profile-pic {
+ 
+        clip-path: circle();
+ 
+    }
+ 
+ }

@@ -5,6 +5,9 @@ const default_img = require("../utils/default_image.json");
 const bcrypt = require("bcrypt");
 const usersDB = require("../db/users");
 const channelsDB = require("../db/channels");
+const subscriptionsDB = require("../db/subscriptions");
+const webpush = require("web-push");
+const { default: mongoose } = require("mongoose");
 
 router.post("/register", async (req, res) => {
     const user = await usersDB.searchUserByName(req.body.username);
@@ -31,8 +34,6 @@ router.post("/register", async (req, res) => {
         bio: req.body.bio,
         following: officialChannels,
     };
-
-    
 
     const u = await usersDB.createNewUser(newUser);
 
@@ -100,8 +101,6 @@ router.get("/:id", async (req, res) => {
 
     res.status(200).json(user);
 });
-
-
 
 //get user from name
 router.get("/name/:name", async (req, res) => {
@@ -228,6 +227,168 @@ router.delete("/:id", async (req, res) => {
     }
 
     await usersDB.deleteUser(req.params.id);
+
+    res.status(200).json({
+        ok: true,
+    });
+});
+
+const resetDB = mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+    },
+    code: {
+        type: Number,
+        required: true,
+    },
+    createdAt: { type: Date, expires: 120, default: Date.now },
+});
+
+const Reset = mongoose.model("Reset", resetDB);
+
+router.post("/password-reset/verify", async (req, res) => {
+    const { code, username } = req.body;
+
+    // find if user is in the list
+    const found = await Reset.findOne({ username: username, code: code });
+
+    console.log(found);
+
+    if (!found) {
+        res.status(400).json({
+            ok: false,
+            message: "Wrong code!",
+        });
+        return;
+    }
+
+    await Reset.deleteMany({ username: username });
+
+    res.status(200).json({
+        ok: true,
+    });
+});
+
+router.post("/password-reset", async (req, res) => {
+    const { username } = req.body;
+
+    const user = await usersDB.searchUserByName(username);
+
+    if (!user) {
+        res.status(400).json({
+            ok: false,
+            status: "not sent",
+            error: "Username not found",
+        });
+        return;
+    }
+
+    const randomSixDigit = Math.floor(100000 + Math.random() * 900000);
+
+    // get all subscriptions
+
+    const subs = await subscriptionsDB.getSubscriptionByUser(user._id);
+
+    let count = 0;
+    let promises = [];
+
+    subs.forEach((s) => {
+        const payload = JSON.stringify({
+            title: `Password reset`,
+            body: `YOUR CODE IS ${randomSixDigit}`,
+        });
+    
+        // Create a promise for each notification
+        const notificationPromise = new Promise((resolve, reject) => {
+            webpush.sendNotification(s.subscription, payload)
+                .then((res) => {
+                    console.log(res.statusCode);
+                    if (res.statusCode === 410) {
+                        console.log("Subscription has expired or is no longer valid: ", res.statusCode);
+                        // GONE (subscription no longer valid)
+                        subscriptionsDB.removeSubscription(s._id);
+                        reject(new Error("Subscription no longer valid"));
+                    } else if (res.statusCode === 201) {
+                        console.log("Sent to " + s._id);
+                        count++;
+                        resolve();
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error sending notification:", error);
+                    reject(error);
+                });
+        });
+    
+        promises.push(notificationPromise);
+    });
+
+    Promise.all(promises)
+    .then(() => {
+        console.log("Sent to " + count + " devices");
+
+        if(count <= 0) {
+            res.status(400).json({
+                ok: false,
+                status: "not sent",
+                message: "No devices found!",
+            });
+        }
+
+        const newReset = new Reset({
+            username: username,
+            code: randomSixDigit,
+        });
+    
+        newReset.save();
+    
+        res.status(200).json({
+            ok: true,
+            status: "sent",
+            message: "Code sent" + (count !== 1 ? ` to ${count} devices!` : "!"),
+        });
+    })
+    .catch((error) => {
+        console.error("Error sending notifications:", error);
+
+        res.status(500).json({
+            ok: false,
+            status: "not sent",
+            message: "Error sending notifications",
+        });
+    });
+});
+
+router.post("/password-reset/reset", async (req, res) => {
+
+    const { username, password, confirmPassword} = req.body;
+
+    if(password !== confirmPassword) {
+        res.status(400).json({
+            ok: false,
+            message: "Passwords don't match!",
+        });
+        return;
+    }
+
+    const user = await usersDB.searchUserByName(username);
+
+    if (!user) {
+        res.status(400).json({
+            ok: false,
+            message: "Username not found!",
+        });
+        return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+
+    //hash password with salt and bcrypt
+
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await usersDB.updateUser(user._id, {password: hashedPassword, salt: salt});
 
     res.status(200).json({
         ok: true,

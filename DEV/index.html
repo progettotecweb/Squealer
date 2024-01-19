@@ -135,6 +135,51 @@
         tfootType.appendChild(optionalRow);
     
         typeTasksTable.appendChild(tfootType);
+
+        //build a table of not yet finished tasks
+        const notFinishedTable = document.getElementById('table-not-finished');
+        const tfootNotFinished = document.createElement('tfoot');
+        const tfootNotFinishedRow = document.createElement('tr');
+        const tfootNotFinishedTitle = document.createElement('td');
+        tfootNotFinishedTitle.textContent = 'Status';
+        const tfootNotFinishedOwner = document.createElement('td');
+        tfootNotFinishedOwner.textContent = 'Owner';
+        const tfootNotFinishedStatus = document.createElement('td');
+        tfootNotFinishedStatus.textContent = 'Task';
+        tfootNotFinishedRow.appendChild(tfootNotFinishedTitle);
+        tfootNotFinishedRow.appendChild(tfootNotFinishedOwner);
+        tfootNotFinishedRow.appendChild(tfootNotFinishedStatus);
+        tfootNotFinished.appendChild(tfootNotFinishedRow);
+
+        const notFinishedRows = Array.from(tableRows).filter(row => {
+            const column3Status = row.cells[2]
+                ? row.cells[2].textContent.trim()
+                : null;
+            return column3Status === '❌';
+        });
+
+        console.log(notFinishedRows)
+
+        notFinishedRows.forEach(row => {
+            const taskCell = row.cells[2];
+            const ownerCell = row.cells[1];
+            const statusCell = row.cells[0];
+            const newRow = document.createElement('tr');
+            const newTaskCell = document.createElement('td');
+            newTaskCell.textContent = taskCell.textContent;
+            const newOwnerCell = document.createElement('td');
+            newOwnerCell.textContent = ownerCell.textContent;
+            const newStatusCell = document.createElement('td');
+            newStatusCell.textContent = statusCell.textContent;
+            newRow.appendChild(newTaskCell);
+            newRow.appendChild(newOwnerCell);
+            newRow.appendChild(newStatusCell);
+            tfootNotFinished.appendChild(newRow);
+        });
+
+        notFinishedTable.appendChild(tfootNotFinished);
+
+
     }
     </script>
     <style>
@@ -188,7 +233,7 @@
         padding: 10px;
     }
     
-    tr > td:nth-child(1) {
+    .main tr > td:nth-child(1) {
         width: 60%;
     }
     </style>
@@ -207,10 +252,10 @@
 
     <div style="padding: 1rem"></div>
 
+  <table id="table-not-finished" style="margin: 1rem"></table>
 
 
-
-<table>
+<table class="main">
     <thead>
       <tr>
         <th>Task</th>
@@ -247,17 +292,17 @@
       </tr>
       <tr>
         <td><span class="orange">possibilità da parte dell'utente che finisce i caratteri mentre digita di usare un certo numero di chars extra da pagare in seguito</span></td>
-        <td></td>
+        <td><span class="owner">GIANLO</span></td>
         <td>❌</td>
       </tr>
       <tr>
         <td>messaggi a privati (utenti) non consumano quota e sono sempre disponibili</td>
-        <td></td>
+        <td><span class="owner">GIANLO</span></td>
         <td>❌</td>
       </tr>
       <tr>
         <td>l'utente può comprare chars extra oppure ottenendo apprezzamenti dal pubblico. Reazioni negative diminuiscono la quota</td>
-        <td></td>
+        <td><span class="owner">GIANLO</span></td>
         <td>❌</td>
       </tr>
       <tr>
@@ -272,7 +317,7 @@
       </tr>
       <tr>
         <td><span class="orange">alcuni canali non sono mai silenziabili</span></td>
-        <td></td>
+        <td><span class="owner">GIANLO</span></td>
         <td>❌</td>
       </tr>
       <tr>
@@ -323,14 +368,14 @@
           <li>servizi social con georeferenziazione (tipo dov'è il mio taxi/bus, caccia al tesoro, etc.)</li>
         </ul>
         </td>
-        <td></td>
+        <td><span class="owner">GIANLO</span></td>
         <td>❌</td>
       </tr>
       <tr><td class="subtitle" colspan="3">APP</td></tr>
       <tr>
         <td>Accounting</td>
-        <td></td>
-        <td>❌</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
       </tr>
       <tr>
         <td>creazione account</td>
@@ -344,8 +389,8 @@
       </tr>
       <tr>
         <td>reset password</td>
-        <td></td>
-        <td>❌</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
       </tr>
       <tr>
         <td>eliminazione account</td>
@@ -359,13 +404,13 @@
       </tr>
       <tr>
         <td>scelta di un social media manager, rimozione SMM (sia utente che SMM devono essere professional).</td>
-        <td></td>
+        <td><span class="owner">SIMO</span></td>
         <td>❌</td>
       </tr>
       <tr>
         <td><span class="orange">aquisto caratteri aggiuntivi giornalieri, settimanali, mensili (solo per verificati e PRO)</span></td>
-        <td></td>
-        <td>❌</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
       </tr>
       <tr>
         <td><span class="orange">acquisto di canali personalizzati</span></td>
@@ -374,7 +419,7 @@
       </tr>
       <tr>
         <td><span class="orange">aggiunta di amministratori a canali privati</span></td>
-        <td></td>
+        <td><span class="owner">GIANLO</span></td>
         <td>❌</td>
       </tr>
       <tr>
@@ -384,8 +429,8 @@
       </tr>
       <tr>
         <td>LETTURA CON LOGIN:</td>
-        <td></td>
-        <td>❌</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
       </tr>
       <tr>
         <td>feed con messaggi personali, canali a cui sono iscritto, canali ufficiali.</td>
@@ -414,8 +459,8 @@
       </tr>
       <tr>
         <td>SCRITTURA (SOLO LOGIN):</td>
-        <td></td>
-        <td>❌</td>
+        <td><span class="owner">GIANLO</span></td>
+        <td>✅</td>
       </tr>
       <tr>
         <td>Creazione di un nuovo squeal (testo, immagine <span class="orange">da fotocamera</span>, geolocazione).</td>
@@ -501,43 +546,43 @@
       </tr>
       <tr>
         <td>SMM posta squeal a nome e per conto del VIP.</td>
-        <td></td>
+        <td><span class="owner">SIMO</span></td>
         <td>❌</td>
       </tr>
       <tr>
         <td>Statistiche sugli squeal postati dal SMM (visualizzazioni, reazioni, squeal a rischio impopolarità/controversia, etc).</td>
-        <td></td>
+        <td><span class="owner">SIMO</span></td>
         <td>❌</td>
       </tr>
       <tr>
         <td><span class="orange">SMM può acquistare caratteri extra per i VIP</span></td>
-        <td></td>
+        <td><span class="owner">SIMO</span></td>
         <td>❌</td>
       </tr>
       <tr>
         <td><span class="orange">Grafici con andamenti dei post dei VIP</span></td>
-        <td></td>
+        <td><span class="owner">SIMO</span></td>
         <td>❌</td>
       </tr>
       <tr>
         <td><span class="green">Geolocazione fittizia per i VIP</span></td>
-        <td></td>
+        <td><span class="owner">SIMO</span></td>
         <td>❌</td>
       </tr>
       <tr><td class="subtitle" colspan="3">REQUISITI DI PROGETTO</td></tr>
       <tr>
         <td>Database già pienotto</td>
-        <td></td>
-        <td>❌</td>
+        <td><span class="owner">GIANLO</span><span class="owner">ENRI</span></td>
+        <td>✅</td>
       </tr>
       <tr>
         <td>6 account: fv, fvPro, fvSMM, fvMod + 2 di tipo pro (il primo molto popolare, il secondo molto impopolare); fvPro e gli altri due pro sono gestiti da fvSMM</td>
-        <td></td>
-        <td>❌</td>
+        <td><span class="owner">GIANLO</span><span class="owner">ENRI</span></td>
+        <td>✅</td>
       </tr>
       <tr>
         <td>ACCESSIBILITÀ: il sito deve essere accessibile a persone con disabilità visive e motorie</td>
-        <td></td>
+        <td><span class="owner">TUTTI</span></td>
         <td>❌</td>
     </tbody>
   </table>

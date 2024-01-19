@@ -76,6 +76,8 @@ const LoginPage = () => {
                 <CustomLink href="/Register">Register</CustomLink>
 
                 <CustomLink href="/">Log in as guest</CustomLink>
+
+                <CustomLink href="/Lost">Forgot your password?</CustomLink>
             </Container>
 
             <AnimatePresence mode="wait">
