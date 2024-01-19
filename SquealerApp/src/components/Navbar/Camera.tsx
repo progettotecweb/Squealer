@@ -24,7 +24,6 @@ const Camera: React.FC<CameraProps> = ({
         }
     };
 
-
     return (
         <div className='flex'>
                {!cameraError &&

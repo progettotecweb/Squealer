@@ -28,11 +28,14 @@ const Geolocation: React.FC<GeolocationProps> = ({
                     onLocation(latitude, longitude);
                 },
                 (error) => {
-                    console.error('Error getting geolocation:', error);
+                    if (error.code === 1) {
+                        // Permission denied
+                        console.log('Geolocation permission denied.');
+                    } else {
+                        console.error('Error getting geolocation:', error.message);
+                    }
                 }
             );
-
-
         } else {
             console.error('Geolocation is not supported by this browser.');
         }

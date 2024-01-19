@@ -400,7 +400,6 @@ const SquealCreator = () => {
                                         accept="image/*"
                                         id="icon-button-file imginputref"
                                         type="file"
-                                        capture="environment"
                                         onChange={(e) => {
                                             handleContent(e);
                                         }}
@@ -429,7 +428,6 @@ const SquealCreator = () => {
                                         accept="video/*"
                                         id="icon-button-file videoinputref"
                                         type="file"
-                                        capture="environment"
                                         onChange={(e) => {
                                             handleContent(e);
                                         }}
