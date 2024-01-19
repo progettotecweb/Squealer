@@ -1410,6 +1410,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
         recipientsDiv = '<div class="squeal-recipients-div align-self-center">'
         for (let i = 0; i < recipients.length; i++) {
+            if(!recipients[i].id) continue;
             recipientsDiv += '<span class="squeal-recipient ">'
                 + (recipients[i].type === "Channel" ? '§' : '@')
                 + recipients[i].id.name + '</span>';
@@ -1595,6 +1596,7 @@ async function postSqueal(squeal, btn) {
 function formatRecipientsForAttribute(recipients) {
     //we need to format the recipients to be able to put them in the data-bs-* attribute
     //@user,§channel
+    console.log(recipients)
     let recipientsFormatted = '';
     for (let i = 0; i < recipients.length; i++) {
         recipientsFormatted += (recipients[i].type === "Channel" ? '§' : '@') + recipients[i].id.name;

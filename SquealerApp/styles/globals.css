@@ -14,9 +14,10 @@
 }
 
 .imgPreview {
-    max-width: 20vw !important;
-    height: auto;
+    max-width: 40vw !important;
+    max-height: 40vh !important;
 }
+
 
 #btnCamera:active {
     animation: cameraBtnAnimation 1s cubic-bezier(0, 0, 0.2, 1) infinite;
