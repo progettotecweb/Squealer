@@ -191,6 +191,11 @@ const SquealCreator = () => {
                 setContent({ ...content, [type]: value });
                 break;
             case "image":
+                //check if upload was empty
+                if (!e.target.files[0]) {
+                    break;
+                }
+
                 //check if file uploaded is an image
                 if (!e.target.files[0].type.startsWith("image")) {
                     alert("File must be an image");
@@ -199,6 +204,11 @@ const SquealCreator = () => {
                 }
                 break;
             case "video":
+                //check if upload was empty
+                if (!e.target.files[0]) {
+                    break;
+                }
+                
                 //check if file uploaded is a video
                 if (!e.target.files[0].type.startsWith("video")) {
                     alert("File must be a video");
@@ -229,6 +239,7 @@ const SquealCreator = () => {
     }
 
     const inputImgRef = useRef<any>(null);
+    const inputVideoRef = useRef<any>(null);
 
     const handleCapture = (img: string) => {
         console.log(img);
@@ -243,6 +254,9 @@ const SquealCreator = () => {
         //reset input field
         if (inputImgRef.current) {
             inputImgRef.current.value = null;
+        }
+        if (inputVideoRef.current) {
+            inputVideoRef.current.value = null;
         }
     };
 
@@ -380,17 +394,17 @@ const SquealCreator = () => {
                                     <p className="mt-4 mb-4">OR</p>
                                 }
                                 <div className="flex justify-center w-full">
-                                <input
-                                    ref={inputImgRef}
-                                    className="md:h-[10vh] w-min"
-                                    accept="image/*"
-                                    id="icon-button-file"
-                                    type="file"
-                                    capture="environment"
-                                    onChange={(e) => {
-                                        handleContent(e);
-                                    }}
-                                />
+                                    <input
+                                        ref={inputImgRef}
+                                        className="md:h-[10vh] w-min"
+                                        accept="image/*"
+                                        id="icon-button-file imginputref"
+                                        type="file"
+                                        capture="environment"
+                                        onChange={(e) => {
+                                            handleContent(e);
+                                        }}
+                                    />
                                 </div>
                             </AnimatedTabContent>
                         }
@@ -402,23 +416,25 @@ const SquealCreator = () => {
                                 <div className="flex justify-center">
                                     {video && (
                                         <video
-                                            className="rounded-lg imgPreview ml-24"
+                                            className="rounded-lg imgPreview"
                                             src={video}
                                             controls={true}
                                         />
                                     )}
                                 </div>
-                                <p className="mt-4 mb-4">OR</p>
-                                <input
-                                    className="md:h-[10vh]"
-                                    accept="video/*"
-                                    id="icon-button-file"
-                                    type="file"
-                                    capture="environment"
-                                    onChange={(e) => {
-                                        handleContent(e);
-                                    }}
-                                />
+                                <div className="flex justify-center w-full">
+                                    <input
+                                        ref={inputVideoRef}
+                                        className="md:h-[10vh] w-min"
+                                        accept="video/*"
+                                        id="icon-button-file videoinputref"
+                                        type="file"
+                                        capture="environment"
+                                        onChange={(e) => {
+                                            handleContent(e);
+                                        }}
+                                    />
+                                </div>
                             </AnimatedTabContent>
                         }
                     />
