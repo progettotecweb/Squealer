@@ -1410,6 +1410,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
         recipientsDiv = '<div class="squeal-recipients-div align-self-center">'
         for (let i = 0; i < recipients.length; i++) {
+            if(!recipients[i].id) continue;
             recipientsDiv += '<span class="squeal-recipient ">'
                 + (recipients[i].type === "Channel" ? '§' : '@')
                 + recipients[i].id.name + '</span>';
@@ -1420,10 +1421,15 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
     }
     let header = '<div class="squeal-header d-flex justify-content-between">';
-    let ownerDiv = '<div class="squeal-owner-div p-1 align-self-between">'
+    let ownerDiv = squeal.ownerID?'<div class="squeal-owner-div p-1 align-self-between">'
         + '<img src="data:' + squeal.ownerID.img.mimetype + ';base64,' + squeal.ownerID.img.blob + '" alt="' + squeal.ownerID.name + '\'s propic" class="user-pic"/>'
         + '<span class="squeal-owner-name h6 m-2">' + squeal.ownerID.name + '</span>'
-        + '</div>';
+        + '</div>'
+        :
+        '<div class="squeal-owner-div p-1 align-self-between">'
+        + '<img src="/deleted.webp" alt="Profile picture" class="user-pic"/>'
+        + '<span class="squeal-owner-name h6 m-2">' + 'user deleted' + '</span>'
+        + '</div>'
     let datetime = '<div class="squeal-date-div align-self-center text-center">' +
         '<span class="squeal-date">' + formatDate(squeal.datetime) + '</span>'
         + '</div>';
@@ -1497,8 +1503,10 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     }
     let btnViewMore = '';
     if (viewMore) {
+        console.log(squeal.ownerID);
+        let ownerName = squeal.ownerID? squeal.ownerID.name : 'user deleted';
         btnViewMore += '<div class="d-flex justify-content-center mt-2"><input type="button" class="channel-squeal-btn btn btn-primary align-self-center" data-bs-squealId="' + squeal._id + '" data-bs-toggle="modal" data-bs-target="#squealModal" value="View more"'
-            + 'data-bs-squealOwner="' + squeal.ownerID.name + '"'
+            + 'data-bs-squealOwner="' + ownerName + '"'
             + 'data-bs-squealRecipientsName="' + formatRecipientsForAttribute(squeal.recipients) + '"'
             + 'data-bs-squealReactions-m2="' + squeal.reactions.m2 + '"'
             + 'data-bs-squealReactions-m1="' + squeal.reactions.m1 + '"'
@@ -1588,6 +1596,7 @@ async function postSqueal(squeal, btn) {
 function formatRecipientsForAttribute(recipients) {
     //we need to format the recipients to be able to put them in the data-bs-* attribute
     //@user,§channel
+    console.log(recipients)
     let recipientsFormatted = '';
     for (let i = 0; i < recipients.length; i++) {
         recipientsFormatted += (recipients[i].type === "Channel" ? '§' : '@') + recipients[i].id.name;

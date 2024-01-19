@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import Tabs, { Tab, AnimatedTabContent } from "@/components/Tabs/Tabs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -54,6 +54,7 @@ const SquealCreator = () => {
         session ? `/api/users/${session?.user.id}` : null
     );
 
+
     const handleTabChange = (index: number) => {
         //setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");
         switch (index) {
@@ -96,7 +97,7 @@ const SquealCreator = () => {
         }).then((res) => {
             if (res.status === 200) {
                 //mutate(`/api/squeals/${session?.user.id}`);
-                
+
             }
             return res.json()
         }).then((res) => {
@@ -222,6 +223,13 @@ const SquealCreator = () => {
         return myImg;
     };
 
+    const [cameraError, setCameraError] = useState(false);
+    const handleCameraError = (err: boolean) => {
+        setCameraError(err)
+    }
+
+    const inputImgRef = useRef<any>(null);
+
     const handleCapture = (img: string) => {
         console.log(img);
         setImg(img);
@@ -231,6 +239,11 @@ const SquealCreator = () => {
             video: null,
             geolocation: null,
         });
+
+        //reset input field
+        if (inputImgRef.current) {
+            inputImgRef.current.value = null;
+        }
     };
 
     const handleLocation = (lat: number, lng: number) => {
@@ -349,18 +362,27 @@ const SquealCreator = () => {
                         label="Image"
                         content={
                             <AnimatedTabContent>
+                                {
+                                    cameraError && !img && (
+                                        <p className="text-red-500">Camera not found</p>)
+                                }
                                 <div className="flex justify-center">
-                                    <Camera onCapture={handleCapture} />
+                                    <Camera onCapture={handleCapture} error={handleCameraError} />
                                     {img && (
                                         <img
-                                            className="rounded-lg imgPreview ml-24"
+                                            className="rounded-lg imgPreview"
                                             src={img}
                                         />
                                     )}
                                 </div>
-                                <p className="mt-4 mb-4">OR</p>
+
+                                {!cameraError &&
+                                    <p className="mt-4 mb-4">OR</p>
+                                }
+                                <div className="flex justify-center w-full">
                                 <input
-                                    className="md:h-[10vh]"
+                                    ref={inputImgRef}
+                                    className="md:h-[10vh] w-min"
                                     accept="image/*"
                                     id="icon-button-file"
                                     type="file"
@@ -369,6 +391,7 @@ const SquealCreator = () => {
                                         handleContent(e);
                                     }}
                                 />
+                                </div>
                             </AnimatedTabContent>
                         }
                     />
@@ -420,16 +443,16 @@ const SquealCreator = () => {
             </motion.div>
             <motion.div layout>
 
-            {squealPostStatus === "posting" ? <SquealSkeleton />: squealPostStatus === "posted"? <Squeal 
-                squealData={newSqueal}
-                type={newSqueal.type}
-                id={newSqueal._id}
-                content={newSqueal.content}
-                owner={newSqueal?.ownerID}
-                date={newSqueal?.datetime}
-                reactions={newSqueal?.reactions}
-                recipients={newSqueal?.recipients}
-                
+                {squealPostStatus === "posting" ? <SquealSkeleton /> : squealPostStatus === "posted" ? <Squeal
+                    squealData={newSqueal}
+                    type={newSqueal.type}
+                    id={newSqueal._id}
+                    content={newSqueal.content}
+                    owner={newSqueal?.ownerID}
+                    date={newSqueal?.datetime}
+                    reactions={newSqueal?.reactions}
+                    recipients={newSqueal?.recipients}
+
                 /> : ""}
             </motion.div>
         </>
