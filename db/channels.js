@@ -87,7 +87,10 @@ exports.updateChannelByName = async function (name, channel) {
 }
 
 exports.getAllChannels = async function () {
-    const channels = await Channel.find({}).populate("owner_id", "name");
+    const channels = await Channel.find({})
+    .populate("owner_id", "name")
+    .populate("administrators", "name");
+
     return channels;
 }
 

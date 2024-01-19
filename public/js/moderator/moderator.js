@@ -309,14 +309,23 @@ window.onload = function () {
                         + 'data-bs-channelFollowers="' + data[i].followers + '"'
                         + 'data-bs-channelSqueals="' + data[i].squeals + '"'
                         //+ 'data-bs-administrators-name="' + usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name") + '"'
-                        + 'data-bs-administrators-id="' + data[i].administrators + '"'
+                        //+ 'data-bs-administrators-id="' + data[i].administrators + '"'
                         + 'data-bs-canUserPost="' + data[i].can_user_post + '"'
                         + 'data-bs-official="' + data[i].official + '"'
                         + 'data-bs-blocked="' + data[i].blocked + '"';
 
-                    if (data[i].administrators)//se ci sono admin, altrimenti null
-                        usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name")
-                    let btn = '<input type="button" class="m-1 channel-btn btn btn-primary align-self-end"' + channelInfoDataBs + ' value="Details" />';
+                    if (data[i].administrators) {//se ci sono admin, altrimenti null
+                        admins = data[i].administrators.map((admin) => admin.name);
+                        admin_ids = data[i].administrators.map((admin) => admin._id);
+                        channelInfoDataBs += 'data-bs-administrators-name="' + admins + '"';
+                        channelInfoDataBs += 'data-bs-administrators-id="' + admin_ids + '"';
+                        //usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name")
+                    }
+                    else{
+                        channelInfoDataBs += 'data-bs-administrators-name=""';
+                        channelInfoDataBs += 'data-bs-administrators-id=""';
+                    }
+                     let btn = '<input type="button" class="m-1 channel-btn btn btn-primary align-self-end"' + channelInfoDataBs + ' value="Details" />';
 
                     let channelSquealsInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
                         + 'data-bs-toggle="modal"'
@@ -360,7 +369,7 @@ window.onload = function () {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            } 
+            }
         })
             .then(res => res.json())
             .then(data => {
@@ -610,6 +619,7 @@ window.onload = function () {
             const officialText = channelModal.querySelector("#channel-official");
 
             //set input values
+            console.log(databs.administratorsName);
             inputName.value = databs.name;
             inputDescription.value = databs.description;
             inputAdmins.value = formatAdmin(databs.administratorsName);
@@ -1012,7 +1022,7 @@ window.onload = function () {
                 Object.keys(dataToUpdate).forEach(key => {
                     data[key] = dataToUpdate[key];
                 });
-
+                console.log(data);
                 //update table
                 await fetch("/api/" + table + "/" + id, {
                     method: "PUT",
@@ -1176,8 +1186,10 @@ function changeSectionClass(newSection) {
 
 async function usersIdToName(usersId, channelId, dataBsName) {
     let usersName = [];
+
     for (let i = 0; i < usersId.length; i++) {
         if (usersId[i] === ",") continue;
+        console.log(usersId[i]);
         const user = await fetch("/api/users/" + usersId[i], {
             method: "GET",
             headers: {
@@ -1410,7 +1422,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
         recipientsDiv = '<div class="squeal-recipients-div align-self-center">'
         for (let i = 0; i < recipients.length; i++) {
-            if(!recipients[i].id) continue;
+            if (!recipients[i].id) continue;
             recipientsDiv += '<span class="squeal-recipient ">'
                 + (recipients[i].type === "Channel" ? '§' : '@')
                 + recipients[i].id.name + '</span>';
@@ -1421,7 +1433,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
     }
     let header = '<div class="squeal-header d-flex justify-content-between">';
-    let ownerDiv = squeal.ownerID?'<div class="squeal-owner-div p-1 align-self-between">'
+    let ownerDiv = squeal.ownerID ? '<div class="squeal-owner-div p-1 align-self-between">'
         + '<img src="data:' + squeal.ownerID.img.mimetype + ';base64,' + squeal.ownerID.img.blob + '" alt="' + squeal.ownerID.name + '\'s propic" class="user-pic"/>'
         + '<span class="squeal-owner-name h6 m-2">' + squeal.ownerID.name + '</span>'
         + '</div>'
@@ -1503,8 +1515,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     }
     let btnViewMore = '';
     if (viewMore) {
-        console.log(squeal.ownerID);
-        let ownerName = squeal.ownerID? squeal.ownerID.name : 'user deleted';
+        let ownerName = squeal.ownerID ? squeal.ownerID.name : 'user deleted';
         btnViewMore += '<div class="d-flex justify-content-center mt-2"><input type="button" class="channel-squeal-btn btn btn-primary align-self-center" data-bs-squealId="' + squeal._id + '" data-bs-toggle="modal" data-bs-target="#squealModal" value="View more"'
             + 'data-bs-squealOwner="' + ownerName + '"'
             + 'data-bs-squealRecipientsName="' + formatRecipientsForAttribute(squeal.recipients) + '"'
@@ -1596,7 +1607,6 @@ async function postSqueal(squeal, btn) {
 function formatRecipientsForAttribute(recipients) {
     //we need to format the recipients to be able to put them in the data-bs-* attribute
     //@user,§channel
-    console.log(recipients)
     let recipientsFormatted = '';
     for (let i = 0; i < recipients.length; i++) {
         recipientsFormatted += (recipients[i].type === "Channel" ? '§' : '@') + recipients[i].id.name;
@@ -1606,7 +1616,7 @@ function formatRecipientsForAttribute(recipients) {
     return recipientsFormatted;
 }
 function formatAdmin(admins) {
-    if (admins === null) return '';
+    if (admins === null || admins === '') return '';
     //we need to format the @admins
     let adminsFormatted = '';
     myadmins = admins.replace(/\s+/g, '').split(",");

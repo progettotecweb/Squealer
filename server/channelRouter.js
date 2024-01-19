@@ -146,6 +146,34 @@ router.put("/id/:id", async (req, res) => {
             error: "Channel not found",
         });
         return;
+    }
+    console.log("channel",req.body);
+    const updatedChannel = {
+        name: req.body.name,
+        description: req.body.description,
+        administrators: req.body.administrators,
+        visibility: req.body.visibility,
+        can_user_post: req.body.can_user_post,
+        squeals: req.body.squeals,
+        followers: req.body.followers,
+        blocked: req.body.blocked
+    };
+
+    await channelsDB.updateChannel(req.params.id, updatedChannel);
+
+    res.status(200).json({
+        ok: true,
+    });
+});
+
+router.put("/app/id/:id", async (req, res) => {
+    const channel = await channelsDB.searchChannelByID(req.params.id);
+    if (!channel) {
+        res.status(404).json({
+            ok: false,
+            error: "Channel not found",
+        });
+        return;
     } else {
         const updatedAdmins = req.body.administrators;
 

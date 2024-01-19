@@ -142,7 +142,7 @@ export default function CreatePrivateChannelPage({
         if (description.length < 10)
             return alert("Description must be at least 10 characters long");
 
-        await fetch(`/api/channels/id/${data?._id}`, {
+        await fetch(`/api/app/channels/id/${data?._id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
