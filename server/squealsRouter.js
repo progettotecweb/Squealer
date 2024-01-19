@@ -42,6 +42,7 @@ router.put("/:id", async (req, res) => {
     for (const recipient of squeal.recipients) {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
+            if(!user) continue;
             const squealIndex = user.squeals.indexOf(squeal._id);
             user.squeals.splice(squealIndex, 1);
             user.save();

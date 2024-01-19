@@ -321,11 +321,11 @@ window.onload = function () {
                         channelInfoDataBs += 'data-bs-administrators-id="' + admin_ids + '"';
                         //usersIdToName(data[i].administrators, data[i]._id, "data-bs-administrators-name")
                     }
-                    else{
+                    else {
                         channelInfoDataBs += 'data-bs-administrators-name=""';
                         channelInfoDataBs += 'data-bs-administrators-id=""';
                     }
-                     let btn = '<input type="button" class="m-1 channel-btn btn btn-primary align-self-end"' + channelInfoDataBs + ' value="Details" />';
+                    let btn = '<input type="button" class="m-1 channel-btn btn btn-primary align-self-end"' + channelInfoDataBs + ' value="Details" />';
 
                     let channelSquealsInfoDataBs = 'data-bs-channelId="' + data[i]._id + '"'
                         + 'data-bs-toggle="modal"'
@@ -1418,6 +1418,14 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     //create the card
     let recipientsDiv = '';
     if (recipients != null) {
+        //check if some recipients are null
+        for (let i = 0; i < recipients.length; i++) {
+            if (recipients[i].id == null) {
+                //check if it is a channel or a user
+                //remove the recipient from the array
+                recipients.splice(i, 1);
+            }
+        }
         recipients.sort((a, b) => (JSON.stringify(a.id.name).toUpperCase > JSON.stringify(b.id.name).toUpperCase) ? -1 : 1);
 
         recipientsDiv = '<div class="squeal-recipients-div align-self-center">'
