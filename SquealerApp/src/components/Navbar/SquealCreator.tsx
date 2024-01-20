@@ -63,11 +63,11 @@ const SquealCreator = () => {
                 ) {
                     setError(
                         "You have a debt of " +
-                            (-data.msg_quota.debt.daily) +
+                            -data.msg_quota.debt.daily +
                             " daily, " +
-                            (-data.msg_quota.debt.weekly) +
+                            -data.msg_quota.debt.weekly +
                             " weekly and " +
-                            (-data.msg_quota.debt.monthly) +
+                            -data.msg_quota.debt.monthly +
                             " monthly characters"
                     );
                     setDisabled(true);
@@ -108,16 +108,19 @@ const SquealCreator = () => {
     const submitSqueal = async (e) => {
         e.preventDefault();
 
-        if(disabled) {
+        if (disabled) {
             return;
         }
 
-        if(content.text === null && content.img === null && content.video === null && content.geolocation === null) {
+        if (
+            content.text === null &&
+            content.img === null &&
+            content.video === null &&
+            content.geolocation === null
+        ) {
             return;
         }
         setSquealPostedLoading("posting");
-
-        
 
         fetch("/api/squeals/post", {
             method: "POST",
@@ -373,39 +376,37 @@ const SquealCreator = () => {
                         label="Text"
                         content={
                             <AnimatedTabContent>
-                                <form name="squeal-post" className="">
-                                    <p>
-                                        <input
-                                            type="checkbox"
-                                            id="repeat"
-                                            name="repeat"
-                                            checked={repeatMessage}
-                                            onChange={() =>
-                                                setRepeatMessage(!repeatMessage)
-                                            }
-                                        />
-                                        <label htmlFor="repeat">Repeat</label>
-                                        {repeatMessage && (
-                                            <p>
-                                                <input
-                                                    type="text"
-                                                    id="repeat"
-                                                    name="repeat"
-                                                    placeholder="Cron job"
-                                                    value={repetitionExpr}
-                                                    onChange={(e) => {
-                                                        setRepetitionExpr(
-                                                            e.target.value
-                                                        );
-                                                    }}
-                                                    className="text-gray-700"
-                                                />
-                                                <label htmlFor="repeat">
-                                                    Cron job
-                                                </label>
-                                            </p>
-                                        )}
-                                    </p>
+                                <form name="squeal-post" className="" id="squeal-post">
+                                    <input
+                                        type="checkbox"
+                                        id="repeat"
+                                        name="repeat"
+                                        checked={repeatMessage}
+                                        onChange={() =>
+                                            setRepeatMessage(!repeatMessage)
+                                        }
+                                    />
+                                    <label htmlFor="repeat">Repeat</label>
+                                    {repeatMessage && (
+                                        <div>
+                                            <input
+                                                type="text"
+                                                id="repeat-cron-expr"
+                                                name="repeat"
+                                                placeholder="Cron job"
+                                                value={repetitionExpr}
+                                                onChange={(e) => {
+                                                    setRepetitionExpr(
+                                                        e.target.value
+                                                    );
+                                                }}
+                                                className="text-gray-700"
+                                            />
+                                            <label htmlFor="repeat">
+                                                Cron job
+                                            </label>
+                                        </div>
+                                    )}
                                     <motion.textarea
                                         //onChange={(e) => { setMessage(e.target.value) }}
                                         onChange={handleContent}

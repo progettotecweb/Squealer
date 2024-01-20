@@ -159,7 +159,7 @@ export default function EditPage() {
                         onChange={(e) => newDesc(e.target.value)}
                         ref={textRef}
                     />
-                    <div>{textRef.current?.value.length}/150</div>
+                    <div>{textRef.current?.value.length || 0}/150</div>
                 </section>
 
                 <section className="flex flex-col gap-4">

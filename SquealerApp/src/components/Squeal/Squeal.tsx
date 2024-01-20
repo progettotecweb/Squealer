@@ -9,7 +9,7 @@ import Avatar from "@mui/material/Avatar";
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import GeolocationSqueal from "./GeolocationSqueal";
 import { useSWRConfig } from "swr";
@@ -18,7 +18,11 @@ import { Skeleton } from "@mui/material";
 import CustomLink from "../CustomLink";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import regexifyString from "regexify-string";
-import Link from "next/link";
+
+import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import KeyboardAltOutlinedIcon from "@mui/icons-material/KeyboardAltOutlined";
+import Spinner from "../Spinner";
 
 function formatDate(date) {
     const d = new Date(date);
@@ -266,7 +270,9 @@ const Squeal: React.FC<SquealProps> = ({
                             </Typography>
                         </CustomLink>
                     ) : (
-                        <Typography className="mr-auto text-gray-400">user deleted</Typography>
+                        <Typography className="mr-auto text-gray-400">
+                            user deleted
+                        </Typography>
                     )}
                     <Typography className="text-gray-400">
                         {formatDate(date)}
@@ -286,6 +292,7 @@ const Squeal: React.FC<SquealProps> = ({
                                     <img
                                         src={`data:${content?.img.mimetype};base64,${content?.img.blob}`}
                                         alt="FOTO"
+                                        className="max-h-[25vw]"
                                     />
                                 );
                             else return;
@@ -381,23 +388,53 @@ const Squeal: React.FC<SquealProps> = ({
     );
 };
 
+interface Content {
+    text: string | null;
+    img: {
+        mimetype: string;
+        blob: string;
+    } | null;
+    video: {
+        mimetype: string;
+        blob: string;
+    } | null;
+    geolocation: {
+        latitude: number;
+        longitude: number;
+    } | null;
+}
+
 const SquealReplyier = (props: { parent; session }) => {
     const [reply, setReply] = useState("");
     const { mutate } = useSWRConfig();
 
+    const inputImgRef = useRef<any>(null);
+
+    const [content, setContent] = useState<Content>({
+        text: null,
+        img: null,
+        video: null,
+        geolocation: null,
+    });
+
+    const [loading, setLoading] = useState(false);
+
+    const [type, setType] = useState<
+        "text" | "image" | "video" | "geolocation"
+    >("text");
+
     const submitReply = () => {
-        console.log(props.parent.recipients);
+
+        if(type === "text" && reply === "") return;
+        if(type === "image" && !content.img) return;
+
+        setLoading(true);
         fetch("/api/squeals/post", {
             method: "POST",
             body: JSON.stringify({
                 ownerID: props.session?.user.id,
-                type: "text",
-                content: {
-                    text: reply,
-                    img: null,
-                    video: null,
-                    geolocation: null,
-                },
+                type: type,
+                content: content,
                 //remove _id from recipients
                 recipients: [
                     ...props.parent.recipients.map((r) => {
@@ -413,32 +450,199 @@ const SquealReplyier = (props: { parent; session }) => {
         }).then((res) => {
             mutate(`/api/squeals/${props.session.user.id}`);
             mutate(`/api/squeals/${props.session.user.id}/feed`);
+            switchType("text");
+            setLoading(false);
+        });
+    };
+
+    const handleContent = async (e: any) => {
+        console.log("Firing handleContent - " + type);
+
+        const { name, value } = e.target;
+        switch (type) {
+            case "text":
+                setReply(value);
+                setContent({
+                    text: value,
+                    img: null,
+                    video: null,
+                    geolocation: null,
+                });
+                setType("text");
+                break;
+            case "image":
+                //check if upload was empty
+                if (e.target.files.length <= 0) {
+                    setType("text");
+                    break;
+                }
+
+                //check if file uploaded is an image
+                if (!e.target.files[0].type.startsWith("image")) {
+                    alert("File must be an image");
+                } else {
+                    await handleImg(e.target, true);
+                }
+                break;
+        }
+    };
+
+    const [img, setImg] = useState<string | null>(null);
+
+    const handleImg = (file, setContentToUpdate = false) => {
+        return new Promise((resolve, reject) => {
+            setType("image");
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                const imgDataUrl = reader.result as string;
+                setImg(imgDataUrl);
+
+                if (setContentToUpdate) {
+                    setContent({
+                        text: null,
+                        img: formatImg(imgDataUrl),
+                        video: null,
+                        geolocation: null,
+                    });
+                }
+
+                resolve(imgDataUrl); // resolve promise
+            };
+
+            reader.onerror = (error) => {
+                //reject(error); // reject promise if something goes wrong
+            };
+
+            reader.readAsDataURL(file.files[0]);
+        });
+    };
+
+    const formatImg = (img: string | null) => {
+        if (!img) {
+            console.log("no img");
+            return null;
+        }
+        let myImg = { mimetype: "", blob: "" };
+        const imgSplit = img.split(",");
+        const imgType = imgSplit[0].split(";")[0].split(":")[1];
+        const imgBlob = imgSplit[1];
+        myImg = { mimetype: imgType, blob: imgBlob };
+
+        return myImg;
+    };
+
+    const switchType = (newType) => {
+        setType(newType);
+        setContent({
+            text: null,
+            img: null,
+            video: null,
+            geolocation: null,
         });
 
         setReply("");
+        setImg(null);
     };
 
+    useEffect(() => {
+        const inputimg = document.getElementById(
+            `icon-button-file imginputref ${props.parent._id}`
+        );
+        if (inputimg) {
+            inputimg.addEventListener("cancel", (e) => {
+                switchType("text");
+            });
+        }
+
+        return () => {
+            if (inputimg) {
+                inputimg.removeEventListener("cancel", (e) => {
+                    switchType("text");
+                });
+            }
+        };
+    }, []);
+
     return (
-        <div className="flex">
-            <input
-                name="reply"
-                className="w-full bg-gray-700 rounded-md text-gray-50 p-2"
-                placeholder="Reply..."
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                disabled={!props.session}
-            />
+        <form className="flex">
+            <div className="flex flex-1 bg-gray-700 rounded-md text-gray-50" >
+                {type === "text" ? (
+                    <>
+                        <input
+                            name="reply"
+                            className="w-full bg-gray-700 rounded-md text-gray-50 p-2 flex-1"
+                            placeholder="Reply..."
+                            value={reply}
+                            onChange={(e) => handleContent(e)}
+                            disabled={!props.session}
+                            
+                        />
+                    </>
+                ) : (
+                    type === "image" &&
+                    img && (
+                        <div className="flex flex-col gap-2" >
+                            <img
+                                src={img}
+                                alt="img"
+                                className="max-h-[25vw] rounded-lg imgPreview p-2"
+                            />
+                        </div>
+                    )
+                )}
+                {type !== "text" && <SquealButton
+                    disabled={!props.session}
+                    aria-label="share"
+                    className="ml-auto"
+                    onClick={() => switchType("text")}
+                >
+                    <KeyboardAltOutlinedIcon className="text-gray-50" />
+                </SquealButton>}
+
+                <SquealButton
+                    disabled={!props.session}
+                    aria-label="share"
+                    className="ml-auto"
+                    //onClick={() => switchType("image")}
+                >
+                    {/* </SquealButton><CameraAltOutlinedIcon className="text-gray-50" /> */}
+                    <label
+                        htmlFor={`icon-button-file imginputref ${props.parent._id}`}
+                    >
+                        <CameraAltOutlinedIcon className="text-gray-50" />
+                    </label>
+                    <input
+                        ref={inputImgRef}
+                        accept="image/*"
+                        id={`icon-button-file imginputref ${props.parent._id}`}
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => {
+                            handleImg(e.target, true);
+                        }}
+                    />
+                </SquealButton>
+                <SquealButton
+                    disabled={!props.session}
+                    aria-label="share"
+                    className="ml-auto"
+                    onClick={() => {}}
+                >
+                    <LocationOnOutlinedIcon className="text-gray-50" />
+                </SquealButton>
+            </div>
             <SquealButton
-                disabled={!props.session}
+                disabled={!props.session || loading}
                 aria-label="share"
                 className="ml-auto"
                 onClick={() => {
                     submitReply();
                 }}
             >
-                <ReplyOutlinedIcon className="text-gray-50" />
+                {loading ? <Spinner /> : <ReplyOutlinedIcon className="text-gray-50" />}
             </SquealButton>
-        </div>
+        </form>
     );
 };
 

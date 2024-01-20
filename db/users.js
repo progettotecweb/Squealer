@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
             daily: { type: Number, default: 0 },
             weekly: { type: Number, default: 0 },
             monthly: { type: Number, default: 0 },
-        }
+        },
     },
     popularity: { type: Number, default: 0 },
     blocked: { type: Boolean, default: false },
@@ -87,15 +87,13 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-exports.searchUserByID = async function (id, select="") {
+exports.searchUserByID = async function (id, select = "") {
     const user = await User.findById(id, select).populate(
         "notifications.author",
         "name img"
     );
     return user;
 };
-
-
 
 exports.searchUserByName = async function (name) {
     const user = await User.findOne({ name: name }).populate(
@@ -187,310 +185,321 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
 
     // get all squeals of followed channels (the output should be a single array of squeals)
     try {
-    const followedChannelsSqueals = await Channel.aggregate([
-        {
-            $match: {
-                _id: {
-                    $in: user.following,
+        const followedChannelsSqueals = await Channel.aggregate([
+            {
+                $match: {
+                    _id: {
+                        $in: user.following,
+                    },
                 },
             },
-        },
-        {
-            $project: {
-                _id: 1,
-                squeals: 1,
-            },
-        },
-        {
-            $unwind: "$squeals",
-        },
-        {
-            $lookup: {
-                from: "squeals",
-                localField: "squeals",
-                foreignField: "_id",
-                as: "squeals",
-            },
-        },
-        {
-            $unionWith: {
-                coll: "squeals",
-                pipeline: [
-                    {
-                        $match: {
-                            recipients: {
-                                $elemMatch: {
-                                    type: "User",
-                                    id: new mongoose.Types.ObjectId(
-                                        user._id
-                                    ),
-                                },
-                            },
-                        },
-                    },
-                    {
-                        $group: {
-                            _id: null,
-                            squeals: {
-                                $push: "$$ROOT",
-                            },
-                        },
-                    },
-                    {
-                        $project: {
-                            _id: 0,
-                            squeals: 1,
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $unwind: "$squeals",
-        },
-        {
-            $lookup: {
-                from: "users",
-                // Assuming the users collection contains the user data
-                as: "squeals.ownerID",
-                let: { temp: "$squeals.ownerID" },
-
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $eq: ["$_id", "$$temp"],
-                            },
-                        },
-                        
-                    },
-                    {
-                        $project: {
-                            name: 1,
-                            img: 1,
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $unwind: "$squeals.ownerID",
-        },
-        {
-            $addFields: {
-                "squealDetails.ownerID": {
-                    name: "$squealDetails.ownerID.name",
-                    img: "$squealDetails.ownerID.img",
+            {
+                $project: {
+                    _id: 1,
+                    squeals: 1,
                 },
             },
-        },
-        {
-            $lookup: {
-                from: "squeals",
-                // Assuming the replies collection contains the reply data
-                let: { "temp": "$squeals.replies"},
-                as: "squeals.replies",
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $in: ["$_id", "$$temp"],
-                            },
-                        },
-                        
-                    },
-                    {
-                        $project: {
-                            type: 1,
-                            content: 1,
-                            ownerID: 1,
-                            createdAt: 1,
-                            datetime: 1,
-                            _id: 1,
-                            reactions: 1,
-                            isAReply: 1,
-                            impressions: 1,
-                        },
-                    },
-                    {
-                        $lookup: {
-                            from: "users",
-                            let: { ownerID: "$ownerID" },
-                            as: "ownerID",
-                            pipeline: [
-                                {
-                                    $match: {
-                                        $expr: {
-                                            $eq: ["$_id", "$$ownerID"],
-                                        },
+            {
+                $unwind: "$squeals",
+            },
+            {
+                $lookup: {
+                    from: "squeals",
+                    localField: "squeals",
+                    foreignField: "_id",
+                    as: "squeals",
+                },
+            },
+            {
+                $unionWith: {
+                    coll: "squeals",
+                    pipeline: [
+                        {
+                            $match: {
+                                recipients: {
+                                    $elemMatch: {
+                                        type: "User",
+                                        id: new mongoose.Types.ObjectId(
+                                            user._id
+                                        ),
                                     },
                                 },
-                                {
-                                    $project: {
-                                        name: 1,
-                                        img: 1,
-                                    },
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                squeals: {
+                                    $push: "$$ROOT",
                                 },
-                            ],
-                        },
-                    },
-                    {
-                        $unwind: "$ownerID",
-                    },
-                ],
-            },
-        },
-        {
-            $lookup: {
-                from: "keywords",
-                let: { "temp": "$squeals.recipients.id" },
-                as: "squeals.recipientsFromCollection1",
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $in: ["$_id", "$$temp"],
                             },
                         },
-                    },
-                    {
-                        $project: {
-                            name: 1,
-                            id: 1,
-                            type: "Keyword",
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $lookup: {
-                from: "users",
-                let: { temp: "$squeals.recipients.id" },
-                as: "squeals.recipientsFromCollection2",
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $in: ["$_id", "$$temp"],
+                        {
+                            $project: {
+                                _id: 0,
+                                squeals: 1,
                             },
                         },
-                    },
-                    {
-                        $project: {
-                            name: 1,
-                            id: 1,
-                            type: "User",
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $lookup: {
-                from: "channels",
-                let: { temp: "$squeals.recipients.id" },
-                as: "squeals.recipientsFromCollection3",
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $in: ["$_id", "$$temp"],
-                            },
-                        },
-                    },
-                    {
-                        $project: {
-                            name: 1,
-                            id: 1,
-                            type: "Channel",
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $addFields: {
-                "squeals.recipients": {
-                    $setUnion: [
-                        "$squeals.recipientsFromCollection1",
-                        "$squeals.recipientsFromCollection2",
-                        "$squeals.recipientsFromCollection3",
                     ],
                 },
             },
-        },
-        {
-            $project: {
-                "squeals.recipientsFromCollection1": 0,
-                "squeals.recipientsFromCollection2": 0,
-                "squeals.recipientsFromCollection3": 0,
+            {
+                $unwind: "$squeals",
             },
-        },
-        {
-            $sort: {
-                "squeals.createdAt": -1,
-            },
-        },
-        {
-            $skip: skip,
-        },
-        {
-            $limit: limit,
-        },
-        {
-            $group: {
-                _id: null,
-                squeals: {
-                    $push: "$squeals",
+            {
+                // remove duplicates
+                $group: {
+                    _id: "$squeals._id",
+                    squeals: {
+                        $first: "$squeals",
+                    },
                 },
             },
-        },
-        {
-            $project: {
-                _id: 0,
-                squeals: 1,
-            },
-        },
-        {
-            $addFields: {
-                squeals: {
-                    $filter: {
-                        input: "$squeals",
-                        as: "squeal",
-                        cond: {
-                            $or: [
-                                { $eq: ["$$squeal.isAReply", false] },
-                                {
-                                    $not: {
-                                        $in: [
-                                            "$$squeal.replyingTo",
-                                            {
-                                                $map: {
-                                                    input: "$squeals",
-                                                    as: "s",
-                                                    in: "$$s._id",
-                                                },
-                                            },
-                                        ],
-                                    },
+            {
+                $lookup: {
+                    from: "users",
+                    // Assuming the users collection contains the user data
+                    as: "squeals.ownerID",
+                    let: { temp: "$squeals.ownerID" },
+
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", "$$temp"],
                                 },
-                            ],
+                            },
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                img: 1,
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                $unwind: "$squeals.ownerID",
+            },
+            {
+                $addFields: {
+                    "squealDetails.ownerID": {
+                        name: "$squealDetails.ownerID.name",
+                        img: "$squealDetails.ownerID.img",
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    from: "squeals",
+                    // Assuming the replies collection contains the reply data
+                    let: { temp: "$squeals.replies" },
+                    as: "squeals.replies",
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ["$_id", "$$temp"],
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                type: 1,
+                                content: 1,
+                                ownerID: 1,
+                                datetime: 1,
+                                _id: 1,
+                                reactions: 1,
+                                isAReply: 1,
+                                impressions: 1,
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: "users",
+                                let: { ownerID: "$ownerID" },
+                                as: "ownerID",
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $eq: ["$_id", "$$ownerID"],
+                                            },
+                                        },
+                                    },
+                                    {
+                                        $project: {
+                                            name: 1,
+                                            img: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            $unwind: "$ownerID",
+                        },
+                    ],
+                },
+            },
+            {
+                $lookup: {
+                    from: "keywords",
+                    let: { temp: "$squeals.recipients.id" },
+                    as: "squeals.recipientsFromCollection1",
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ["$_id", "$$temp"],
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                id: 1,
+                                type: "Keyword",
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    let: { temp: "$squeals.recipients.id" },
+                    as: "squeals.recipientsFromCollection2",
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ["$_id", "$$temp"],
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                id: 1,
+                                type: "User",
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                $lookup: {
+                    from: "channels",
+                    let: { temp: "$squeals.recipients.id" },
+                    as: "squeals.recipientsFromCollection3",
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ["$_id", "$$temp"],
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                id: 1,
+                                type: "Channel",
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                $addFields: {
+                    "squeals.recipients": {
+                        $setUnion: [
+                            "$squeals.recipientsFromCollection1",
+                            "$squeals.recipientsFromCollection2",
+                            "$squeals.recipientsFromCollection3",
+                        ],
+                    },
+                },
+            },
+            {
+                $project: {
+                    "squeals.recipientsFromCollection1": 0,
+                    "squeals.recipientsFromCollection2": 0,
+                    "squeals.recipientsFromCollection3": 0,
+                },
+            },
+            {
+                $sort: {
+                    "squeals.datetime": -1,
+                },
+            },
+            {
+                $skip: skip,
+            },
+            
+            {
+                $limit: limit,
+            },
+            {
+                $group: {
+                    _id: null,
+                    squeals: {
+                        $push: "$squeals",
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    squeals: 1,
+                },
+            },
+            {
+                $addFields: {
+                    squeals: {
+                        $filter: {
+                            input: "$squeals",
+                            as: "squeal",
+                            cond: {
+                                $or: [
+                                    { $eq: ["$$squeal.isAReply", false] },
+                                    {
+                                        $not: {
+                                            $in: [
+                                                "$$squeal.replyingTo",
+                                                {
+                                                    $map: {
+                                                        input: "$squeals",
+                                                        as: "s",
+                                                        in: "$$s._id",
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    },
+                                ],
+                            },
                         },
                     },
                 },
             },
-        },
-    ]);
+            
+        ]);
 
-    const feed = followedChannelsSqueals[0]?.squeals || [];
+        
 
-    return feed;} catch(e) {
+        const feed = followedChannelsSqueals[0]?.squeals || [];
+
+        return feed;
+    } catch (e) {
         console.log(e);
-        res.status(500).json({error: e.message})
+        res.status(500).json({ error: e.message });
     }
 };
 
 exports.deleteUser = async function (id) {
     await User.findByIdAndDelete(id);
-}
+};

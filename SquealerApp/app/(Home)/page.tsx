@@ -6,18 +6,19 @@ import Spinner from "@/components/Spinner";
 import Squeal, { SquealSkeleton } from "@/components/Squeal/Squeal";
 import Tabs, { Tab } from "@/components/Tabs/Tabs";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWRInfinite from "swr/infinite";
 
 const Homepage = () => {
     const { data: session, status } = useSession();
-    const [contentFinished, setContentFinished] = useState(false);
+    const contentFinished = useRef<boolean>(false);
 
     const getKey = (pageIndex: any, previousPageData: string | any[]) => {
         if (previousPageData && !previousPageData.length) {
-            setContentFinished(true);
+            contentFinished.current = true;
             return null;
         } // reached the end
+
         return status === "authenticated"
             ? `/api/users/${session?.user?.id}/feed?page=${pageIndex}&limit=10`
             : status === "unauthenticated"
@@ -30,7 +31,7 @@ const Homepage = () => {
             .then((res) => res.json())
             .then((data) => {
                 if (data.length === 0) {
-                    setContentFinished(true);
+                    contentFinished.current = true;
                 }
 
                 return data;
@@ -46,7 +47,8 @@ const Homepage = () => {
             const scrollHeight = e.target.documentElement.scrollHeight;
             const currentHeight =
                 e.target.documentElement.scrollTop + window.innerHeight;
-            if (currentHeight + 1 >= scrollHeight && !contentFinished) {
+            if ((currentHeight + 1 >= scrollHeight) && !contentFinished.current) {
+                console.log(`Requesting next page (${contentFinished.current ? "finished" : "not finished"})`)
                 setSize(size + 1);
             }
         };
@@ -91,13 +93,6 @@ const Homepage = () => {
                                           </div>
                                       ))}
                                 {isValidating || (isLoading && <Spinner />)}
-                                {!contentFinished ? (
-                                    <button onClick={() => setSize(size + 1)}>
-                                        Load More
-                                    </button>
-                                ) : (
-                                    <div>finished</div>
-                                )}
                             </section>
                         }
                     />

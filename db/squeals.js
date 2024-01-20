@@ -479,45 +479,16 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
         },
         {
             $lookup: {
-                from: "keywords",
-                localField: "squeals.recipients.id",
-                foreignField: "_id",
-                as: "squeals.recipientsFromCollection1",
-                pipeline: [
-                    {
-                        $project: {
-                            name: 1,
-                            id: "$id",
-                            type: "Keyword",
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "squeals.recipients.id",
-                foreignField: "_id",
-                as: "squeals.recipientsFromCollection2",
-                pipeline: [
-                    {
-                        $project: {
-                            name: 1,
-                            id: "$id",
-                            type: "User",
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $lookup: {
                 from: "channels",
                 localField: "squeals.recipients.id",
                 foreignField: "_id",
                 as: "squeals.recipientsFromCollection3",
                 pipeline: [
+                    {
+                        $match: {
+                            official: true
+                        }
+                    },
                     {
                         $project: {
                             name: 1,
@@ -532,8 +503,6 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
             $addFields: {
                 "squeals.recipients": {
                     $setUnion: [
-                        "$squeals.recipientsFromCollection1",
-                        "$squeals.recipientsFromCollection2",
                         "$squeals.recipientsFromCollection3",
                     ],
                 },
@@ -541,14 +510,12 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
         },
         {
             $project: {
-                "squeals.recipientsFromCollection1": 0,
-                "squeals.recipientsFromCollection2": 0,
                 "squeals.recipientsFromCollection3": 0,
             },
         },
         {
             $sort: {
-                "squeals.createdAt": -1,
+                "squeals.datetime": -1,
             },
         },
         {

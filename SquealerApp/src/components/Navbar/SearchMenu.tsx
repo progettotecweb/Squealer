@@ -150,14 +150,16 @@ export default function SearchMenu() {
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            {recents?.map((recent: any) => {
+                            {recents?.map((recent: any, index) => {
                                 return (
-                                    <div
+                                    <CustomLink
+                                        key={index}
                                         className="flex flex-row gap-2 cursor-pointer hover:bg-gray-700 rounded-lg p-1"
-                                        onClick={() => setQuery(recent)}
+                                        href={`/${recent.startsWith("@") ? "Users" : "Channels" }/${recent.replace("@", "")}`}
+                                        
                                     >
                                         <p>{recent}</p>
-                                    </div>
+                                    </CustomLink>
                                 );
                             })}
                         </div>
@@ -174,14 +176,13 @@ export default function SearchMenu() {
                             return (
                                 <CustomLink href={`/${query.startsWith("@") ? "Users" : "Channels" }/${result.name}`} key={i}>
                                     <motion.div
-                                        key={i}
                                         variants={resultsVariants}
                                         initial="hidden"
                                         animate="visible"
                                         exit="exit"
                                         className="flex flex-row gap-2 cursor-pointer hover:bg-gray-700 rounded-lg p-1"
                                         onClick={() => {
-                                            setNewRecent(result.name);
+                                            setNewRecent(query[0] + result.name);
                                             setTrigger(true);
                                         }}
                                     >

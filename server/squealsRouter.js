@@ -171,13 +171,14 @@ router.post("/post", async (req, res) => {
 
     const toBeRemoved = [];
 
-    for (const recipient of recipients) {
+    for (let recipient of recipients) {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
             if (!user) {
                 privacy = 0;
                 toBeRemoved.push(recipient);
             }
+            recipient.name = user.name;
         } else if (recipient.type === "Channel") {
             const channel = await channelsDB.searchChannelByID(recipient.id);
 
@@ -202,12 +203,15 @@ router.post("/post", async (req, res) => {
                         }
                     }
                 }
+                recipient.name = channel.name;
             } else {
                 toBeRemoved.push(recipient);
             }
+
         } else if (recipient.type === "Keyword") {
             const keyword = await keywordsDB.searchKeywordByID(recipient.id);
             if (!keyword) toBeRemoved.push(recipient);
+            recipient.name = keyword.name;
         }
     }
 
@@ -393,6 +397,7 @@ router.post("/post", async (req, res) => {
         success: true,
         squeal: {
             ...newSqueal._doc,
+            recipients: [...newRecipients],
             ownerID: {
                 _id: owner._id,
                 name: owner.name,

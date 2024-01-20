@@ -27,31 +27,6 @@ export const UserCard = ({ id }) => {
     if (error) return <div>{error.message}</div>;
 
     if (isLoading) return;
-    <section>
-        <div className="flex flex-col items-center justify-center p-4">
-            <img
-                src={`/squealer.png`}
-                alt="Profile Picture"
-                className="w-32 h-32 rounded-full object-cover"
-            />
-        </div>
-        <section className="col-span-3 p-4 flex flex-col h-full items-start gap-4 w-full">
-            <div className="flex gap-2 items-center w-full">
-                <h1 className="text-2xl font-bold text-white">Loading...</h1>
-            </div>
-            <div className="flex text-lg gap-16">
-                <h1 className="flex">
-                    <h2>Loading...</h2>
-                </h1>
-                <h1 className="flex">
-                    <h2>Loading...</h2>
-                </h1>
-            </div>
-            <div className="self-start h-full flex items-center text-md">
-                Loading...
-            </div>
-        </section>
-    </section>;
 
     return (
         <section className="w-full md:w-[60vw]  grid grid-cols-4">
@@ -69,12 +44,12 @@ export const UserCard = ({ id }) => {
                     </h1>
                 </div>
                 <div className="flex text-lg gap-16">
-                    <h1 className="flex">
+                    <div className="flex">
                         <h2>{data.squeals.length} Squeals</h2>
-                    </h1>
-                    <h1 className="flex">
+                    </div>
+                    <div className="flex">
                         <h2>{data.following.length} Following</h2>
-                    </h1>
+                    </div>
                 </div>
                 <div className="self-start h-full flex items-center text-md">
                     {data.bio}
