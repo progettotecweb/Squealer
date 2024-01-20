@@ -11,7 +11,6 @@ import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import { signOut } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SearchOutlined } from "@mui/icons-material";
 import NotificationMenu from "./NotificationMenu";
@@ -21,6 +20,7 @@ import ForumIcon from "@mui/icons-material/Forum";
 import Dialog from "@mui/material/Dialog";
 import SquealCreator from "./SquealCreator";
 import SearchMenu from "./SearchMenu";
+import useSignout from "@/hooks/useSignout";
 
 const MenuItem = ({
     text,
@@ -94,6 +94,8 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
         setOpen(false);
     };
 
+    const signOut = useSignout();
+
     return (
         <div className="flex flex-row h-full">
             <AnimatePresence>
@@ -120,9 +122,7 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                         {user ? (
                             <button
                                 onClick={() =>
-                                    signOut({
-                                        callbackUrl: "/Home/Login",
-                                    })
+                                    signOut()
                                 }
                             >
                                 Sign Out
@@ -145,7 +145,7 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 href="/Account"
                                 icon={
                                     <img
-                                        src={`data:${user?.img.mimetype};base64,${user?.img.blob}`}
+                                        src={`data:${user?.img?.mimetype};base64,${user?.img?.blob}`}
                                         alt="Profile Picture"
                                         className="w-8 h-8 rounded-full object-cover"
                                     />
