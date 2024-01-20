@@ -80,9 +80,19 @@ window.onload = function () {
     });
 
     const sectionList = document.querySelector(".section-list");
+    //click on section event listener
     sectionList.addEventListener("click", async (e) => {
         if (e.target.classList.contains("box-section")) {
             await loadSection(e.target);
+        }
+    });
+
+    //press enter on section event listener
+    sectionList.addEventListener("keypress", async (e) => {
+        if (e.key === "Enter") {
+            if (e.target.classList.contains("box-section")) {
+                await loadSection(e.target);
+            }
         }
     });
 
@@ -163,7 +173,7 @@ window.onload = function () {
                     let mycard = "<div class='my-card my-card-grid-tl-tr-b'>";
 
                     const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
-                    let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s propic' class='user-pic my-card-grid-tl'/>";
+                    let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s profile picture' class='user-pic my-card-grid-tl'/>";
                     mycard += img;
                     mycard += '<div class="user-content my-card-grid-tr">';
                     let content = "<p class='user-name h5'>" + data[i].name + "</p>";
@@ -538,6 +548,7 @@ window.onload = function () {
 
             modalTitle.textContent = databs.username
             modalImg.src = databs.img
+            modalImg.alt = databs.username + "'s profile picture";
 
             btnSave.setAttribute("data-bs-userId", databs.id);
             btnSave.setAttribute("data-bs-operation", "users")
@@ -619,7 +630,6 @@ window.onload = function () {
             const officialText = channelModal.querySelector("#channel-official");
 
             //set input values
-            console.log(databs.administratorsName);
             inputName.value = databs.name;
             inputDescription.value = databs.description;
             inputAdmins.value = formatAdmin(databs.administratorsName);
@@ -1022,7 +1032,7 @@ window.onload = function () {
                 Object.keys(dataToUpdate).forEach(key => {
                     data[key] = dataToUpdate[key];
                 });
-                console.log(data);
+
                 //update table
                 await fetch("/api/" + table + "/" + id, {
                     method: "PUT",
@@ -1103,6 +1113,7 @@ window.onload = function () {
     const channelSection = document.getElementById("channelSection");
     const squealSection = document.getElementById("squealSection");
 
+    //change active section when clicking on the section
     userSection.addEventListener("click", (e) => {
         changeSectionClass(e.target);
     });
@@ -1114,6 +1125,25 @@ window.onload = function () {
 
     squealSection.addEventListener("click", (e) => {
         changeSectionClass(e.target);
+    });
+
+    //change active section when pressing enter
+    userSection.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            changeSectionClass(e.target);
+        }
+    });
+
+    channelSection.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            changeSectionClass(e.target);
+        }
+    });
+
+    squealSection.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            changeSectionClass(e.target);
+        }
     });
 
 
@@ -1164,6 +1194,7 @@ function changeSectionClass(newSection) {
     const activeSection = document.querySelector(".active-section");
     activeSection.classList.remove("active-section");
     activeSection.classList.remove("active-section-not-scrolled");
+    activeSection.setAttribute("aria-selected", "false");
 
     //in the new section, update the attribute for the filter modal
     const btnFilter = document.querySelector("#btn-filter");
@@ -1182,6 +1213,7 @@ function changeSectionClass(newSection) {
     //update the section
     newSection.classList.add("active-section");
     newSection.classList.add("active-section-not-scrolled");
+    newSection.setAttribute("aria-selected", "true");
 }
 
 async function usersIdToName(usersId, channelId, dataBsName) {
