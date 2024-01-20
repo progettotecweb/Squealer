@@ -195,6 +195,11 @@
     object-fit: cover;
 }
 
+.squeal-content{
+    min-height: 10em;
+    margin-bottom: 2em;
+}
+
 .squeal-text {
     min-height: 1em;
     padding: 0.7em;
@@ -219,6 +224,13 @@
 .geo-squeal {
     width: 100%;
     height: 12em;
+}
+
+.geo-squeal,
+.video-squeal,
+.img-squeal {
+    border-radius: 10px;
+    box-shadow: 0px 0px 2px 0px #000000;
 }
 
 .squeal-footer {
@@ -258,7 +270,6 @@
 
 .squeal-recipients-div {
     text-align: end;
-    margin-bottom: 0.5em;
     min-height: 1em;
 }
 
@@ -358,8 +369,8 @@
     cursor: pointer;
 }
 
-.noItems{
-   place-self: center;
+.noItems {
+    place-self: center;
 }
 
 /*Styles for max-width 600px*/
@@ -414,7 +425,7 @@
     }
 }
 
-#loading-screen{
+#loading-screen {
     position: fixed;
     width: 100vw;
     height: 100vh;
@@ -424,4 +435,3 @@
     justify-content: center;
     align-items: center;
 }
-

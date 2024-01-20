@@ -1460,7 +1460,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
         }
         recipients.sort((a, b) => (JSON.stringify(a.id.name).toUpperCase > JSON.stringify(b.id.name).toUpperCase) ? -1 : 1);
 
-        recipientsDiv = '<div class="squeal-recipients-div align-self-center">'
+        recipientsDiv = '<div class="squeal-recipients-div">'
         for (let i = 0; i < recipients.length; i++) {
             if (!recipients[i].id) continue;
             recipientsDiv += '<span class="squeal-recipient ">'
@@ -1567,7 +1567,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
             + 'data-bs-idsType="' + getIdsType(squeal.recipients) + '"'
             + ' /></div>';
     }
-    let mycard = "<div class='my-card-squeal channel-squeal'>";
+    let mycard = "<div class='d-flex justify-content-between flex-column my-card-squeal channel-squeal'>";
     mycard += recipientsDiv;
     mycard += header;
     mycard += content;
@@ -1611,14 +1611,17 @@ function createGeoMap(geolocation, mapId = null) {
     return map;
 }
 
+function pad(number) {
+    return (number < 10 ? '0' : '') + number;
+}
+
 function formatDate(date) {
     const d = new Date(date);
-    const month = d.getMonth();//+1
-    const day = d.getDate();
+    const month = pad(d.getMonth() + 1); // Aggiungo 1 al mese perché i mesi in JavaScript partono da 0
+    const day = pad(d.getDate());
     const year = d.getFullYear();
-    const hour = d.getHours();
-    const minutes = d.getMinutes();
-    const seconds = d.getSeconds();
+    const hour = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
 
     return day + "/" + month + "/" + year + " " + hour + ":" + minutes;
 }
