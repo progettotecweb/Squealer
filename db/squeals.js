@@ -149,7 +149,7 @@ const Squeal = mongoose.model("Squeal", squealSchema);
 
 exports.createNewSqueal = async function (squeal) {
     const newSqueal = new Squeal(squeal);
-    await newSqueal.save();
+    //await newSqueal.save();
     return newSqueal;
 };
 

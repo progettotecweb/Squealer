@@ -8,6 +8,8 @@ const squealsDB = require("../db/squeals");
 
 const { getToken } = require("../SquealerApp/node_modules/next-auth/jwt");
 
+const {auth, personalRoute} = require("../utils/utils.js");
+
 router.get("/", async (req, res) => {
     const channels = await channelsDB.searchChannel("visibility", "public");
     res.json({ results: channels });
@@ -147,7 +149,7 @@ router.put("/id/:id", async (req, res) => {
         });
         return;
     }
-    console.log("channel",req.body);
+    console.log("channel", req.body);
     const updatedChannel = {
         name: req.body.name,
         description: req.body.description,
@@ -156,7 +158,7 @@ router.put("/id/:id", async (req, res) => {
         can_user_post: req.body.can_user_post,
         squeals: req.body.squeals,
         followers: req.body.followers,
-        blocked: req.body.blocked
+        blocked: req.body.blocked,
     };
 
     await channelsDB.updateChannel(req.params.id, updatedChannel);
@@ -185,26 +187,27 @@ router.put("/app/id/:id", async (req, res) => {
 
         console.log(toBeRemoved);
 
-        const toBeAdded = updatedAdmins.filter((adm) => adm.state === "adding").map((adm) => adm?._id || adm?.id);
+        const toBeAdded = updatedAdmins
+            .filter((adm) => adm.state === "adding")
+            .map((adm) => adm?._id || adm?.id);
 
         console.log(toBeAdded);
 
         console.log(channel.administrators);
 
         const newAdmins = channel.administrators
-            .filter((adm) => !toBeRemoved.includes(adm.toString()) && !toBeAdded.includes(adm.toString()))
+            .filter(
+                (adm) =>
+                    !toBeRemoved.includes(adm.toString()) &&
+                    !toBeAdded.includes(adm.toString())
+            )
             .map((adm) => adm?._id || adm?.id);
 
         const updatedChannel = {
             name: req.body.name,
             description: req.body.description,
-            administrators: [
-                ...new Set([
-                    ...newAdmins,
-                    ...toBeAdded
-                ]),
-            ],
-            visibility: req.body.visibility,
+            administrators: [...new Set([...newAdmins, ...toBeAdded])],
+            visibility: req.body.isPublic ? "public" : "private",
             can_user_post: req.body.can_user_post,
             squeals: req.body.squeals,
             followers: req.body.followers,
@@ -222,6 +225,16 @@ router.put("/app/id/:id", async (req, res) => {
             ok: true,
         });
     }
+});
+
+//id is the user id - SHOULD BE A PRIVATE ROUTE (requester === id)
+router.get("/:id/administered",auth, personalRoute("id"), async (req, res) => {
+    // get all channels owned or administered by user identified by id url param
+    const channels = await channelsDB.getAllChannelsByAdminOrOwner(
+        req.params.id
+    );
+
+    res.status(200).json(channels);
 });
 
 router.post("/createprivate", async (req, res) => {
@@ -246,40 +259,16 @@ router.post("/createprivate", async (req, res) => {
         administrators: new Array(user),
     });
 
-    res.status(200).json({
-        ok: true,
-        channel: newChannel,
-    });
-});
+    const creator = usersDB.searchUserByID(user);
 
-router.put("/createprivate", async (req, res) => {
-    const { name, description, img, isPublic, user } = req.body;
-
-    console.log(name);
-
-    const channel = await channelsDB.updateChannelByName(name, {
-        name: name.toLowerCase(),
-        owner_id: user,
-        description: description,
-        visibility: isPublic ? "public" : "private",
-        banner: img,
-        followers: new Array(user),
-        administrators: new Array(user),
-    });
-
-    console.log(channel);
-
-    if (channel) {
-        res.status(500).json({
-            ok: false,
-            error: "Channel could not be updated",
-        });
-        return;
+    if (creator) {
+        creator.following.push(newChannel._id);
+        await creator.save();
     }
 
     res.status(200).json({
         ok: true,
-        channel: channel,
+        channel: newChannel,
     });
 });
 

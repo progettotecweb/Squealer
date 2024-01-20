@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema({
         weekly: { type: Number, default: WEEKLY_MSG_QUOTA },
         monthly: { type: Number, default: MONTHLY_MSG_QUOTA },
         extra: { type: Number, default: 0 },
+        debt: {
+            daily: { type: Number, default: 0 },
+            weekly: { type: Number, default: 0 },
+            monthly: { type: Number, default: 0 },
+        }
     },
     popularity: { type: Number, default: 0 },
     blocked: { type: Boolean, default: false },

@@ -69,7 +69,7 @@ const Homepage = () => {
                             <section className="flex flex-col gap-2 w-full">
                                 {data
                                     ? data.map((page) => {
-                                          return page.map((squeal, index) => (
+                                          return page?.map((squeal, index) => (
                                               <Squeal
                                                   squealData={squeal}
                                                   type={squeal.type}

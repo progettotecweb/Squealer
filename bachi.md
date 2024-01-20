@@ -1,0 +1,21 @@
+# APP react
+
+- ❌ quando posto con @ come dest errore (vedi console log)
+- ❌ quando posto con § or @ come dest non vengono visualizzati correttamente nello squeal appena postato
+- ❌ uno squeal appartenente a due canali viene visualizzato due volte
+- ❌ se rispondo a uno squeal errore nel console.log di vscode (secondo me deriva dagli altri errori 1-2)
+- ❌ se premo il tasto repeat errore nell console di js
+- ❌ nella bio il contatore di char inizia da /150 invece che 0/150
+- ❌ se premo search errore nella console di js
+- ❌ nella search i recenti funzionano male, se premo su un recente devi inserire § o @ prima del nome. altrimenti non trova il recente
+- 
+
+~~
+
+# MOD DASHBOARD js vanilla
+
+-
+
+# SMM DASHBOARD vue
+
+- 

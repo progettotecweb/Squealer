@@ -33,32 +33,32 @@ const auth = async (req, res, next) => {
     if (token) {
         const user = await usersDB.searchUserByID(token.id);
 
-        if(!user) {
+        if (!user) {
             signOut();
             res.status(404).sendFile(
                 path.join(global.rootDir, "public", "html", "404.html")
-            )
+            );
         }
 
-        req.user = {"role": user.role};
+        req.user = { role: user.role };
         next();
     } else {
         res.status(401).sendFile(
             path.join(global.rootDir, "public", "html", "401.html")
         );
     }
-}
+};
 
 const checkIfUserStillExists = async (id) => {
     const user = await usersDB.searchUserByID(id);
 
-    if(!user) {
+    if (!user) {
         signOut();
         res.status(404).sendFile(
             path.join(global.rootDir, "public", "html", "404.html")
-        )
+        );
     }
-}
+};
 
 const checkRole = (roles) => async (req, res, next) => {
     const user = req.user;
@@ -80,10 +80,30 @@ const checkRole = (roles) => async (req, res, next) => {
     }
 };
 
+const personalRoute = (param="id", userParam="id") => async (req, res, next) => {
+
+    const user = req.user;
+
+    console.log(user);
+
+    const actualParam = req.params[param];
+
+    if(user[userParam] !== actualParam) {
+        res.status(401).sendFile(
+            path.join(global.rootDir, "public", "html", "401.html")
+        );
+    }
+
+    console.log("Middleware param check: " + actualParam);
+
+    next();
+};
+
 module.exports = {
     server_log,
     checkRole,
     auth,
     signOut,
     checkIfUserStillExists,
+    personalRoute,
 };

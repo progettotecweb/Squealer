@@ -5,6 +5,7 @@ const usersDB = require("../db/users");
 const channelsDB = require("../db/channels");
 const squealsDB = require("../db/squeals");
 const keywordsDB = require("../db/keywords");
+const { personalRoute, auth } = require("../utils/utils");
 
 router.use("/squeals", require("./squealsRouter"));
 
@@ -42,11 +43,16 @@ router.get("/globalFeed", async (req, res) => {
 })
 
 //this should be a personal route
-router.post("/shop/:id", async (req, res) => {
+router.post("/shop/:id",auth, async (req, res) => {
     const type = req.params.id
 
     console.log(type)
     const user = await usersDB.searchUserByID(req.body.user, "name msg_quota")
+
+    // if(req.body.user !== req.user.id) {
+    //     res.status(401).json({error: "Unauthorized"})
+    //     return
+    // }
 
     switch (type) {
         case "daily": {

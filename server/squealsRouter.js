@@ -8,6 +8,9 @@ const keywordsDB = require("../db/keywords");
 const webpush = require("web-push");
 const subscriptionsDB = require("../db/subscriptions");
 const conditionsDB = require("../db/conditions");
+
+const notifications = require("./notifications/notifications");
+
 let PipelineSingleton;
 
 (async () => {
@@ -97,13 +100,13 @@ router.put("/reaction/:id", async (req, res) => {
 });
 
 const validateChars = (len, owner) => {
-    if (owner.msg_quota.daily - len < 0) {
+    if (owner.msg_quota.daily < 0) {
         return false;
     }
-    if (owner.msg_quota.weekly - len < 0) {
+    if (owner.msg_quota.weekly < 0) {
         return false;
     }
-    if (owner.msg_quota.monthly - len < 0) {
+    if (owner.msg_quota.monthly < 0) {
         return false;
     }
     return true;
@@ -114,22 +117,16 @@ function truncate(str, n) {
 }
 
 // squeal posting route
-/**
- * TODO: add chars validation (DONE)
- * TODO: add text in image validation with transformers (OPTIONAL)
- * TODO: add text sentiment analysis (OPTIONAL)
- * TODO: add image sentiment analysis (OPTIONAL)
- * TODO: add temporized squeals
- */
 router.post("/post", async (req, res) => {
     let squeal = req.body;
 
     // #TODO: squeal validation
     console.log("squeal", squeal);
 
-    
-
     const owner = await usersDB.searchUserByID(squeal.ownerID);
+    if (!owner) {
+        res.status(400).json({ success: false, error: "User not found" });
+    }
 
     // Squeal creation
     const newSqueal = await squealsDB.createNewSqueal(squeal);
@@ -154,37 +151,73 @@ router.post("/post", async (req, res) => {
             });
             await parentOwner.save();
 
-            const subs = await subscriptionsDB.getSubscriptionByUser(
-                parentOwner._id
-            );
-
-            subs.forEach(async (s) => {
-                const payload = JSON.stringify({
-                    title: `@${owner.name} replied to your squeal`,
-                    body: `${truncate(newSqueal.content.text, 20)}`,
-                });
-                const res = await webpush.sendNotification(
-                    s.subscription,
-                    payload
-                );
-                if (res.statusCode === 410) {
-                    console.log(
-                        "Subscription has expired or is no longer valid: ",
-                        res.statusCode
-                    );
-                    // GONE (subscription no longer valid)
-                    await subscriptionsDB.removeSubscription(s._id);
-                }
+            const payload = JSON.stringify({
+                title: `@${owner.name} replied to your squeal`,
+                body: `${truncate(newSqueal.content.text, 20)}`,
             });
+
+            await notifications.sendNotification(parentOwner._id, payload);
         }
     }
 
     //console.log("newSqueal", newSqueal);
 
-    if (!owner) {
-        res.status(400).json({ success: false, error: "User not found" });
+    const recipients = squeal.recipients;
+
+    let privacy = 0;
+
+    if (recipients.length === 1 && recipients[0].type === "User") privacy = 1;
+
+    const toBeRemoved = [];
+
+    for (const recipient of recipients) {
+        if (recipient.type === "User") {
+            const user = await usersDB.searchUserByID(recipient.id);
+            if (!user) {
+                privacy = 0;
+                toBeRemoved.push(recipient);
+            }
+        } else if (recipient.type === "Channel") {
+            const channel = await channelsDB.searchChannelByID(recipient.id);
+
+            if (channel) {
+                if (channel.visibility === "private") {
+                    if (
+                        channel.administrators.includes(owner._id) ||
+                        channel.owner_id.toString() === owner._id.toString()
+                    ) {
+                        privacy ||= 1;
+                    } else {
+                        toBeRemoved.push(recipient);
+                    }
+                } else {
+                    if (!channel.can_user_post) {
+                        if (
+                            channel.administrators.includes(owner._id) ||
+                            channel.owner_id.toString() === owner._id.toString()
+                        ) {
+                        } else {
+                            toBeRemoved.push(recipient);
+                        }
+                    }
+                }
+            } else {
+                toBeRemoved.push(recipient);
+            }
+        } else if (recipient.type === "Keyword") {
+            const keyword = await keywordsDB.searchKeywordByID(recipient.id);
+            if (!keyword) toBeRemoved.push(recipient);
+        }
     }
-    // Keywords
+
+    const newRecipients = recipients.filter((recipient) => {
+        return !toBeRemoved.includes(recipient);
+    });
+
+    console.log("Computed privacy: " + (privacy ? "private" : "public"));
+
+    let squealLen = 0;
+
     //check if the squeal has text
     if (newSqueal.type === "text" && newSqueal.content.text) {
         const message = newSqueal.content.text;
@@ -213,7 +246,7 @@ router.post("/post", async (req, res) => {
         const len = message.length;
         console.log("len", len);
 
-        if (!validateChars(newSqueal.content.text, owner)) {
+        if (!privacy && !validateChars(len, owner)) {
             res.status(400).json({
                 success: false,
                 error: "You have exceeded your daily, weekly or monthly message quota",
@@ -221,9 +254,7 @@ router.post("/post", async (req, res) => {
             return;
         }
 
-        owner.msg_quota.daily -= len;
-        owner.msg_quota.weekly -= len;
-        owner.msg_quota.monthly -= len;
+        squealLen = len;
 
         // mentions
         // mentions begin with @
@@ -238,28 +269,12 @@ router.post("/post", async (req, res) => {
                 );
 
                 if (mentionUser) {
-                    const subs = await subscriptionsDB.getSubscriptionByUser(
-                        mentionUser._id
-                    );
-
-                    subs.forEach(async (s) => {
-                        const payload = JSON.stringify({
-                            title: `@${owner.name} mentioned you in a squeal`,
-                            body: `${truncate(message, 20)}`,
-                        });
-                        const res = await webpush.sendNotification(
-                            s.subscription,
-                            payload
-                        );
-                        if (res.statusCode === 410) {
-                            console.log(
-                                "Subscription has expired or is no longer valid: ",
-                                res.statusCode
-                            );
-                            // GONE (subscription no longer valid)
-                            await subscriptionsDB.removeSubscription(s._id);
-                        }
+                    const payload = JSON.stringify({
+                        title: `@${owner.name} mentioned you in a squeal`,
+                        body: `${truncate(message, 20)}`,
                     });
+
+                    await notifications.sendNotification(mentionUser._id, payload);
 
                     mentionUser.notifications.push({
                         notificationType: "mention",
@@ -297,7 +312,7 @@ router.post("/post", async (req, res) => {
         newSqueal.type === "geolocation" ||
         newSqueal.type === "video"
     ) {
-        if (!validateChars(125, owner)) {
+        if (!privacy && !validateChars(125, owner)) {
             res.status(400).json({
                 success: false,
                 error: "You have exceeded your daily, weekly or monthly message quota",
@@ -305,9 +320,33 @@ router.post("/post", async (req, res) => {
             return;
         }
 
-        owner.msg_quota.daily -= 125;
-        owner.msg_quota.weekly -= 125;
-        owner.msg_quota.monthly -= 125;
+        squealLen = 125;
+    }
+
+    const getUserDebt = (len) => {
+        const debt = {
+            daily: 0,
+            weekly: 0,
+            monthly: 0,
+        };
+
+        if (owner.msg_quota.daily > 0 && owner.msg_quota.daily - len < 0)
+            debt.daily = owner.msg_quota.daily - len;
+        if (owner.msg_quota.weekly > 0 && owner.msg_quota.weekly - len < 0)
+            debt.weekly = owner.msg_quota.weekly - len;
+        if (owner.msg_quota.monthly > 0 && owner.msg_quota.monthly - len < 0)
+            debt.monthly = owner.msg_quota.monthly - len;
+
+        return debt;
+    };
+
+    
+    if (!privacy) {
+        console.log("debt", getUserDebt(squealLen));
+        owner.msg_quota.debt = getUserDebt(squealLen);
+        owner.msg_quota.daily -= squealLen;
+        owner.msg_quota.weekly -= squealLen;
+        owner.msg_quota.monthly -= squealLen;
     }
 
     // Owner
@@ -316,9 +355,12 @@ router.post("/post", async (req, res) => {
     owner.save();
 
     // Squeal distribution
-    const recipients = squeal.recipients;
+
     console.log(squeal.recipients);
-    recipients.forEach(async (recipient) => {
+    console.log(newRecipients);
+    newSqueal.recipients = [...newRecipients];
+    
+    newRecipients.forEach(async (recipient) => {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
             user.squeals.push(newSqueal._id);
@@ -349,13 +391,11 @@ router.post("/post", async (req, res) => {
     res.json({
         success: true,
         squeal: {
-            
             ...newSqueal._doc,
             ownerID: {
                 _id: owner._id,
                 name: owner.name,
                 img: owner.img,
-            
             },
         },
     });

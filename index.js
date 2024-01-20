@@ -89,7 +89,7 @@ appNext
         app.use(express.json());
         app.use(cookieParser());
 
-        
+        //move these in env file
         const vapidKeys = {
             public: "BKd0FOnmkngVtRSf7N3ogMcnnDQGtu5PSMcbzmt_uvrcDTpL424TE6W92qpnMGZPeh1XqHi1rA_MT0iUL0gBXuY",
             private: "GyXqHJJVtw7uXgCx9mXw9QK65SsCnALClWNHpPHy2pQ",

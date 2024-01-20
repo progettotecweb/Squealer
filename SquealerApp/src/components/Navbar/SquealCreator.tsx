@@ -50,10 +50,36 @@ const SquealCreator = () => {
     const { data: session } = useSession();
     const [activeTabNumber, setActiveTabNumber] = useState<number>(0);
 
-    const { data: user } = useSWR(
-        session ? `/api/users/${session?.user.id}` : null
-    );
+    const [disabled, setDisabled] = useState<boolean>(false);
 
+    const fetcher = (url: string) =>
+        fetch(url)
+            .then((res) => res.json())
+            .then((data) => {
+                if (
+                    data.msg_quota.debt.daily < 0 ||
+                    data.msg_quota.debt.weekly < 0 ||
+                    data.msg_quota.debt.monthly < 0
+                ) {
+                    setError(
+                        "You have a debt of " +
+                            (-data.msg_quota.debt.daily) +
+                            " daily, " +
+                            (-data.msg_quota.debt.weekly) +
+                            " weekly and " +
+                            (-data.msg_quota.debt.monthly) +
+                            " monthly characters"
+                    );
+                    setDisabled(true);
+                }
+
+                return data;
+            });
+
+    const { data: user } = useSWR(
+        session ? `/api/users/${session?.user.id}` : null,
+        fetcher
+    );
 
     const handleTabChange = (index: number) => {
         //setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");
@@ -77,10 +103,22 @@ const SquealCreator = () => {
         useState<string>("not-posted");
 
     const [newSqueal, setNewSqueal] = useState<any>(null);
+    const [error, setError] = useState<string>("");
 
     const submitSqueal = async (e) => {
         e.preventDefault();
+
+        if(disabled) {
+            return;
+        }
+
+        if(content.text === null && content.img === null && content.video === null && content.geolocation === null) {
+            return;
+        }
         setSquealPostedLoading("posting");
+
+        
+
         fetch("/api/squeals/post", {
             method: "POST",
             body: JSON.stringify({
@@ -94,17 +132,21 @@ const SquealCreator = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then((res) => {
-            if (res.status === 200) {
-                //mutate(`/api/squeals/${session?.user.id}`);
+        })
+            .then((res) => {
+                return res.json();
+            })
+            .then((res) => {
+                if (!res.success) {
+                    setError(res.error);
+                    setSquealPostedLoading("not-posted");
+                    return;
+                }
 
-            }
-            return res.json()
-        }).then((res) => {
-            setNewSqueal(res.squeal)
-            setSquealPostedLoading("posted");
-            mutate(`/api/users/${session?.user.id}`)
-        });
+                setNewSqueal(res.squeal);
+                setSquealPostedLoading("posted");
+                mutate(`/api/users/${session?.user.id}`);
+            });
 
         setMessage("");
         setContent({
@@ -208,7 +250,7 @@ const SquealCreator = () => {
                 if (!e.target.files[0]) {
                     break;
                 }
-                
+
                 //check if file uploaded is a video
                 if (!e.target.files[0].type.startsWith("video")) {
                     alert("File must be a video");
@@ -235,8 +277,8 @@ const SquealCreator = () => {
 
     const [cameraError, setCameraError] = useState(false);
     const handleCameraError = (err: boolean) => {
-        setCameraError(err)
-    }
+        setCameraError(err);
+    };
 
     const inputImgRef = useRef<any>(null);
     const inputVideoRef = useRef<any>(null);
@@ -278,20 +320,24 @@ const SquealCreator = () => {
 
     return (
         <>
-            <motion.div className="flex flex-col h-full w-full bg-gray-500 p-4 md:bg-[#111B21]" layout>
+            {error && <p className="text-red-500">{error}</p>}
+            <motion.div
+                className="flex flex-col h-full w-full bg-gray-500 p-4 md:bg-[#111B21]"
+                layout
+            >
                 <motion.div className="flex flex-col" layout>
                     <Counter
-                        quota={user?.msg_quota.daily}
+                        quota={user?.msg_quota?.daily}
                         length={getContentSize()}
                         maxLength={1000}
                     />
                     <Counter
-                        quota={user?.msg_quota.weekly}
+                        quota={user?.msg_quota?.weekly}
                         length={getContentSize()}
                         maxLength={6000}
                     />
                     <Counter
-                        quota={user?.msg_quota.monthly}
+                        quota={user?.msg_quota?.monthly}
                         length={getContentSize()}
                         maxLength={24000}
                     />
@@ -305,6 +351,7 @@ const SquealCreator = () => {
                     onInputChange={(inputValue) => {
                         setQuery(inputValue);
                     }}
+                    isDisabled={disabled}
                     loadOptions={async (inputValue) => {
                         const res = await fetch(`/api/search?q=${inputValue}`);
                         const data = await res.json();
@@ -367,6 +414,7 @@ const SquealCreator = () => {
                                         rows={4}
                                         className="block p-2.5 w-full text-sm bg-gray-600 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="What's happening?"
+                                        disabled={disabled}
                                     ></motion.textarea>
                                 </form>
                             </AnimatedTabContent>
@@ -376,12 +424,16 @@ const SquealCreator = () => {
                         label="Image"
                         content={
                             <AnimatedTabContent>
-                                {
-                                    cameraError && !img && (
-                                        <p className="text-red-500">Camera not found</p>)
-                                }
+                                {cameraError && !img && (
+                                    <p className="text-red-500">
+                                        Camera not found
+                                    </p>
+                                )}
                                 <div className="flex justify-center">
-                                    <Camera onCapture={handleCapture} error={handleCameraError} />
+                                    <Camera
+                                        onCapture={handleCapture}
+                                        error={handleCameraError}
+                                    />
                                     {img && (
                                         <img
                                             className="rounded-lg imgPreview"
@@ -390,9 +442,9 @@ const SquealCreator = () => {
                                     )}
                                 </div>
 
-                                {!cameraError &&
+                                {!cameraError && (
                                     <p className="mt-4 mb-4">OR</p>
-                                }
+                                )}
                                 <div className="flex justify-center w-full">
                                     <input
                                         ref={inputImgRef}
@@ -458,18 +510,22 @@ const SquealCreator = () => {
                 </div>
             </motion.div>
             <motion.div layout>
-
-                {squealPostStatus === "posting" ? <SquealSkeleton /> : squealPostStatus === "posted" ? <Squeal
-                    squealData={newSqueal}
-                    type={newSqueal.type}
-                    id={newSqueal._id}
-                    content={newSqueal.content}
-                    owner={newSqueal?.ownerID}
-                    date={newSqueal?.datetime}
-                    reactions={newSqueal?.reactions}
-                    recipients={newSqueal?.recipients}
-
-                /> : ""}
+                {squealPostStatus === "posting" ? (
+                    <SquealSkeleton />
+                ) : squealPostStatus === "posted" ? (
+                    <Squeal
+                        squealData={newSqueal}
+                        type={newSqueal.type}
+                        id={newSqueal._id}
+                        content={newSqueal.content}
+                        owner={newSqueal?.ownerID}
+                        date={newSqueal?.datetime}
+                        reactions={newSqueal?.reactions}
+                        recipients={newSqueal?.recipients}
+                    />
+                ) : (
+                    ""
+                )}
             </motion.div>
         </>
     );

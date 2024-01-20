@@ -109,3 +109,8 @@ exports.createChannel = async function (channel) {
     await newChannel.save();
     return newChannel;
 }
+
+exports.getAllChannelsByAdminOrOwner = async function (id) {
+    const channels = await Channel.find({ $or: [{ owner_id: id }, { administrators: id }] }, "_id name description visibility");
+    return channels;
+}

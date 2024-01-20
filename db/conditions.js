@@ -121,11 +121,11 @@ module.exports.createNewCondition = async (name, cond, effects) => {
 };
 
 module.exports.executeAll = async (squeal, executeOn = ["all"]) => {
-    console.log("Executing...");
+    //console.log("Executing...");
     const conditions = await Condition.find({
         executeOn: { $in: executeOn },
     });
-    console.log("Found " + conditions.length + " conditions");
+    //console.log("Found " + conditions.length + " conditions");
 
     conditions.forEach((condition) => {
         const test = new Function("squeal", `return ${condition.cond};`);
@@ -134,12 +134,12 @@ module.exports.executeAll = async (squeal, executeOn = ["all"]) => {
         try {
             result = test(squeal);
         } catch (e) {
-            console.log("Error in condition " + condition.name);
+            //console.log("Error in condition " + condition.name);
             return;
         }
 
         if (result) {
-            console.log("RUNNING condition " + condition.name);
+            //console.log("RUNNING condition " + condition.name);
             condition.effects.forEach(async (effect) => {
                 const key = Object.keys(effect)[0];
                 const value = Object.values(effect)[0];
@@ -162,7 +162,7 @@ module.exports.executeAll = async (squeal, executeOn = ["all"]) => {
                 }
             });
         } else {
-            console.log("Condition " + condition.name + " not met");
+            //console.log("Condition " + condition.name + " not met");
         }
     });
 };
