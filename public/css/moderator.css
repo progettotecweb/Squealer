@@ -1,9 +1,8 @@
 :root {
-    --bg: #F2E9E4;
-    --dark: #022B3A;
-    --mid: #1F7A8C;
-    --light: #BFDBF7;
-    --header: #E1E5F2;
+    --nav: #1f303b;
+    --section: #1f303b;
+    --bg_section: #7b94a5;
+    --bg: #111B21;
 }
 
 * {
@@ -14,14 +13,14 @@
     height: 100vh;
     width: 100vw;
     /*background-color: #1d2d44;*/
-    background-color: var(--header);
+    background-color: var(--bg);
 }
 
 .navbar {
     width: auto;
     height: 5em;
     min-height: 10vh;
-    background-color: var(--dark);
+    background-color: var(--nav);
 }
 
 #master-user-img {
@@ -48,8 +47,8 @@
     min-width: 65vw;
     border-radius: 16px;
     /*background-color: #293858;*/
-    background-color: var(--mid);
-    box-shadow: 0px 5px 40px 0px var(--dark);
+    background-color: var(--section);
+    box-shadow: 0px 5px 40px 0px var(--nav);
 }
 
 #box-content {
@@ -62,7 +61,7 @@
     padding: 1em;
 
     /*background-color: #2E6079;*/
-    background-color: var(--light);
+    background-color: var(--bg_section);
     border-radius: 0 0 16px 16px;
 
     display: grid;
@@ -96,15 +95,15 @@
     /*color: rgb(26, 210, 146) !important;*/
     border-radius: 15px;
     /* background-color: #2E6079;*/
-    background-color: var(--light);
-    color: var(--dark) !important;
+    background-color: var(--bg_section);
+    color: var(--nav) !important;
     font-weight: bold;
 }
 
 .active-section-not-scrolled {
     /*bottom shadow*/
     border-radius: 7px 7px 0 0 !important;
-    box-shadow: 0px 10px 0px 0px var(--light);
+    box-shadow: 0px 10px 0px 0px var(--bg_section);
 }
 
 .my-card {
@@ -195,7 +194,7 @@
     object-fit: cover;
 }
 
-.squeal-content{
+.squeal-content {
     min-height: 10em;
     margin-bottom: 2em;
 }
