@@ -167,7 +167,7 @@
 
 .my-card-squeal {
     width: 100%;
-    max-height: 25em;
+    max-height: 27em;
     /*border: 1px solid black;*/
     box-shadow: 0px 0px 5px 0px #000000;
     background-color: #F0F0F0;
@@ -195,8 +195,10 @@
 }
 
 .squeal-content {
+    padding: 0.1em;
     min-height: 10em;
     margin-bottom: 2em;
+    overflow-y: auto;
 }
 
 .squeal-text {
@@ -207,12 +209,12 @@
 
 .img-squeal {
     max-width: 10em;
-    max-height: 12em;
+    max-height: 10em;
 }
 
 .video-squeal {
     max-width: 10em;
-    max-height: 12em;
+    max-height: 10em;
 }
 
 .geo-squeal-container {
@@ -269,7 +271,7 @@
 
 .squeal-recipients-div {
     text-align: end;
-    min-height: 1em;
+    min-height: 1.5em;
 }
 
 .squeal-recipient {
