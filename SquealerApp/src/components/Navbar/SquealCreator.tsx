@@ -97,6 +97,18 @@ const SquealCreator = () => {
                 setType("geolocation");
                 break;
         }
+
+        setImg(null);
+        setVideo(null);
+        setGeolocation(null);
+        setMessage("");
+        setContent({
+            text: null,
+            img: null,
+            video: null,
+            geolocation: null,
+        });
+        
     };
 
     const [squealPostStatus, setSquealPostedLoading] =
