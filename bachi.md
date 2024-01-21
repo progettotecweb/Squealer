@@ -8,7 +8,8 @@
 - ✅ ~~nella bio il contatore di char inizia da /150 invece che 0/150~~
 - ✅ ~~se premo search errore nella console di js~~
 - ✅ ~~nella search i recenti funzionano male, se premo su un recente devi inserire § o @ prima del nome. altrimenti non trova il recente~~
-- 
+- ❌ se ho x quota e posto y quota con y>x posso andare in negativo di quota, è giusto?
+
 
 # MOD DASHBOARD js vanilla
 

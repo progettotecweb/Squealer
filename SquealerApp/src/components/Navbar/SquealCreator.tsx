@@ -63,12 +63,12 @@ const SquealCreator = () => {
                 ) {
                     setError(
                         "You have a debt of " +
-                            -data.msg_quota.debt.daily +
-                            " daily, " +
-                            -data.msg_quota.debt.weekly +
-                            " weekly and " +
-                            -data.msg_quota.debt.monthly +
-                            " monthly characters"
+                        -data.msg_quota.debt.daily +
+                        " daily, " +
+                        -data.msg_quota.debt.weekly +
+                        " weekly and " +
+                        -data.msg_quota.debt.monthly +
+                        " monthly characters"
                     );
                     setDisabled(true);
                 }
@@ -158,6 +158,9 @@ const SquealCreator = () => {
             video: null,
             geolocation: null,
         });
+        setImg(null);
+        setVideo(null);
+        setGeolocation(null);
         setActiveTabNumber(0);
         setSelected([]);
         setQuery("");
