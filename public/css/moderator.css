@@ -55,6 +55,8 @@
     min-height: 50vh;
     max-height: 70vh;
 
+    max-width: 90vw;
+
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -349,7 +351,7 @@
 
 .btn-block {
     font-size: small;
-    padding: 0.25em 0.7em;
+    padding: 0.15em 0.7em;
 }
 
 .section-list {
