@@ -147,6 +147,7 @@ const Geolocation: React.FC<GeolocationProps> = ({
                             initGeolocation();
                             initMap();
                         }}
+                        type="button"
                         className="bg-green-700 hover:bg-green-900 text-white py-2 px-4 rounded mb-2">
                         Reset position
                     </button>

@@ -7,12 +7,12 @@ import IconButton from "@mui/material/IconButton";
 import Avatar from "@mui/material/Avatar";
 
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 
 import GeolocationSqueal from "./GeolocationSqueal";
-import { useSWRConfig } from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { useInView } from "react-cool-inview";
 import { Skeleton } from "@mui/material";
 import CustomLink from "../CustomLink";
@@ -23,6 +23,9 @@ import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import KeyboardAltOutlinedIcon from "@mui/icons-material/KeyboardAltOutlined";
 import Spinner from "../Spinner";
+
+import Geolocation from "../Navbar/Geolocation";
+import { Counter } from "../Navbar/SquealCreator";
 
 function formatDate(date) {
     const d = new Date(date);
@@ -424,9 +427,8 @@ const SquealReplyier = (props: { parent; session }) => {
     >("text");
 
     const submitReply = () => {
-
-        if(type === "text" && reply === "") return;
-        if(type === "image" && !content.img) return;
+        if (type === "text" && reply === "") return;
+        if (type === "image" && !content.img) return;
 
         setLoading(true);
         fetch("/api/squeals/post", {
@@ -545,6 +547,24 @@ const SquealReplyier = (props: { parent; session }) => {
         setImg(null);
     };
 
+    const [geolocation, setGeolocation] = useState<[number, number] | null>(
+        null
+    );
+
+    const handleLocation = (lat: number, lng: number) => {
+        setGeolocation([lat, lng]);
+        setContent({
+            text: null,
+            img: null,
+            video: null,
+            geolocation: { latitude: lat, longitude: lng },
+        });
+    };
+
+    const { data: user } = useSWR(
+        props.session ? `/api/users/${props.session?.user.id}` : null
+    );
+
     useEffect(() => {
         const inputimg = document.getElementById(
             `icon-button-file imginputref ${props.parent._id}`
@@ -564,73 +584,156 @@ const SquealReplyier = (props: { parent; session }) => {
         };
     }, []);
 
+    const isContentEmpty = () => {
+        switch (type) {
+            case "text":
+                return reply === "";
+            case "image":
+                return !content.img;
+            case "video":
+                return !content.video;
+            case "geolocation":
+                return !content.geolocation;
+            default:
+                return true;
+        }
+    };
+
+    const getContentSize = () => {
+        if (type === "text") return reply.length;
+
+        return 125;
+    };
+
+    const slideInFromRight = {
+        initial: {
+            opacity: 0,
+            x: 100,
+        },
+        animate: {
+            opacity: 1,
+            x: 0,
+        },
+        exit: {
+            opacity: 0,
+            x: 100,
+        },
+    };
+
     return (
         <form className="flex">
-            <div className="flex flex-1 bg-gray-700 rounded-md text-gray-50" >
-                {type === "text" ? (
+            <AnimatePresence>
+                {!isContentEmpty() && (
                     <>
-                        <input
+                    
+                    <div className="sticky top-[1rem] right-[1rem]"></div>
+                    <motion.div
+                        key="counters"
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        variants={slideInFromRight}
+                        className="fixed top-[1rem] right-[1rem] p-4 rounded-lg bg-gray-800 text-slate-50 z-[1200] shadow-md shadow-gray-500"
+                    >
+                        <h1 className="md:text-xl mb-4">Characters</h1>
+                        <div className="flex flex-col">
+                            <Counter
+                                quota={user?.msg_quota?.daily}
+                                length={getContentSize()}
+                                maxLength={1000}
+                            />
+                            <Counter
+                                quota={user?.msg_quota?.weekly}
+                                length={getContentSize()}
+                                maxLength={6000}
+                            />
+                            <Counter
+                                quota={user?.msg_quota?.monthly}
+                                length={getContentSize()}
+                                maxLength={24000}
+                            />
+                        </div>
+                    </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+            <div className="flex flex-1 bg-gray-700 rounded-md text-gray-50">
+                <div className="flex-1">
+                    {type === "text" ? (
+                        <motion.input
                             name="reply"
-                            className="w-full bg-gray-700 rounded-md text-gray-50 p-2 flex-1"
+                            className="w-full bg-gray-700 rounded-md text-gray-50 p-2 flex-1 reply-input overflow-y-auto break-words resize-none"
                             placeholder="Reply..."
                             value={reply}
                             onChange={(e) => handleContent(e)}
                             disabled={!props.session}
-                            
                         />
-                    </>
-                ) : (
-                    type === "image" &&
-                    img && (
-                        <div className="flex flex-col gap-2" >
-                            <img
-                                src={img}
-                                alt="img"
-                                className="max-h-[25vw] rounded-lg imgPreview p-2"
-                            />
-                        </div>
-                    )
-                )}
-                {type !== "text" && <SquealButton
-                    disabled={!props.session}
-                    aria-label="share"
-                    className="ml-auto"
-                    onClick={() => switchType("text")}
+                    ) : type === "image" ? (
+                        img && (
+                            <div className="flex flex-col gap-2">
+                                <img
+                                    src={img}
+                                    alt="img"
+                                    className="max-h-[25vw] rounded-lg imgPreview p-2"
+                                />
+                            </div>
+                        )
+                    ) : (
+                        type === "geolocation" && (
+                            <Geolocation onLocation={handleLocation} />
+                        )
+                    )}
+                </div>
+                <div
+                    className={`flex ${
+                        type === "text" ? "flex-row" : "flex-col p-4 h-full justify-center gap-4"
+                    }`}
                 >
-                    <KeyboardAltOutlinedIcon className="text-gray-50" />
-                </SquealButton>}
+                    {type !== "text" && (
+                        <SquealButton
+                            disabled={!props.session}
+                            aria-label="share"
+                            className="ml-auto"
+                            onClick={() => switchType("text")}
+                        >
+                            <KeyboardAltOutlinedIcon className="text-gray-50" />
+                        </SquealButton>
+                    )}
 
-                <SquealButton
-                    disabled={!props.session}
-                    aria-label="share"
-                    className="ml-auto"
-                    //onClick={() => switchType("image")}
-                >
-                    {/* </SquealButton><CameraAltOutlinedIcon className="text-gray-50" /> */}
-                    <label
-                        htmlFor={`icon-button-file imginputref ${props.parent._id}`}
+                    <SquealButton
+                        disabled={!props.session}
+                        aria-label="share"
+                        className="ml-auto"
+                        //onClick={() => switchType("image")}
                     >
-                        <CameraAltOutlinedIcon className="text-gray-50" />
-                    </label>
-                    <input
-                        ref={inputImgRef}
-                        accept="image/*"
-                        id={`icon-button-file imginputref ${props.parent._id}`}
-                        type="file"
-                        className="hidden"
-                        onChange={(e) => {
-                            handleImg(e.target, true);
+                        {/* </SquealButton><CameraAltOutlinedIcon className="text-gray-50" /> */}
+                        <label
+                            htmlFor={`icon-button-file imginputref ${props.parent._id}`}
+                        >
+                            <CameraAltOutlinedIcon className="text-gray-50" />
+                        </label>
+                        <input
+                            ref={inputImgRef}
+                            accept="image/*"
+                            id={`icon-button-file imginputref ${props.parent._id}`}
+                            type="file"
+                            className="hidden"
+                            onChange={(e) => {
+                                handleImg(e.target, true);
+                            }}
+                        />
+                    </SquealButton>
+                    <SquealButton
+                        disabled={!props.session}
+                        aria-label="share"
+                        className="ml-auto"
+                        onClick={() => {
+                            switchType("geolocation");
                         }}
-                    />
-                </SquealButton>
-                <SquealButton
-                    disabled={!props.session}
-                    aria-label="share"
-                    className="ml-auto"
-                    onClick={() => {}}
-                >
-                    <LocationOnOutlinedIcon className="text-gray-50" />
-                </SquealButton>
+                    >
+                        <LocationOnOutlinedIcon className="text-gray-50" />
+                    </SquealButton>
+                </div>
             </div>
             <SquealButton
                 disabled={!props.session || loading}
@@ -640,7 +743,11 @@ const SquealReplyier = (props: { parent; session }) => {
                     submitReply();
                 }}
             >
-                {loading ? <Spinner /> : <ReplyOutlinedIcon className="text-gray-50" />}
+                {loading ? (
+                    <Spinner />
+                ) : (
+                    <ReplyOutlinedIcon className="text-gray-50" />
+                )}
             </SquealButton>
         </form>
     );

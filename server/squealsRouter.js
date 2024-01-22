@@ -154,7 +154,7 @@ router.post("/post", async (req, res) => {
 
             const payload = JSON.stringify({
                 title: `@${owner.name} replied to your squeal`,
-                body: `${truncate(newSqueal.content.text, 20)}`,
+                body: newSqueal.type === "text" ? `${truncate(newSqueal.content.text, 20)}` : "",
             });
 
             await notifications.sendNotification(parentOwner._id, payload);
@@ -186,7 +186,7 @@ router.post("/post", async (req, res) => {
                 if (channel.visibility === "private") {
                     if (
                         channel.administrators.includes(owner._id) ||
-                        channel.owner_id.toString() === owner._id.toString()
+                        channel?.owner_id?.toString() === owner?._id?.toString()
                     ) {
                         privacy ||= 1;
                     } else {
@@ -196,7 +196,7 @@ router.post("/post", async (req, res) => {
                     if (!channel.can_user_post) {
                         if (
                             channel.administrators.includes(owner._id) ||
-                            channel.owner_id.toString() === owner._id.toString()
+                            channel?.owner_id?.toString() === owner?._id?.toString()
                         ) {
                         } else {
                             toBeRemoved.push(recipient);

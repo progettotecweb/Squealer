@@ -79,7 +79,7 @@ const SquealCreator = () => {
     const { data: user } = useSWR(
         session ? `/api/users/${session?.user.id}` : null,
         fetcher
-    );
+    );fetcher
 
     const handleTabChange = (index: number) => {
         //setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");
@@ -324,11 +324,10 @@ const SquealCreator = () => {
     return (
         <>
             {error && <p className="text-red-500">{error}</p>}
-            <motion.div
+            <div
                 className="flex flex-col h-full w-full bg-gray-500 p-4 md:bg-[#111B21]"
-                layout
             >
-                <motion.div className="flex flex-col" layout>
+                <div className="flex flex-col">
                     <Counter
                         quota={user?.msg_quota?.daily}
                         length={getContentSize()}
@@ -344,7 +343,7 @@ const SquealCreator = () => {
                         length={getContentSize()}
                         maxLength={24000}
                     />
-                </motion.div>
+                </div>
                 <AsyncSelect
                     className="text-gray-700"
                     isMulti
@@ -507,8 +506,8 @@ const SquealCreator = () => {
                         Post
                     </button>
                 </div>
-            </motion.div>
-            <motion.div layout>
+            </div>
+            <div>
                 {squealPostStatus === "posting" ? (
                     <SquealSkeleton />
                 ) : squealPostStatus === "posted" ? (
@@ -525,21 +524,19 @@ const SquealCreator = () => {
                 ) : (
                     ""
                 )}
-            </motion.div>
+            </div>
         </>
     );
 };
 
-const Counter = (props: {
+export const Counter = (props: {
     quota: number;
     length: number;
     maxLength: number;
 }) => {
     return (
-        <motion.div
-            className="text-2xl text-gray-50 flex justify-center gap-1"
-            layoutRoot
-            layout
+        <div
+            className=" text-gray-50 flex justify-center gap-1"
         >
             <motion.span
                 layout
@@ -562,7 +559,7 @@ const Counter = (props: {
             </AnimatePresence>
             <motion.span layout> / </motion.span>
             <motion.span layout>{props.maxLength}</motion.span>
-        </motion.div>
+        </div>
     );
 };
 
