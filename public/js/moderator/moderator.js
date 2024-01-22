@@ -640,9 +640,8 @@ window.onload = function () {
             officialText.textContent = databs.official === "true" ? "Official" : "Unofficial";
 
             //admin 
-            //reset check admins label and checkbox
+            //reset check admins label
             const checkAdmins = channelModal.querySelector("#channel-administrators-checkbox");
-            checkAdmins.checked = false;
             const correctLabel = document.querySelector("#channel-administrators-label");
             correctLabel.classList.remove("text-danger");
             correctLabel.classList.remove("text-success");
@@ -687,18 +686,26 @@ window.onload = function () {
         //add event listener to the administrators input
         const inputAdmins = channelModal.querySelector("#channel-administrators");
         const checkAdmins = channelModal.querySelector("#channel-administrators-checkbox");
-        checkAdmins.addEventListener("change", async (e) => {
-            if (checkAdmins.checked) {
-                const correctLabel = document.querySelector("#channel-administrators-label");
-                checkIfExistsAndSet(inputAdmins.value, inputAdmins, correctLabel, true, "data-bs-administrators-id", { user: true, channel: false });
-            }
-            else {
+        checkAdmins.addEventListener("click", async (e) => {
+            const correctLabel = document.querySelector("#channel-administrators-label");
+            checkIfExistsAndSet(inputAdmins.value, inputAdmins, correctLabel, true, "data-bs-administrators-id", { user: true, channel: false });
+
+            if (inputAdmins.value === "") {
                 //reset check admins label and checkbox
                 const correctLabel = document.querySelector("#channel-administrators-label");
                 correctLabel.classList.remove("text-danger");
                 correctLabel.classList.remove("text-success");
-                correctLabel.innerHTML = "Insert @username(s) separated by a comma";
+                //correctLabel.innerHTML = "Insert @username(s) separated by a comma";
             }
+        });
+
+        inputAdmins.addEventListener("input", async (e) => {
+            //reset check admins label and checkbox
+            const checkAdmins = channelModal.querySelector("#channel-administrators-checkbox");
+            const correctLabel = document.querySelector("#channel-administrators-label");
+            correctLabel.classList.remove("text-danger");
+            correctLabel.classList.remove("text-success");
+            correctLabel.innerHTML = "Insert @username(s) separated by a comma";
         });
     }
 
@@ -716,7 +723,6 @@ window.onload = function () {
 
         //reset check admins label and checkbox
         const checkAdmins = channelModal.querySelector("#channel-administrators-checkbox");
-        checkAdmins.checked = false;
         const correctLabel = document.querySelector("#channel-administrators-label");
         correctLabel.classList.remove("text-danger");
         correctLabel.classList.remove("text-success");
@@ -845,7 +851,6 @@ window.onload = function () {
             //recipients
             //reset check admins label and checkbox
             const checkRecipients = squealsModal.querySelector("#channel-recipients-checkbox");
-            checkRecipients.checked = false;
             const correctLabel = document.querySelector("#channel-recipients-label");
             correctLabel.classList.remove("text-danger");
             correctLabel.classList.remove("text-success");
@@ -854,18 +859,24 @@ window.onload = function () {
             //add event listener to the recipients input
             // const inputRecipients = squealsModal.querySelector("#squeal-recipients");
             //const checkRecipients = squealsModal.querySelector("#squeal-recipients-checkbox");
-            checkRecipients.addEventListener("change", async (e) => {
-                if (checkRecipients.checked) {
-                    const correctLabel = document.querySelector("#channel-recipients-label");
-                    checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true }, "data-bs-ids-type");
-                }
-                else {
+            checkRecipients.addEventListener("click", async (e) => {
+                const correctLabel = document.querySelector("#channel-recipients-label");
+                checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true }, "data-bs-ids-type");
+
+                if (inputRecipients.value === "") {
                     //reset check admins label and checkbox
                     const correctLabel = document.querySelector("#channel-recipients-label");
                     correctLabel.classList.remove("text-danger");
                     correctLabel.classList.remove("text-success");
-                    correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
+                    //correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
                 }
+            });
+
+            inputRecipients.addEventListener("input", async (e) => {
+                const correctLabel = document.querySelector("#channel-recipients-label");
+                correctLabel.classList.remove("text-danger");
+                correctLabel.classList.remove("text-success");
+                correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
             });
 
             btnSave.setAttribute("data-bs-squealId", databs.id);
@@ -877,8 +888,7 @@ window.onload = function () {
         squealsModal.addEventListener('hidden.bs.modal', () => {
             //reset checkbox 
             const checkRecipients = squealsModal.querySelector("#channel-recipients-checkbox");
-            checkRecipients.checked = false;
-            //reset check admins label and checkbox
+            //reset check admins label
             const correctLabel = document.querySelector("#channel-recipients-label");
             correctLabel.classList.remove("text-danger");
             correctLabel.classList.remove("text-success");
