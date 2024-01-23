@@ -11,6 +11,9 @@ const conditionsDB = require("../db/conditions");
 
 const notifications = require("./notifications/notifications");
 
+
+const {auth} = require("../utils/utils.js");
+
 let PipelineSingleton;
 
 (async () => {
@@ -118,7 +121,7 @@ function truncate(str, n) {
 }
 
 // squeal posting route
-router.post("/post", async (req, res) => {
+router.post("/post",auth, async (req, res) => {
     let squeal = req.body;
 
     // #TODO: squeal validation
