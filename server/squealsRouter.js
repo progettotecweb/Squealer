@@ -12,7 +12,7 @@ const conditionsDB = require("../db/conditions");
 const notifications = require("./notifications/notifications");
 
 
-const {auth} = require("../utils/utils.js");
+const { auth } = require("../utils/utils.js");
 
 let PipelineSingleton;
 
@@ -34,11 +34,43 @@ router.put("/:id", async (req, res) => {
         return;
     }
 
+    oldRecipients = req.body.recipients;
+
+    //Now we need to check if the recipients contain Keywords
+    let keywordIds = [];
+    for (const recipient of oldRecipients) {
+        if (recipient.type === "Keyword") {
+            const keyword = recipient.id;
+            if (!keyword) {
+                res.status(404).json({ success: false, error: "Keyword not found" });
+                return;
+            }
+
+            id = await keywordsDB.addSquealToKeyword(keyword, squeal._id);
+            keywordIds.push(id.toString());
+        }
+    }
+
+    console.log("keywordIds", keywordIds);
+
+    //remove all keywords type recipients from the oldRecipients array
+    oldRecipients=oldRecipients.filter((recipient) => {
+        return recipient.type !== "Keyword";
+    });
+
+    console.log("oldRecipients", oldRecipients);
+
+    //now we create an updatedRecipients array that contains the oldRecipients and the new keyword recipients
+    const updatedRecipients = oldRecipients;
+    for (const id of keywordIds) {
+        updatedRecipients.push({ id: id, type: "Keyword" });
+    }
+
     const updatedSqueal = {
-        recipients: req.body.recipients,
+        recipients: updatedRecipients,
         reactions: req.body.reactions,
     };
-
+    console.log("oldSqueal", req.body.recipients);
     console.log("updatedSqueal", updatedSqueal);
 
     await squealsDB.updateSquealByID(squeal._id, updatedSqueal);
@@ -48,7 +80,7 @@ router.put("/:id", async (req, res) => {
     for (const recipient of squeal.recipients) {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
-            if(!user) continue;
+            if (!user) continue;
             const squealIndex = user.squeals.indexOf(squeal._id);
             user.squeals.splice(squealIndex, 1);
             user.save();
@@ -121,7 +153,7 @@ function truncate(str, n) {
 }
 
 // squeal posting route
-router.post("/post",auth, async (req, res) => {
+router.post("/post", auth, async (req, res) => {
     let squeal = req.body;
 
     // #TODO: squeal validation
@@ -348,7 +380,7 @@ router.post("/post",auth, async (req, res) => {
         return debt;
     };
 
-    
+
     if (!privacy) {
         console.log("debt", getUserDebt(squealLen));
         owner.msg_quota.debt = getUserDebt(squealLen);
@@ -367,7 +399,7 @@ router.post("/post",auth, async (req, res) => {
     console.log(squeal.recipients);
     console.log(newRecipients);
     newSqueal.recipients = [...newRecipients];
-    
+
     newRecipients.forEach(async (recipient) => {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
@@ -477,6 +509,22 @@ router.delete("/cron/:id", async (req, res) => {
 router.post("/:id/view", async (req, res) => {
     await squealsDB.updateSquealImpressions(req.params.id);
     res.status(200).json({ success: true });
+});
+
+//take a squeal by its id and add a keyword to it
+router.post("/addKeywordToSqueal/:id", async (req, res) => {
+    const keyword = req.body.keyword;
+    const squealId = req.params.id;
+
+    const id = await keywordsDB.addSquealToKeyword(
+        keyword,
+        squealId
+    );
+
+    //keywords.push(id);
+
+    //return 
+    res.status(200).json({ success: true, keywordId: id });
 });
 
 module.exports = router;
