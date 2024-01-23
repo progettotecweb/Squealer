@@ -277,6 +277,7 @@
 .squeal-recipients-div {
     text-align: end;
     min-height: 1.5em;
+    overflow-y: auto;
 }
 
 .squeal-recipient {
@@ -317,6 +318,12 @@
 
 .channel-name {
     font-weight: bold;
+    overflow-y: auto;
+    min-height: 2.5em;
+}
+
+.channel-description {
+    overflow-y: auto;
 }
 
 .user-role {

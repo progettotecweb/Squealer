@@ -1545,7 +1545,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
         + '</span>'
         + '</div>';
     let CM = '<div class="squeal-cm squeal-footer-bl">'
-        + '<span><b>CM</b>: ' + squeal.cm.label.type + '</span>'
+        + '<span><b>CM</b>: ' + squeal.cm.label + '</span>'
         + '</div>';
     let impressions = '<div class="squeal-impressions squeal-footer-tr">'
         + '<span>' + squeal.impressions + ' impression(s)</span>'
