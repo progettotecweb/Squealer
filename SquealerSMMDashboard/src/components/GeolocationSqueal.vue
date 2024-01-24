@@ -2,7 +2,6 @@
   <div style="height: 25vh; width: 100%;">
     <l-map :zoom="zoom" :center="mapCenter" @ready="initMap()">
       <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"></l-tile-layer>
-      <l-control-layers />
 
 
       <l-marker :lat-lng="markerPosition">
@@ -14,12 +13,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { PointExpression, LatLng } from "leaflet";
-import { defineProps, onMounted } from "vue";
+import { defineProps } from "vue";
 import {
   LMap,
   LTileLayer,
-  LMarker,
-  LControlLayers
+  LMarker
 } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -30,10 +28,6 @@ const mapCenter = ref<PointExpression>([0, 0]); // Set the initial center to (0,
 const markerPosition = ref<LatLng>(new LatLng(0, 0)); // Set the initial marker position to (0, 0)
 
 
-onMounted(() => {
-  console.log(geolocation.geolocation)
-
-})
 
 function initMap() {
   mapCenter.value = [geolocation.geolocation.latitude, geolocation.geolocation.longitude] as PointExpression;

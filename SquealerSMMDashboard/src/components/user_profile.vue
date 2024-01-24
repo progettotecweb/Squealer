@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { getMyData } from './fetch';
 import squeal_box from './squeal_box.vue';
-
+import Geolocation from './Geolocation.vue';
 
 const user = ref<any>(null);
 const id = defineProps(['id']);
@@ -108,6 +108,8 @@ const create_new_squeal = async () => {
         recipients: [] // passare type e id
     }
 
+    console.log(new_squeal_content)
+
     await fetch("/api/squeals/post", {
         method: "POST",
         headers: {
@@ -135,6 +137,11 @@ const create_new_squeal = async () => {
 }
 
 
+const markerPosition = ref({ lat: 0, lng: 0 });
+
+function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
+    markerPosition.value = newPosition;
+}
 
 </script>
 
@@ -168,10 +175,12 @@ const create_new_squeal = async () => {
         </div>
 
         <div class="row">
-            <button class="btn btn-outline-primary col-auto" v-if="new_characters == false" @click="new_squeal = !new_squeal">
+            <button class="btn btn-outline-primary col-auto" v-if="new_characters == false"
+                @click="new_squeal = !new_squeal">
                 create new post
             </button>
-            <button class="btn btn-outline-primary col-auto" v-if="new_squeal == false" @click="new_characters = !new_characters">
+            <button class="btn btn-outline-primary col-auto" v-if="new_squeal == false"
+                @click="new_characters = !new_characters">
                 buy characters
             </button>
         </div>
@@ -189,12 +198,12 @@ const create_new_squeal = async () => {
                 </div>
                 <div class="row">
                     <div v-if="insert_new_text == true"> <!--inserimento testo-->
-                        <div >
-                            <textarea class="form-control" v-model="new_squeal_content" 
-                                placeholder="tell me the news" id="new_squeal_text_input" rows="4">
+                        <div>
+                            <textarea class="form-control" v-model="new_squeal_content" placeholder="tell me the news"
+                                id="new_squeal_text_input" rows="4">
                             </textarea>
                         </div>
-                                <div class="col-auto">
+                        <div class="col-auto">
 
                             <button class="btn btn-outline-primary" @click="
                                 new_squeal_type = 'text',
@@ -202,23 +211,37 @@ const create_new_squeal = async () => {
                                     text: new_squeal_content,
                                     img: null,
                                     geolocation: null,
-                                      video: null
+                                    video: null
                                 },
                                 create_new_squeal()">post 1
                             </button>
-                         </div>
+                        </div>
                     </div>
                     <div v-if="insert_new_img == true"> <!--inserimento immagine-->
                         <label for="formFile1" class="form-label">select an image to squeal</label>
                         <input class="form-control" id="formFile1" @change="Handlecontent" accept="image/*" type="file" />
                         <div class="col-auto">
-                            <button class="btn btn-outline-primary" @click=" new_squeal_type = 'image', create_new_squeal()">post 2</button>
+                            <button class="btn btn-outline-primary"
+                                @click=" new_squeal_type = 'image', create_new_squeal()">post 2</button>
                         </div>
                     </div>
-                        <div v-if="insert_new_pos == true"> <!--inserimento posizione-->
-
+                    <div v-if="insert_new_pos == true"> <!--inserimento posizione-->
+                        <Geolocation @markerPositionChanged="updateMarkerPosition"></Geolocation>
+                        <p>{{ markerPosition.lat }} lat</p>
+                        <p>{{ markerPosition.lng }} lng</p>
                         <div class="col-auto">
-                            
+                            <button class="btn btn-outline-primary" @click="
+                                new_squeal_type = 'geolocation',
+                                new_squeal_content = {
+                                    text: null,
+                                    img: null,
+                                    geolocation: { latitude: markerPosition.lat, longitude: markerPosition.lng },
+                                    video: null
+                                },
+                                create_new_squeal()">post 3</button>
+                        </div>
+                        <div class="col-auto">
+
                         </div>
                     </div>
                 </div>
