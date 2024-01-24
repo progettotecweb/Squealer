@@ -56,7 +56,6 @@ squeal.value.then((data: any) => {
                     <div v-if="squeal.type === 'video'">
                     </div>
                     <div v-if="squeal.type === 'geolocation'">
-                        <p>{{ squeal.content.geolocation }}</p>
                         <GeolocationSqueal :geolocation="squeal.content.geolocation"></GeolocationSqueal> 
 
                     </div>       
