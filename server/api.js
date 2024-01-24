@@ -68,6 +68,10 @@ router.post("/shop/:id",auth, async (req, res) => {
             break;
         }
         case "vip": {
+            //check if user role is user
+            if(user.role !== "user") {
+                break;
+            }
             user.role="Pro";
             break;
         }

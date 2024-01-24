@@ -4,55 +4,133 @@ import { getMyData } from './fetch';
 import squeal_box from './squeal_box.vue';
 
 
-const user = ref<any>(null)
-const id = defineProps(['id'])
+const user = ref<any>(null);
+const id = defineProps(['id']);
 const user_squeals = ref<any>(null);
 const waiting = ref(true);
 
 const new_squeal = ref(false);
-const new_squeal_text = ref("")
+const new_squeal_content = ref<any>(null);
+const new_squeal_type = ref("");
 
+const insert_new_text = ref(true);
+const insert_new_img = ref(false);
+const insert_new_pos = ref(false);
 
 const new_characters = ref(false);
 
-
-user.value = getMyData(id.id)
+user.value = getMyData(id.id);
 user.value.then((data: any) => {
-    user.value = data
-    user_squeals.value = user.value.squeals
-    waiting.value = false
+    user.value = data,
+        user_squeals.value = user.value.squeals,
+        waiting.value = false
 
 })
 
+const formatImg = (img: string | null) => {
+    if (!img) {
+        console.log("no img");
+        return null;
+    }
+    let myImg = { mimetype: "", blob: "" };
+    const imgSplit = img.split(",");
+    const imgType = imgSplit[0].split(";")[0].split(":")[1];
+    const imgBlob = imgSplit[1];
+    myImg = { mimetype: imgType, blob: imgBlob };
+    console.log(myImg);
+    return myImg;
+}
 
-async function create_new_squeal(){
+const handleImg = (file: any, setContentToUpdate = false) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const imgDataUrl = reader.result as string;
+            console.log(imgDataUrl);
+            if (setContentToUpdate) {
+
+                new_squeal_content.value = {
+                    text: null,
+                    img: formatImg(imgDataUrl),
+                    geolocation: null,
+                    video: null
+                };
+            }
+
+            resolve(imgDataUrl); // resolve promise
+        };
+
+        reader.onerror = (error) => {
+            reject(error); // reject promise if something goes wrong
+        };
+
+        reader.readAsDataURL(file.files[0]);
+    });
+}
+
+
+
+
+
+const Handlecontent = async (e: any) => {
+    switch (new_squeal_type.value) {
+        case "text":
+            //await handleText();
+            break;
+
+        case "image":
+            if (!e.target.files[0]) return;
+
+            if (!e.target.files[0].type.startsWith('image')) {
+                console.log("file not supported");
+                return;
+            } else {
+                await handleImg(e.target, true);
+            }
+            break;
+
+        case "geolocation":
+            //await handlePos(e);
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+const create_new_squeal = async () => {
     let content = {
         ownerID: user.value._id,
-        type: "text",
-        content: { text: new_squeal_text.value , image: null, geolocation: null },
-        recipients: []
+        type: new_squeal_type.value,
+        content: new_squeal_content.value,
+        recipients: [] // passare type e id
     }
 
-    await fetch("/api/squeals/post",{
+    await fetch("/api/squeals/post", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(content),
-        
+        body: JSON.stringify(content)
+
     })
-        .then(res =>{
-            if(res.ok){
-                
+        .then(res => {
+            if (res.ok) {
+
             } else {
                 console.log("Error while updating data!");
             }
         })
-     
+
+
+    waiting.value = true;
     user.value = getMyData(id.id)
     user.value.then((data: any) => {
         user.value = data
         user_squeals.value = user.value.squeals
+        waiting.value = false
     })
 }
 
@@ -62,70 +140,103 @@ async function create_new_squeal(){
 
 
 <template>
-    <div class="w-100 container  text-start" >
+    <div class="w-100 container  text-start">
         <div class="row">
 
             <div class="col-3">
-                <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 80px; height: 80px;"/>
+                <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img"
+                    style="width: 80px; height: 80px;" />
             </div>
 
-            <div class="col-3">
+            <div class="col-4">
                 <h6>@{{ user.name }}</h6>
                 <h6>popularity: {{ user.popularity }}</h6>
-                <h6>followers (TODO)</h6>
-                
-
-            </div>
-
-            <div class="col-3">
                 <h6 v-if="waiting == false">posts: {{ user.squeals.length }}</h6>
-                
             </div>
 
-            <div v-if="waiting == false" class="col-3">
+            <div class="col-1">
+
+            </div>
+
+            <div v-if="waiting == false" class="col-4">
                 <h6>remaining characters</h6>
                 <h6>daily:{{ user.msg_quota.daily }} </h6>
                 <h6>weekly:{{ user.msg_quota.weekly }} </h6>
-                <h6>monthly:{{ user.msg_quota.monthly }} </h6>     
+                <h6>monthly:{{ user.msg_quota.monthly }} </h6>
             </div>
 
         </div>
 
-        <div  class="row">
+        <div class="row">
             <button class="AppBtn col-auto" v-if="new_characters == false" @click="new_squeal = !new_squeal">
                 create new post
             </button>
             <button class="AppBtn col-auto" v-if="new_squeal == false" @click="new_characters = !new_characters">
                 buy characters
             </button>
-        </div >
+        </div>
+
 
         <div v-if="new_squeal" class="row">
             <div class="col-12">
-                <input v-model="new_squeal_text" placeholder="tell me the news" id="new_squeal_text_input" />
-                <button class="AppBtn" @click="create_new_squeal()" >post</button>
+                <div class="row">
+                    <button class="AppBtn col-auto"
+                        @click="insert_new_text = true, insert_new_img = false, insert_new_pos = false">text</button>
+                    <button class="AppBtn col-auto"
+                        @click="insert_new_text = false, insert_new_img = true, insert_new_pos = false">image</button>
+                    <button class="AppBtn col-auto"
+                        @click="insert_new_text = false, insert_new_img = false, insert_new_pos = true">geolocation</button>
+                </div>
+                <div class="row">
+                    <div v-if="insert_new_text == true"> <!--inserimento testo-->
+                        <textarea v-model="new_squeal_content" placeholder=
+                           "tell me the news" id="new_squeal_text_input" rows="4">
+                            </textarea><!--chiamare anche qui handle content-->
+                                <div class="col-auto">
+
+                            <button class="AppBtn" @click="
+                                new_squeal_type = 'text',
+                                new_squeal_content = {
+                                    text: new_squeal_content,
+                                    img: null,
+                                    geolocation: null,
+                                      video: null
+                                },
+                                create_new_squeal()">post 1
+                            </button>
+                         </div>
+                    </div>
+                    <div v-if="insert_new_img == true"> <!--inserimento immagine-->
+                        <input @change="Handlecontent" accept="image/*" type="file" />
+                        <div class="col-auto">
+                            <button class="AppBtn" @click=" new_squeal_type = 'image', create_new_squeal()">post 2</button>
+                        </div>
+                    </div>
+                        <div v-if="insert_new_pos == true"> <!--inserimento posizione-->
+
+                        <div class="col-auto">
+                            
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
 
+
         <div class="container ">
-            <squeal_box class="m-3" v-for="squeal in user_squeals"  
-                        :id="squeal">
+            <squeal_box class="m-3" v-for="squeal in user_squeals" :id="squeal">
             </squeal_box>
-            <!--clicca uno squils per vedere le statistiche --> 
-            <!-- acuista caratteri-->  
+            <!--clicca uno squils per vedere le statistiche -->
+            <!-- acuista caratteri-->
         </div>
     </div>
 </template>
 
 <style>
-
-.squeal-box{
+.squeal-box {
     margin: auto;
 }
-
-
-
 </style>
 
 
