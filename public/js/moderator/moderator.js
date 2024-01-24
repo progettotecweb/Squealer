@@ -688,7 +688,7 @@ window.onload = function () {
         const checkAdmins = channelModal.querySelector("#channel-administrators-checkbox");
         checkAdmins.addEventListener("click", async (e) => {
             const correctLabel = document.querySelector("#channel-administrators-label");
-            checkIfExistsAndSet(inputAdmins.value, inputAdmins, correctLabel, true, "data-bs-administrators-id", { user: true, channel: false });
+            checkIfExistsAndSet(inputAdmins.value, inputAdmins, correctLabel, true, "data-bs-administrators-id", { user: true, channel: false, keyword: false });
 
             if (inputAdmins.value === "") {
                 //reset check admins label and checkbox
@@ -845,6 +845,7 @@ window.onload = function () {
             inputReactions.m1.value = databs.reactions.m1;
             inputReactions.p1.value = databs.reactions.p1;
             inputReactions.p2.value = databs.reactions.p2;
+            squealId = databs.id;
             inputRecipients.setAttribute("data-bs-recipients-id", databs.recipientsId);
             inputRecipients.setAttribute("data-bs-ids-type", databs.idsType);
 
@@ -854,14 +855,14 @@ window.onload = function () {
             const correctLabel = document.querySelector("#channel-recipients-label");
             correctLabel.classList.remove("text-danger");
             correctLabel.classList.remove("text-success");
-            correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
+            correctLabel.innerHTML = "Insert @usernames and §channels and #keywords names separated by a comma";
 
             //add event listener to the recipients input
             // const inputRecipients = squealsModal.querySelector("#squeal-recipients");
             //const checkRecipients = squealsModal.querySelector("#squeal-recipients-checkbox");
             checkRecipients.addEventListener("click", async (e) => {
                 const correctLabel = document.querySelector("#channel-recipients-label");
-                checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true }, "data-bs-ids-type");
+                checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true, keyword: true }, "data-bs-ids-type", squealId);
 
                 if (inputRecipients.value === "") {
                     //reset check admins label and checkbox
@@ -876,7 +877,7 @@ window.onload = function () {
                 const correctLabel = document.querySelector("#channel-recipients-label");
                 correctLabel.classList.remove("text-danger");
                 correctLabel.classList.remove("text-success");
-                correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
+                correctLabel.innerHTML = "Insert @usernames and §channels and #keywords names separated by a comma";
             });
 
             btnSave.setAttribute("data-bs-squealId", databs.id);
@@ -892,7 +893,7 @@ window.onload = function () {
             const correctLabel = document.querySelector("#channel-recipients-label");
             correctLabel.classList.remove("text-danger");
             correctLabel.classList.remove("text-success");
-            correctLabel.innerHTML = "Insert @usernames and §channels names separated by a comma";
+            correctLabel.innerHTML = "Insert @usernames and §channels and #keywords names separated by a comma";
 
             //reload squeals
             loadSqueals();
@@ -1260,7 +1261,7 @@ async function usersIdToName(usersId, channelId, dataBsName) {
     }
 }
 
-async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: true, channel: true }) {
+async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: true, channel: true, keyword: true }, squealId) {
     // normalize the string for our purpose
     let namesArray = names.trim();//remove spaces
     //namesArray = namesArray.replace(/\s+/g, '');// remove spaces
@@ -1324,6 +1325,36 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
             }
         }
 
+        /*if (todo.keyword && squealId != null) {
+            if (namesArray[i].charAt(0) === "#") {
+                //Keywords are created on the fly, so we nee do create them via the API
+                const keywordId = await fetch("/api/squeals/addKeywordToSqueal/" + squealId, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ keyword: namesArray[i] })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        return data.keywordId;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+
+                ids.push({ type: "Keyword", id: keywordId });
+                found = true;
+            }
+        }*/
+
+        if (todo.keyword) {
+            if (namesArray[i].charAt(0) === "#") {
+                ids.push({ type: "Keyword", id: namesArray[i].split('#')[1] });
+                found = true;
+            }
+        }
+
         //the channel/user could be empty
         if (namesArray[i] === "") {
             found = true;
@@ -1366,13 +1397,13 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
     return ids;
 }
 
-async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dataBsId, todo = { user: true, channel: true }, dataBsType) {
+async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dataBsId, todo = { user: true, channel: true, keyword: true }, dataBsType, squealId = null) {
     let ids = [];
     if (toId) {
-        ids = await namesToIds(value, input, correctLabel, dataBsId, todo);
+        ids = await namesToIds(value, input, correctLabel, dataBsId, todo, squealId);
     }
     input.value = value;
-    if (todo.user && !todo.channel) {
+    if (todo.user && !todo.channel && !todo.keyword) {
         input.setAttribute("data-bs-administrators-name", value);
     } else {
         if (ids) {
@@ -1473,9 +1504,18 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
         recipientsDiv = '<div class="squeal-recipients-div">'
         for (let i = 0; i < recipients.length; i++) {
             if (!recipients[i].id) continue;
+
+            let typeSymbol = '';
+            if (recipients[i].type === "Channel") {
+                typeSymbol = '§';
+            } else if (recipients[i].type === "User") {
+                typeSymbol = '@';
+            } else if (recipients[i].type === "Keyword") {
+                typeSymbol = '#';
+            }
+
             recipientsDiv += '<span class="squeal-recipient ">'
-                + (recipients[i].type === "Channel" ? '§' : '@')
-                + recipients[i].id.name + '</span>';
+                + typeSymbol + recipients[i].id.name + '</span>';
             if (i < recipients.length - 1)
                 recipientsDiv += ', ';
         }
@@ -1545,7 +1585,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
         + '</span>'
         + '</div>';
     let CM = '<div class="squeal-cm squeal-footer-bl">'
-        + '<span><b>CM</b>: ' + squeal.cm.label.type + '</span>'
+        + '<span><b>CM</b>: ' + squeal.cm.label + '</span>'
         + '</div>';
     let impressions = '<div class="squeal-impressions squeal-footer-tr">'
         + '<span>' + squeal.impressions + ' impression(s)</span>'
@@ -1659,15 +1699,25 @@ async function postSqueal(squeal, btn) {
 
 function formatRecipientsForAttribute(recipients) {
     //we need to format the recipients to be able to put them in the data-bs-* attribute
-    //@user,§channel
+    //@user,§channel,#keyword
     let recipientsFormatted = '';
     for (let i = 0; i < recipients.length; i++) {
-        recipientsFormatted += (recipients[i].type === "Channel" ? '§' : '@') + recipients[i].id.name;
+        let typeSymbol = '';
+        if (recipients[i].type === "Channel") {
+            typeSymbol = '§';
+        } else if (recipients[i].type === "User") {
+            typeSymbol = '@';
+        } else if (recipients[i].type === "Keyword") {
+            typeSymbol = '#';
+        }
+
+        recipientsFormatted += typeSymbol + recipients[i].id.name;
         if (i < recipients.length - 1)
             recipientsFormatted += ','; //add comma if not last
     }
     return recipientsFormatted;
 }
+
 function formatAdmin(admins) {
     if (admins === null || admins === '') return '';
     //we need to format the @admins
@@ -1696,10 +1746,16 @@ function formatRecipientsIdsToAttribute(recipientsIds) {
 }
 
 function getIdsType(recipients) {
-    //for every recipient, check if it's a channel or a user
+    //for every recipient, check if it's a channel or a user or a keyword
     let idsType = '';
     for (let i = 0; i < recipients.length; i++) {
-        idsType += recipients[i].type === "Channel" ? 'Channel' : 'User';
+        if (recipients[i].type === "Channel") {
+            idsType += 'Channel';
+        } else if (recipients[i].type === "User") {
+            idsType += 'User';
+        } else if (recipients[i].type === "Keyword") {
+            idsType += 'Keyword';
+        }
         if (i < recipients.length - 1)
             idsType += ','; //add comma if not last
     }

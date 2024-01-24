@@ -266,6 +266,8 @@ const MIN_IMPRESSION_COUNT = 10
 
 const updateSquealMetadata = async (squeal) => {
 
+    if(!squeal.cm) squeal.cm = {}
+
     conditionsDB.executeAll(squeal, ["reaction", "view"])
 
     if (squeal.impressions < MIN_IMPRESSION_COUNT) return;
@@ -292,6 +294,7 @@ const updateSquealMetadata = async (squeal) => {
         squeal.cm.label = "impopular";
     }
 
+    await squeal.save();
     
 };
 
@@ -304,7 +307,7 @@ exports.getAllSqueals = async function () {
 };
 
 exports.updateSquealByID = async function (id, newSqueal) {
-    console.log("newSqueal", newSqueal);
+    //console.log("newSqueal", newSqueal);
     await Squeal.findByIdAndUpdate(id, newSqueal, { new: true })
         .then((squeal) => {
             return squeal;

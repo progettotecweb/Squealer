@@ -372,15 +372,16 @@ const SquealCreator = () => {
                     loadOptions={async (inputValue) => {
                         const res = await fetch(`/api/search?q=${inputValue}`);
                         const data = await res.json();
+                        console.log(inputValue)
                         return data.results.map((res) => {
                             return {
                                 value: {
-                                    type: query.startsWith("@")
+                                    type: inputValue.startsWith("@")
                                         ? "User"
                                         : "Channel",
                                     id: res.id,
                                 },
-                                label: res.name,
+                                label:  (inputValue.startsWith("@") ? "@" : "§") + res.name,
                             };
                         });
                     }}

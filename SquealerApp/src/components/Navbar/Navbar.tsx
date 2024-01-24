@@ -24,7 +24,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="fixed bottom-0 h-16 bg-[#111B21] w-full flex justify-evenly items-center md:hidden">
+            <nav className="fixed bottom-0 h-16 bg-[#111B21] w-full flex justify-evenly items-center md:hidden z-[1003]">
                 <CustomIcon
                     icon={<SearchIcon className="h-8 w-8 text-gray-50" />}
                     onClick={() => setOpenSearch(!openSearch)}

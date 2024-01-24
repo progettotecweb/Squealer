@@ -1,22 +1,26 @@
-"use client"
+"use client";
 import { useRef, useEffect, useState } from "react";
 
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import "leaflet/dist/leaflet.css";
-import { init } from "next/dist/compiled/webpack/webpack";
+import { useSession } from "next-auth/react";
 
 interface GeolocationProps {
     onLocation: (lat: number, lng: number) => void;
 }
 
-const Geolocation: React.FC<GeolocationProps> = ({
-    onLocation
-}) => {
-    const [geolocation, setGeolocation] = useState<[number, number] | any>([null, null]);
+const Geolocation: React.FC<GeolocationProps> = ({ onLocation }) => {
+    const [geolocation, setGeolocation] = useState<[number, number] | any>([
+        null,
+        null,
+    ]);
     const mapContainerRef = useRef<HTMLDivElement | null>(null);
-    const [userPosition, setUserPosition] = useState<[number, number] | any>([null, null]);
+    const [userPosition, setUserPosition] = useState<[number, number] | any>([
+        null,
+        null,
+    ]);
 
     function initGeolocation() {
         if (navigator.geolocation) {
@@ -30,14 +34,17 @@ const Geolocation: React.FC<GeolocationProps> = ({
                 (error) => {
                     if (error.code === 1) {
                         // Permission denied
-                        console.log('Geolocation permission denied.');
+                        console.log("Geolocation permission denied.");
                     } else {
-                        console.error('Error getting geolocation:', error.message);
+                        console.error(
+                            "Error getting geolocation:",
+                            error.message
+                        );
                     }
                 }
             );
         } else {
-            console.error('Geolocation is not supported by this browser.');
+            console.error("Geolocation is not supported by this browser.");
         }
     }
 
@@ -50,16 +57,19 @@ const Geolocation: React.FC<GeolocationProps> = ({
     const mapRef = useRef<L.Map | null>(null);
 
     useEffect(() => {
-        if (mapRef.current) { return }
-        const mapElement = document.getElementById('map');
+        if (mapRef.current) {
+            return;
+        }
+        const mapElement = document.getElementById("map");
         if (!mapElement) return; // Map container not found
 
         initMap();
-
     }, geolocation);
 
+    const { data: session } = useSession();
+
     function initMap() {
-        import("leaflet").then(L => {
+        import("leaflet").then((L) => {
             // Fix the bug where the images for the marker are not found
             L.Icon.Default.mergeOptions({
                 iconUrl: markerIcon.src,
@@ -69,14 +79,18 @@ const Geolocation: React.FC<GeolocationProps> = ({
 
             if (!mapRef.current) {
                 // If map is not initialized, create a new one
-                mapRef.current = L.map('map', {
+                mapRef.current = L.map("map", {
                     center: geolocation,
                     zoom: 13,
                     layers: [
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '&copy; OpenStreetMap contributors'
-                        })
-                    ]
+                        L.tileLayer(
+                            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                            {
+                                attribution:
+                                    "&copy; OpenStreetMap contributors",
+                            }
+                        ),
+                    ],
                 });
 
                 // Add marker
@@ -86,21 +100,28 @@ const Geolocation: React.FC<GeolocationProps> = ({
                     .addTo(mapRef.current);
 
                 // onclick event listener
-                mapRef.current.on('click', function (e) {
-                    const { lat, lng } = e.latlng;
-                    if (mapRef.current) {
-                        // Remove previous marker
-                        mapRef.current.eachLayer(function (layer) {
-                            if (layer instanceof L.Marker && mapRef.current) {
-                                mapRef.current.removeLayer(layer);
-                            }
-                        });
-                    }
+                // can check if the user has a pro account?
+                if (
+                    session &&
+                    ["Pro", "Mod", "SMM"].includes(session?.user?.role)
+                )
+                    mapRef.current.on("click", function (e) {
+                        const { lat, lng } = e.latlng;
+                        if (mapRef.current) {
+                            // Remove previous marker
+                            mapRef.current.eachLayer(function (layer) {
+                                if (
+                                    layer instanceof L.Marker &&
+                                    mapRef.current
+                                ) {
+                                    mapRef.current.removeLayer(layer);
+                                }
+                            });
+                        }
 
-                    // Add new marker
-                    changeMarkerPosition(L, lat, lng);
-
-                });
+                        // Add new marker
+                        changeMarkerPosition(L, lat, lng);
+                    });
 
                 setMap(mapRef.current);
             } else {
@@ -108,7 +129,9 @@ const Geolocation: React.FC<GeolocationProps> = ({
                 mapRef.current.setView(geolocation, 13);
 
                 // Move the existing marker to the new position
-                const existingMarker = mapRef.current.eachLayer(function (layer) {
+                const existingMarker = mapRef.current.eachLayer(function (
+                    layer
+                ) {
                     if (layer instanceof L.Marker) {
                         layer.setLatLng(geolocation);
                     }
@@ -148,10 +171,15 @@ const Geolocation: React.FC<GeolocationProps> = ({
                             initMap();
                         }}
                         type="button"
-                        className="bg-green-700 hover:bg-green-900 text-white py-2 px-4 rounded mb-2">
+                        className="bg-green-700 hover:bg-green-900 text-white py-2 px-4 rounded mb-2"
+                    >
                         Reset position
                     </button>
-                    <div id="map" style={{ height: "400px", width: "100%" }} className="mapSqueal"></div>
+                    <div
+                        id="map"
+                        style={{ height: "400px", width: "100%" }}
+                        className="mapSqueal"
+                    ></div>
                 </div>
             ) : (
                 <p>Loading geolocation...</p>
