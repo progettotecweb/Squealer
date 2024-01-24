@@ -30,7 +30,7 @@ user.value.then((data: any) => {
         <img src="/public/squealer.png" alt="squealer-logo" class="img-fluid logo" />
       </div>
       <div class="d-none d-lg-block">
-        <a href=""><button class="AppBtn">Bottone</button></a>
+        <a href=""><button class="btn btn-outline-primary">Bottone</button></a>
       </div>
     </div>
 
@@ -41,7 +41,7 @@ user.value.then((data: any) => {
       <div class="col-12 col-md-3 col-xl-2 sidebar d-none d-lg-block">
         <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
         <p>@{{ user.name }}</p>
-        <a href="/home"><button class="AppBtn ">Home</button></a>
+        <a href="/home"><button class="btn btn-outline-primary ">Home</button></a>
       </div>
 
       <main 
@@ -49,7 +49,7 @@ user.value.then((data: any) => {
       role="main">
         <div>
           <div class="container text-end" v-if="active_name != null">
-            <button class="AppBtn " @click="active_name = null">Back</button>
+            <button class="btn btn-outline-primary" @click="active_name = null">Back</button>
           </div>
           <div v-if="active_name == null" class="d-flex justify-content-around flex-wrap " > <!-- si vede se variabile Name == NULL-->
               <user_boxs
@@ -81,11 +81,5 @@ header {
     width: 30pt;
     height: 30pt;
 }
-.AppBtn{
-  background-color: #374e64;
-  color: aliceblue;
-  border: 1px solid aliceblue;
-  border-radius: 5px;
-  padding: 5px;
-}
+
 </style>

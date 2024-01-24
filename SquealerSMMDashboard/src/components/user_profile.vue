@@ -143,7 +143,7 @@ const create_new_squeal = async () => {
     <div class="w-100 container  text-start">
         <div class="row">
 
-            <div class="col-3">
+            <div class="col-3 ">
                 <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img"
                     style="width: 80px; height: 80px;" />
             </div>
@@ -168,10 +168,10 @@ const create_new_squeal = async () => {
         </div>
 
         <div class="row">
-            <button class="AppBtn col-auto" v-if="new_characters == false" @click="new_squeal = !new_squeal">
+            <button class="btn btn-outline-primary col-auto" v-if="new_characters == false" @click="new_squeal = !new_squeal">
                 create new post
             </button>
-            <button class="AppBtn col-auto" v-if="new_squeal == false" @click="new_characters = !new_characters">
+            <button class="btn btn-outline-primary col-auto" v-if="new_squeal == false" @click="new_characters = !new_characters">
                 buy characters
             </button>
         </div>
@@ -180,21 +180,23 @@ const create_new_squeal = async () => {
         <div v-if="new_squeal" class="row">
             <div class="col-12">
                 <div class="row">
-                    <button class="AppBtn col-auto"
+                    <button class="btn btn-outline-primary col-auto"
                         @click="insert_new_text = true, insert_new_img = false, insert_new_pos = false">text</button>
-                    <button class="AppBtn col-auto"
+                    <button class="btn btn-outline-primary col-auto"
                         @click="insert_new_text = false, insert_new_img = true, insert_new_pos = false">image</button>
-                    <button class="AppBtn col-auto"
+                    <button class="btn btn-outline-primary col-auto"
                         @click="insert_new_text = false, insert_new_img = false, insert_new_pos = true">geolocation</button>
                 </div>
                 <div class="row">
                     <div v-if="insert_new_text == true"> <!--inserimento testo-->
-                        <textarea v-model="new_squeal_content" placeholder=
-                           "tell me the news" id="new_squeal_text_input" rows="4">
-                            </textarea><!--chiamare anche qui handle content-->
+                        <div >
+                            <textarea class="form-control" v-model="new_squeal_content" 
+                                placeholder="tell me the news" id="new_squeal_text_input" rows="4">
+                            </textarea>
+                        </div>
                                 <div class="col-auto">
 
-                            <button class="AppBtn" @click="
+                            <button class="btn btn-outline-primary" @click="
                                 new_squeal_type = 'text',
                                 new_squeal_content = {
                                     text: new_squeal_content,
@@ -207,9 +209,10 @@ const create_new_squeal = async () => {
                          </div>
                     </div>
                     <div v-if="insert_new_img == true"> <!--inserimento immagine-->
-                        <input @change="Handlecontent" accept="image/*" type="file" />
+                        <label for="formFile1" class="form-label">select an image to squeal</label>
+                        <input class="form-control" id="formFile1" @change="Handlecontent" accept="image/*" type="file" />
                         <div class="col-auto">
-                            <button class="AppBtn" @click=" new_squeal_type = 'image', create_new_squeal()">post 2</button>
+                            <button class="btn btn-outline-primary" @click=" new_squeal_type = 'image', create_new_squeal()">post 2</button>
                         </div>
                     </div>
                         <div v-if="insert_new_pos == true"> <!--inserimento posizione-->
@@ -220,6 +223,9 @@ const create_new_squeal = async () => {
                     </div>
                 </div>
             </div>
+
+
+
         </div>
 
 

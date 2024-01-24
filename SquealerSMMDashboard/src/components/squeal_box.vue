@@ -56,12 +56,17 @@ squeal.value.then((data: any) => {
                     <div v-if="squeal.type === 'video'">
                     </div>
                     <div v-if="squeal.type === 'geolocation'">
-                        <GeolocationSqueal :geolocation="squeal.content.geolocation"></GeolocationSqueal>
+                        <p>{{ squeal.content.geolocation }}</p>
+                        <GeolocationSqueal :geolocation="squeal.content.geolocation"></GeolocationSqueal> 
 
-                    </div>
-                        
+                    </div>       
                 </div>
+                <div> <!--riga delle reazioni-->
 
+                </div>
+                <div>
+
+                </div>
             </div>
         </div>
     </div>
