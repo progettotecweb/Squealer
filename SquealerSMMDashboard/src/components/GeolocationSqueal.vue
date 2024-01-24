@@ -5,7 +5,7 @@
       <l-control-layers />
 
 
-      <l-marker :lat-lng="markerPosition" draggable>
+      <l-marker :lat-lng="markerPosition" >
       </l-marker>
     </l-map>
   </div>
