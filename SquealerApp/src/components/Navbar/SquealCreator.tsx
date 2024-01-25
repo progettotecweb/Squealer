@@ -79,7 +79,7 @@ const SquealCreator = () => {
     const { data: user } = useSWR(
         session ? `/api/users/${session?.user.id}` : null,
         fetcher
-    );fetcher
+    );
 
     const handleTabChange = (index: number) => {
         //setType(index === 0 ? "text" : index === 1 ? "image" : "geolocation");

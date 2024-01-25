@@ -17,11 +17,11 @@ export default function GeneralLayout({
 }) {
     return (
         <>
-            <div className="flex flex-row">
+            <div className="flex flex-row h-full">
                 <div className="hidden md:block md:h-screen md:z-[1001] md:sticky md:top-0">
                     <Menu />
                 </div>
-                <main className="w-full">
+                <main className="w-full h-full">
                     <Header />
                     <LayoutWrapper>{children}</LayoutWrapper>
                 </main>

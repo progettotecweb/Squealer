@@ -3,7 +3,7 @@ import SignUpSequence from "@/components/SignUp/SignUpSequence";
 
 export default function Page() {
     return (
-        <PageContainer className="h-[100vh]">
+        <PageContainer className="items-center justify-center h-[80vh]">
             <SignUpSequence />
         </PageContainer>
     );

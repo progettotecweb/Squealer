@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-const InputClassNames = "rounded-md p-2 bg-gray-800 mb-4";
+const InputClassNames = "rounded-md p-2 bg-gray-800 mb-4 w-full";
 
 const fadeInFromRight = {
     initial: {
@@ -230,7 +230,7 @@ const SignUpSequence = () => {
                         layout
                     >
                         <form
-                            className="flex flex-col items-start"
+                            className="flex flex-col items-start w-full"
                             name="register-form"
                         >
                             <label htmlFor="username">Username</label>
@@ -257,7 +257,7 @@ const SignUpSequence = () => {
                                 onChange={(e) => setRPassword(e.target.value)}
                                 className={InputClassNames}
                             />
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 w-full">
                                 <input
                                     type="checkbox"
                                     checked={agreeTerms}
@@ -322,7 +322,6 @@ const SignUpSequence = () => {
                                 className="md:h-[10vh] hidden file:hidden"
                                 accept="image/*"
                                 type="file"
-                                capture="environment"
                                 id="profile-pic"
                                 name="profile-pic"
                                 onChange={(e) => {

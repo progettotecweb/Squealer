@@ -116,8 +116,8 @@ const ShopPage = () => {
 
     if (status === "authenticated")
         return (
-            <PageContainer key="shop" className="gap-4">
-                <motion.div className=" flex flex-col gap-4 w-[60vw]">
+            <PageContainer key="shop" className="gap-4 mb-[4rem]">
+                <motion.div className=" flex flex-col gap-4 w-full sm:w-[60vw] ">
                     <h1 className="text-4xl font-bold">Shop</h1>
                     <p className="text-xl">
                         Buy more characters, or your own private channel!

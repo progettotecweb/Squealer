@@ -69,14 +69,6 @@ const ServiceRegister = () => {
         })();
     }, [status]);
 
-    if (!notificationsSupported()) {
-        return (
-            <div className="text-gray-50">
-                Error: notifications not supported
-            </div>
-        );
-    }
-
     return <></>;
 };
 

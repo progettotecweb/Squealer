@@ -12,7 +12,7 @@ import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { AnimatePresence, motion } from "framer-motion";
-import { SearchOutlined } from "@mui/icons-material";
+import SearchOutlined from "@mui/icons-material/SearchOutlined"; 
 import NotificationMenu from "./NotificationMenu";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
@@ -97,7 +97,7 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
     const signOut = useSignout();
 
     return (
-        <div className="flex flex-row h-full">
+        <div className="flex flex-row h-full z-[2067]">
             <AnimatePresence>
                 <motion.div
                     layout

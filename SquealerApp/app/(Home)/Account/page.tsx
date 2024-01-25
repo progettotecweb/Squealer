@@ -93,15 +93,15 @@ const AccountPage = () => {
 
     if (status === "authenticated")
         return (
-            <PageContainer key="account">
+            <PageContainer key="account" className="">
                 <AccountUserCard id={session?.user.id} />
-                <Tabs>
+                {/* <Tabs>
                     <Tab
                         label="Squeals"
                         content={
-                            <AnimatedTabContent>
+                            <AnimatedTabContent> */}
                                 <SquealsSection id={session?.user.id} />
-                            </AnimatedTabContent>
+                            {/* </AnimatedTabContent>
                         }
                     />
                     <Tab
@@ -112,7 +112,7 @@ const AccountPage = () => {
                             </AnimatedTabContent>
                         }
                     />
-                </Tabs>
+                </Tabs> */}
             </PageContainer>
         );
 };
