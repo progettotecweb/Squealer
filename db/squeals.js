@@ -64,14 +64,12 @@ const squealSchema = new mongoose.Schema({
     },
     keywords: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Keywords",
+            type: String
         },
     ],
     mentions: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            type: String,
         },
     ],
     visibility: {
@@ -184,14 +182,14 @@ exports.getAllSquealsByOwnerID = async function (ownerID) {
 exports.getAllSquealsByRecipientID = function (type, recipientID) {
     const res = Squeal.find({
         recipients: { $elemMatch: { type: type, id: recipientID } },
-    }).populate("ownerID", "name img")
-    .populate({
-        path: "replies",
-        populate: { path: "ownerID", select: "name img" },
-        select: " type ownerID content datetime _id reactions isAReply impressions",
     })
-    .exec();
-    
+        .populate("ownerID", "name img")
+        .populate({
+            path: "replies",
+            populate: { path: "ownerID", select: "name img" },
+            select: " type ownerID content datetime _id reactions isAReply impressions",
+        })
+        .exec();
 
     return res;
 };
@@ -262,13 +260,12 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
     return res;
 };
 
-const MIN_IMPRESSION_COUNT = 10
+const MIN_IMPRESSION_COUNT = 10;
 
 const updateSquealMetadata = async (squeal) => {
+    if (!squeal.cm) squeal.cm = {};
 
-    if(!squeal.cm) squeal.cm = {}
-
-    conditionsDB.executeAll(squeal, ["reaction", "view"])
+    conditionsDB.executeAll(squeal, ["reaction", "view"]);
 
     if (squeal.impressions < MIN_IMPRESSION_COUNT) return;
 
@@ -295,14 +292,13 @@ const updateSquealMetadata = async (squeal) => {
     }
 
     await squeal.save();
-    
 };
 
 exports.getAllSqueals = async function () {
     const res = await Squeal.find({})
         .populate("ownerID", "name img")
-        .populate("recipients.id", "name")
-        //.populate({ path: "recipients.id", model: Channel });
+        .populate("recipients.id", "name");
+    //.populate({ path: "recipients.id", model: Channel });
     return res;
 };
 
@@ -380,13 +376,212 @@ exports.updateSquealImpressions = async function (id) {
     await squeal.save();
 };
 
+const populateSquealAggregation = [
+    {
+        $lookup: {
+            from: "users",
+            // Assuming the users collection contains the user data
+            localField: "ownerID",
+            foreignField: "_id",
+            as: "ownerID",
+            pipeline: [
+                {
+                    $project: {
+                        name: 1,
+                        img: 1,
+                    },
+                },
+            ],
+        },
+    },
+    {
+        $unwind: "$ownerID",
+    },
+    {
+        $lookup: {
+            from: "squeals",
+            // Assuming the replies collection contains the reply data
+            let: { temp: "$replies" },
+            as: "replies",
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $in: ["$_id", "$$temp"],
+                        },
+                    },
+                },
+                {
+                    $project: {
+                        type: 1,
+                        content: 1,
+                        ownerID: 1,
+                        datetime: 1,
+                        _id: 1,
+                        reactions: 1,
+                        isAReply: 1,
+                        impressions: 1,
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        let: { ownerID: "$ownerID" },
+                        as: "ownerID",
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $eq: ["$_id", "$$ownerID"],
+                                    },
+                                },
+                            },
+                            {
+                                $project: {
+                                    name: 1,
+                                    img: 1,
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    $unwind: "$ownerID",
+                },
+            ],
+        },
+    },
+    {
+        $lookup: {
+            from: "channels",
+            let: { temp: "$recipients.id" },
+            as: "recipientsFromCollection3",
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $in: ["$_id", "$$temp"],
+                        },
+                    },
+                },
+                {
+                    $project: {
+                        name: 1,
+                        id: 1,
+                        type: "Channel",
+                    },
+                },
+            ],
+        },
+    },
+    {
+        $lookup: {
+            from: "keyowrds",
+            let: { temp: "$recipients.id" },
+            as: "recipientsFromCollection1",
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $in: ["$_id", "$$temp"],
+                        },
+                    },
+                },
+                {
+                    $project: {
+                        name: 1,
+                        id: 1,
+                        type: "Keyword",
+                    },
+                },
+            ],
+        },
+    },
+    {
+        $lookup: {
+            from: "users",
+            let: { temp: "$recipients.id" },
+            as: "recipientsFromCollection2",
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $in: ["$_id", "$$temp"],
+                        },
+                    },
+                },
+                {
+                    $project: {
+                        name: 1,
+                        id: 1,
+                        type: "User",
+                    },
+                },
+            ],
+        },
+    },
+    {
+        $addFields: {
+            recipients: {
+                $setUnion: ["$recipientsFromCollection3", "$recipientsFromCollection1", "$recipientsFromCollection2",],
+            },
+        },
+    },
+    {
+        $project: {
+            recipientsFromCollection3: 0,
+            recipientsFromCollection1: 0,
+            recipientsFromCollection2: 0,
+        },
+    },
+    {
+        $sort: {
+            datetime: -1,
+        },
+    },
+];
+
+exports.getAllSquealsByFilter = async function (query, page = 0, limit = 10) {
+    const skip = page * limit;
+
+    if (query.startsWith("#")) {
+        const squeals = await Squeal.aggregate([
+            {
+                $match: {
+                    //match only squeals that have part of that keyword
+                    keywords: query,
+                    visibility: "public",
+                },
+            },
+            ...populateSquealAggregation,
+        ]);
+
+        return squeals;
+    } else if (query.startsWith("@")) {
+        const squeals = await Squeal.aggregate([
+            {
+                $match: {
+                    //match only squeals that have part of that keyword
+                    mentions: query,
+                    visibility: "public",
+                },
+            },
+            ...populateSquealAggregation,
+        ]);
+
+        return squeals;
+    } else {
+        return [];
+    }
+};
+
 exports.getGlobalFeed = async function (page = 0, limit = 10) {
     const skip = page * limit;
 
     const publicSqueals = await Channel.aggregate([
         {
             $match: {
-                official: true
+                official: true,
             },
         },
         {
@@ -489,8 +684,8 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
                 pipeline: [
                     {
                         $match: {
-                            official: true
-                        }
+                            official: true,
+                        },
                     },
                     {
                         $project: {
@@ -505,9 +700,7 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
         {
             $addFields: {
                 "squeals.recipients": {
-                    $setUnion: [
-                        "$squeals.recipientsFromCollection3",
-                    ],
+                    $setUnion: ["$squeals.recipientsFromCollection3"],
                 },
             },
         },
@@ -570,9 +763,9 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
                 },
             },
         },
-    ])
+    ]);
 
-    const feed = publicSqueals[0]?.squeals || []
+    const feed = publicSqueals[0]?.squeals || [];
 
     return feed;
-}
+};

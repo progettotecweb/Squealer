@@ -10,8 +10,8 @@ import { useSWRConfig } from "swr";
 
 export default function FakePaymentPage() {
     const searchParams = useSearchParams();
-    const {data: session, status} = useSession();
-    const {mutate} = useSWRConfig()
+    const { data: session, status, update } = useSession();
+    const { mutate } = useSWRConfig();
 
     const search = `your ${searchParams?.get("q")}` || "";
     const red = searchParams?.get("r") || "/";
@@ -51,24 +51,28 @@ export default function FakePaymentPage() {
 
     useEffect(() => {
         const timer = setInterval(() => {
-          setProgress((oldProgress) => {
-            if (oldProgress === 100) {
-               redirect(red);
-            }
-            const diff = Math.random() * 10;
-            if(Math.floor(Math.floor(oldProgress + diff) / 22) > currentStep.current) advance();
-            return Math.min(oldProgress + diff, 100);
-          });
+            setProgress((oldProgress) => {
+                if (oldProgress === 100) {
+                    redirect(red);
+                }
+                const diff = Math.random() * 10;
+                if (
+                    Math.floor(Math.floor(oldProgress + diff) / 22) >
+                    currentStep.current
+                )
+                    advance();
+                return Math.min(oldProgress + diff, 100);
+            });
         }, 250);
-    
+
         return () => {
-          clearInterval(timer);
+            clearInterval(timer);
         };
-      }, []);
+    }, []);
 
     useEffect(() => {
-        const post = async () => {
-            const res = await fetch(`/api/shop/${id}`, {
+        if (session) {
+            fetch(`/api/shop/${id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -78,23 +82,25 @@ export default function FakePaymentPage() {
                     user: session?.user?.id,
                     type: search,
                 }),
+            }).then((res) => {
+                
             });
-            const data = await res.json();
-            console.log(data);
-            mutate(`/api/users/${session?.user?.id}`)
         }
-        
-        if(status==="authenticated") {
-            post();
+
+        return () => {
+            update();
+            mutate(`/api/users/${session?.user?.id}`);
         }
-    }, [status]);
+    }, []);
 
     return (
         <PageContainer
             className="flex flex-col items-center justify-center h-[80vh] gap-4"
             key="fake-payment"
         >
-            <h1 className="text-4xl font-bold">Processing order for {search.toLowerCase()}...</h1>
+            <h1 className="text-4xl font-bold">
+                Processing order for {search.toLowerCase()}...
+            </h1>
             <Step step={steps[currentStep.current]?.title}>
                 {steps[currentStep.current]?.description}
             </Step>

@@ -10,6 +10,10 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { signOut } from "next-auth/react";
 
+import MenuIcon from "@mui/icons-material/Menu";
+import Drawer from "@mui/material/Drawer";
+import Divider from "../Divider";
+
 const fetcher = (url: string) =>
     fetch(url)
         .then((res) => res.json())
@@ -68,7 +72,7 @@ export const AccountUserCard = ({ id }) => {
             <img
                 src={`/squealer.png`}
                 alt="Profile Picture"
-                className="max-w-32 max-h-32 rounded-full object-cover"
+                className=" rounded-full object-cover"
             />
         </div>
         <section className="col-span-3 p-4 flex flex-col h-full items-start gap-4 w-full">
@@ -90,40 +94,85 @@ export const AccountUserCard = ({ id }) => {
     </section>;
 
     return (
-        <section className="w-full md:w-[60vw]  grid grid-cols-4">
-            <div className="flex flex-col items-center justify-center p-4">
-                <img
-                    src={`data:${data?.img.mimetype};base64,${data?.img.blob}`}
-                    alt="Profile Picture"
-                    className="w-32 h-32 rounded-full object-cover"
-                />
-            </div>
-            <section className="col-span-3 p-4 flex flex-col h-full items-start gap-4 w-full">
-                <div className="flex gap-2 items-center w-full">
+        <>
+            <section className="w-full md:w-[60vw] grid grid-cols-6">
+                <div className="w-full col-span-2 sm:grid sm:place-content-center flex justify-center pt-6">
+                    <img
+                        src={`data:${data?.img?.mimetype};base64,${data?.img?.blob}`}
+                        alt="Profile Picture"
+                        className="rounded-full w-24 h-24 sm:w-32 sm:h-32 col-span-2 object-cover"
+                    />
+                </div>
+                <section className="p-4 flex flex-col h-full items-start gap-4 col-span-4">
+                    <div className="hidden sm:flex gap-2 items-center">
+                        <h1 className="text-2xl font-bold text-white">
+                            {data?.name}
+                        </h1>
+                        <Link
+                            className="bg-gray-700 px-4 py-1 rounded-md hover:bg-gray-800"
+                            href="/Account/Edit"
+                        >
+                            Edit profile
+                        </Link>
+                        <DeleteAccountModal id={id} name={data?.name} />
+                    </div>
                     <h1 className="text-2xl font-bold text-white">
                         {data?.name}
                     </h1>
+                    <div className="flex sm:text-lg gap-16 items-center justify-center">
+                        <h1 className="flex">{data.squeals.length} Squeals</h1>
+                        <h1 className="flex ">
+                            {data.following.length} Following
+                        </h1>
+                    </div>
+                    <div className="self-start h-full text-md max-w-full text-wrap overflow-x-auto">
+                        {data.bio}
+                    </div>
+                </section>
+            </section>
+        </>
+    );
+};
+
+export const MobileAccountMenu = ({ id, name }) => {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <>
+            <button
+                onClick={() => setOpen(true)}
+                className="bg-gray-700 px-4 py-1 rounded-md hover:bg-gray-800"
+            >
+                <MenuIcon />
+            </button>
+            <Drawer
+                open={open}
+                anchor="left"
+                onClose={() => setOpen(false)}
+                classes={{
+                    paper: "w-[70vw] bg-gray-800 text-gray-50 p-4",
+                }}
+            >
+                <aside className="size-full flex flex-col gap-4 items-start text-lg">
+                
+
+                
+                    <Divider className="w-full"/>
+
+                    
+                    <button onClick={() => signOut()}>Sign out</button>
                     <Link
-                        className="bg-gray-700 px-4 py-1 rounded-md hover:bg-gray-800"
+                        className=""
                         href="/Account/Edit"
                     >
                         Edit profile
                     </Link>
-                    <DeleteAccountModal id={id} name={data?.name} />
-                </div>
-                <div className="flex text-lg gap-16">
-                    <h1 className="flex">
-                       {data.squeals.length} Squeals
-                    </h1>
-                    <h1 className="flex">
-                        {data.following.length} Following
-                    </h1>
-                </div>
-                <div className="self-start h-full flex items-center text-md">
-                    {data.bio}
-                </div>
-            </section>
-        </section>
+                    <DeleteAccountModal id={id} name={name} />
+
+                    
+                </aside>
+            </Drawer>
+        </>
     );
 };
 
@@ -163,7 +212,7 @@ const DeleteAccountModal = (props: { id: string; name: string }) => {
     return (
         <>
             <button
-                className="bg-red-500 text-gray-50 px-4 py-1 rounded-md hover:bg-red-600 ml-auto"
+                className="bg-red-500 text-gray-50 px-4 py-1 rounded-md hover:bg-red-600 sm:ml-auto"
                 onClick={handleClickOpen}
             >
                 Delete Account

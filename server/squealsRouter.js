@@ -5,8 +5,6 @@ const usersDB = require("../db/users");
 const channelsDB = require("../db/channels");
 const squealsDB = require("../db/squeals");
 const keywordsDB = require("../db/keywords");
-const webpush = require("web-push");
-const subscriptionsDB = require("../db/subscriptions");
 const conditionsDB = require("../db/conditions");
 
 const notifications = require("./notifications/notifications");
@@ -22,6 +20,17 @@ let PipelineSingleton;
     );
 })();
 
+router.get("/filter", async (req, res) => {
+
+    const query = req.query.q || "";
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const squeals = await squealsDB.getAllSquealsByFilter(query, page, limit);
+
+    return res.json(squeals)
+})
+
 router.get("/:id", async (req, res) => {
     const squeals = await squealsDB.getAllSquealsByOwnerID(req.params.id);
     res.json({ results: squeals.reverse() });
@@ -34,7 +43,7 @@ router.put("/:id", async (req, res) => {
         return;
     }
 
-    oldRecipients = req.body.recipients;
+    var oldRecipients = req.body.recipients;
 
     //Now we need to check if the recipients contain Keywords
     let keywordIds = [];
@@ -301,8 +310,9 @@ router.post("/post", auth, async (req, res) => {
         const regexp_mention = /@\w+/g;
         const mentions = message.match(regexp_mention);
         console.log(mentions);
-
+        
         if (mentions) {
+            newSqueal.mentions = [...mentions];
             mentions.forEach(async (mention) => {
                 const mentionUser = await usersDB.searchUserByName(
                     mention.slice(1)
@@ -336,14 +346,7 @@ router.post("/post", auth, async (req, res) => {
         console.log(keywords);
 
         if (keywords) {
-            keywords.forEach(async (keyword) => {
-                const keywordName = keyword.slice(1);
-                const id = await keywordsDB.addSquealToKeyword(
-                    keywordName,
-                    newSqueal._id
-                );
-                newSqueal.keywords.push(id);
-            });
+            newSqueal.keywords = [...keywords];
         }
     }
 
@@ -423,6 +426,9 @@ router.post("/post", auth, async (req, res) => {
             owner._id
         );
     }
+
+    newSqueal.visibility = privacy ? "private" : "public";
+    
 
     await newSqueal.save();
 
@@ -526,5 +532,10 @@ router.post("/addKeywordToSqueal/:id", async (req, res) => {
     //return 
     res.status(200).json({ success: true, keywordId: id });
 });
+
+
+// filtered squeals
+
+
 
 module.exports = router;

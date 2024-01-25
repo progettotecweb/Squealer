@@ -12,8 +12,18 @@ const authOptions: NextAuthOptions = {
     },
 
     callbacks: {
-        async jwt({ token, user, session }) {
+        async jwt({ token, user, trigger }) {
             // the processing of JWT occurs before handling sessions.
+            if (trigger === "update") {
+                const updatedUser = await fetch(`${process.env.BASE_URL}/api/users/${token.id}`)
+                const updatedUserData = await updatedUser.json()
+
+                token.role = updatedUserData.role;
+                token.id = updatedUserData._id;
+                token.name = updatedUserData.name;
+
+                return token;
+            }
 
             if (user) {
                 token.accessToken = user.accessToken;
@@ -21,6 +31,7 @@ const authOptions: NextAuthOptions = {
                 token.accessTokenExpires = user.accessTokenExpires;
                 token.role = user.role;
                 token.id = user.id;
+                token.name = user.name;
             }
 
             return token;
@@ -37,6 +48,7 @@ const authOptions: NextAuthOptions = {
                     refreshToken: token.refreshToken as string,
                     role: token.role,
                     id: token.id,
+                    name: token.name,
                 },
                 error: token.error,
             };

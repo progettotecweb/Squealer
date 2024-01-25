@@ -46,7 +46,6 @@ router.get("/globalFeed", async (req, res) => {
 router.post("/shop/:id",auth, async (req, res) => {
     const type = req.params.id
 
-    console.log(type)
     const user = await usersDB.searchUserByID(req.body.user, "name msg_quota")
 
     // if(req.body.user !== req.user.id) {
@@ -88,9 +87,6 @@ router.post("/shop/:id",auth, async (req, res) => {
     }
 
     await user.save();
-
-
-    console.log(user);
 
     res.json({ success: true })
 
