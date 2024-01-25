@@ -307,7 +307,7 @@ router.post("/post", auth, async (req, res) => {
 
         // mentions
         // mentions begin with @
-        const regexp_mention = /@\w+/g;
+        const regexp_mention = /@[\w|.|-|_]+/g;
         const mentions = message.match(regexp_mention);
         console.log(mentions);
         

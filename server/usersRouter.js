@@ -9,6 +9,83 @@ const subscriptionsDB = require("../db/subscriptions");
 const webpush = require("web-push");
 const { default: mongoose } = require("mongoose");
 
+//get SMM user by name
+router.get("/smm", async (req, res) => {
+    const query = req.query.q;
+
+    const users = await usersDB.getSMMSByName(query);
+
+    if (!users) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    res.status(200).json(users);
+});
+
+//add SMM to user
+router.post("/setSmm", async (req, res) => {
+    //get the user id that requested to be controlled by SMM and the SMM id
+    const user_id = req.body.user_id;
+    const smm_id = req.body.smm_id;
+
+    //check if user is already controlled by a SMM
+    const user = await usersDB.searchUserByID(user_id);
+    if (user.controlled_by) {
+        res.status(400).json({
+            ok: false,
+            error: "You already have a SMM! Please remove it first.",
+        });
+        return;
+    }
+
+    //link the user to the SMM
+    const updatedUser = await usersDB.setSMM(user_id, smm_id);
+
+    if (!updatedUser) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    return res.status(200).json(updatedUser);
+});
+
+//remove SMM from user
+router.post("/removeSmm", async (req, res) => {
+    //get the user id that requested to be controlled by SMM and the SMM id
+    const user_id = req.body.user_id;
+    const smm_id = req.body.smm_id;
+
+    //check if user is not controlled by the SMM
+    const user = await usersDB.searchUserByID(user_id);
+    if (user.controlled_by?._id?.toString() != smm_id) {
+        res.status(400).json({
+            ok: false,
+            error: "User is not controlled by the SMM",
+        });
+        return;
+    }
+
+    //link the user to the SMM
+    const updatedUser = await usersDB.removeSMM(user_id);
+
+    if (!updatedUser) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    return res.status(200).json(updatedUser);
+});
+
 router.post("/register", async (req, res) => {
     const user = await usersDB.searchUserByName(req.body.username);
 
@@ -298,14 +375,18 @@ router.post("/password-reset", async (req, res) => {
             title: `Password reset`,
             body: `YOUR CODE IS ${randomSixDigit}`,
         });
-    
+
         // Create a promise for each notification
         const notificationPromise = new Promise((resolve, reject) => {
-            webpush.sendNotification(s.subscription, payload)
+            webpush
+                .sendNotification(s.subscription, payload)
                 .then((res) => {
                     console.log(res.statusCode);
                     if (res.statusCode === 410) {
-                        console.log("Subscription has expired or is no longer valid: ", res.statusCode);
+                        console.log(
+                            "Subscription has expired or is no longer valid: ",
+                            res.statusCode
+                        );
                         // GONE (subscription no longer valid)
                         subscriptionsDB.removeSubscription(s._id);
                         reject(new Error("Subscription no longer valid"));
@@ -320,51 +401,51 @@ router.post("/password-reset", async (req, res) => {
                     reject(error);
                 });
         });
-    
+
         promises.push(notificationPromise);
     });
 
     Promise.all(promises)
-    .then(() => {
-        console.log("Sent to " + count + " devices");
+        .then(() => {
+            console.log("Sent to " + count + " devices");
 
-        if(count <= 0) {
-            res.status(400).json({
+            if (count <= 0) {
+                res.status(400).json({
+                    ok: false,
+                    status: "not sent",
+                    message: "No devices found!",
+                });
+            }
+
+            const newReset = new Reset({
+                username: username,
+                code: randomSixDigit,
+            });
+
+            newReset.save();
+
+            res.status(200).json({
+                ok: true,
+                status: "sent",
+                message:
+                    "Code sent" + (count !== 1 ? ` to ${count} devices!` : "!"),
+            });
+        })
+        .catch((error) => {
+            console.error("Error sending notifications:", error);
+
+            res.status(500).json({
                 ok: false,
                 status: "not sent",
-                message: "No devices found!",
+                message: "Error sending notifications",
             });
-        }
-
-        const newReset = new Reset({
-            username: username,
-            code: randomSixDigit,
         });
-    
-        newReset.save();
-    
-        res.status(200).json({
-            ok: true,
-            status: "sent",
-            message: "Code sent" + (count !== 1 ? ` to ${count} devices!` : "!"),
-        });
-    })
-    .catch((error) => {
-        console.error("Error sending notifications:", error);
-
-        res.status(500).json({
-            ok: false,
-            status: "not sent",
-            message: "Error sending notifications",
-        });
-    });
 });
 
 router.post("/password-reset/reset", async (req, res) => {
+    const { username, password, confirmPassword } = req.body;
 
-    const { username, password, confirmPassword} = req.body;
-
-    if(password !== confirmPassword) {
+    if (password !== confirmPassword) {
         res.status(400).json({
             ok: false,
             message: "Passwords don't match!",
@@ -388,11 +469,14 @@ router.post("/password-reset/reset", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    await usersDB.updateUser(user._id, {password: hashedPassword, salt: salt});
+    await usersDB.updateUser(user._id, {
+        password: hashedPassword,
+        salt: salt,
+    });
 
     res.status(200).json({
         ok: true,
     });
-})
+});
 
 module.exports = router;

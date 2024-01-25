@@ -106,21 +106,26 @@ export const AccountUserCard = ({ id }) => {
                     />
                 </div>
                 <section className="p-4 flex flex-col h-full items-start gap-4 col-span-4">
-                    <div className="hidden sm:flex gap-2 items-center">
+                    <div className="flex gap-2 items-center">
                         <h1 className="text-2xl font-bold text-white">
                             {data?.name}
                         </h1>
-                        <Link
-                            className="bg-gray-700 px-4 py-1 rounded-md hover:bg-gray-800"
-                            href="/Account/Edit"
-                        >
-                            Edit profile
-                        </Link>
-                        <DeleteAccountModal id={id} name={data?.name} />
+                        <div className="hidden sm:flex gap-2">
+                            <Link
+                                className="bg-gray-700 px-4 py-1 rounded-md hover:bg-gray-800"
+                                href="/Account/Edit"
+                            >
+                                Edit profile
+                            </Link>
+                            <Link
+                                href="/Account/SMM"
+                                className="bg-gray-700 px-4 py-1  rounded-md hover:bg-gray-800"
+                            >
+                                Add SMM
+                            </Link>
+                            <DeleteAccountModal id={id} name={data?.name} />
+                        </div>
                     </div>
-                    <h1 className="text-2xl font-bold text-white">
-                        {data?.name}
-                    </h1>
                     <div className="flex sm:text-lg gap-16 items-center justify-center">
                         <h1 className="flex">{data.squeals.length} Squeals</h1>
                         <h1 className="flex ">
@@ -157,9 +162,15 @@ export const MobileAccountMenu = ({ id, name }) => {
                 <aside className="size-full flex flex-col gap-4 items-start text-lg">
                     {status === "authenticated" &&
                         ["SMM", "Mod"].includes(session?.user?.role) && (
-                            <CustomLink href="/SMMDashboard" type="a">
-                                Switch to SMM
-                            </CustomLink>
+                            <>
+                                <CustomLink href="/Account/SMM">
+                                    Add Social Media Manager
+                                </CustomLink>
+
+                                <CustomLink href="/SMMDashboard" type="a">
+                                    Switch to SMM
+                                </CustomLink>
+                            </>
                         )}
 
                     {status === "authenticated" &&

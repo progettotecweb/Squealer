@@ -88,10 +88,9 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 exports.searchUserByID = async function (id, select = "") {
-    const user = await User.findById(id, select).populate(
-        "notifications.author",
-        "name img"
-    );
+    const user = await User.findById(id, select)
+        .populate("notifications.author", "name img")
+        .populate("controlled_by", "name img _id");
     return user;
 };
 
@@ -100,6 +99,43 @@ exports.searchUserByName = async function (name) {
         "notifications.author",
         "name img"
     );
+    return user;
+};
+
+exports.getSMMSByName = async function (name) {
+    const users = await User.find(
+        {
+            name: new RegExp(name, "i"),
+            role: "SMM",
+        },
+        "name img _id"
+    );
+    return users;
+};
+
+exports.setSMM = async function (user_id, smm_id) {
+    //add user_id to smm_id controls->user_id array
+    const smm = await User.findByIdAndUpdate(smm_id, {
+        $push: { "controls.user_id": user_id },
+    });
+    //add smm_id to user.controlled_by
+    const user = await User.findByIdAndUpdate(user_id, {
+        controlled_by: smm_id,
+    });
+
+    return user;
+};
+
+exports.removeSMM = async function (user_id, smm_id) {
+    //remove user_id from smm_id controls->user_id array
+    const smm = await User.findByIdAndUpdate(smm_id, {
+        $pull: { "controls.user_id": user_id },
+    });
+    //remove smm_id from user.controlled_by
+    const user = await User.findByIdAndUpdate(user_id, {
+        controlled_by: null,
+    });
+
     return user;
 };
 
@@ -439,7 +475,7 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
             {
                 $skip: skip,
             },
-            
+
             {
                 $limit: limit,
             },
@@ -486,10 +522,7 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                     },
                 },
             },
-            
         ]);
-
-        
 
         const feed = followedChannelsSqueals[0]?.squeals || [];
 

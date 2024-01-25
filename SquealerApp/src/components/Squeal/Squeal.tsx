@@ -231,7 +231,7 @@ const Squeal: React.FC<SquealProps> = ({
             className={`${className} flex flex-col bg-gray-800 text-gray-50 shadow-none mx-2 p-4 rounded-md gap-2 `}
             ref={observe}
         >
-            <div className="flex flex-row gap-2 text-md">
+            <div className="flex flex-row gap-2 text-md flex-wrap">
                 {recipients?.map((recipient, index) => {
                     return (
                         <span

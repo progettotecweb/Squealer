@@ -6,9 +6,9 @@ const useUser = () => {
     const {data: session, status} = useSession();
 
     const fetcher = (url: string) => fetch(url).then((res) => res.json());
-    const {data, isLoading} = useSWR(session ? `/api/users/${session.user.id}` : null, fetcher);
+    const {data, isLoading, mutate} = useSWR(session ? `/api/users/${session.user.id}` : null, fetcher);
 
-    return {user: data, status, isLoading};
+    return {user: data, status, isLoading, mutate};
 }
 
 const useServerUser = async () => {
