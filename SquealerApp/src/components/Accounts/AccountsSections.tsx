@@ -8,11 +8,13 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import Drawer from "@mui/material/Drawer";
 import Divider from "../Divider";
+import Close from "@mui/icons-material/Close";
+import CustomLink from "../CustomLink";
 
 const fetcher = (url: string) =>
     fetch(url)
@@ -137,13 +139,12 @@ export const AccountUserCard = ({ id }) => {
 export const MobileAccountMenu = ({ id, name }) => {
     const [open, setOpen] = useState(false);
 
+    const { data: session, status } = useSession();
+
     return (
         <>
-            <button
-                onClick={() => setOpen(true)}
-                className="bg-gray-700 px-4 py-1 rounded-md hover:bg-gray-800"
-            >
-                <MenuIcon />
+            <button onClick={() => setOpen(true)} className="">
+                {open ? <Close /> : <MenuIcon />}
             </button>
             <Drawer
                 open={open}
@@ -154,22 +155,27 @@ export const MobileAccountMenu = ({ id, name }) => {
                 }}
             >
                 <aside className="size-full flex flex-col gap-4 items-start text-lg">
-                
+                    {status === "authenticated" &&
+                        ["SMM", "Mod"].includes(session?.user?.role) && (
+                            <CustomLink href="/SMMDashboard" type="a">
+                                Switch to SMM
+                            </CustomLink>
+                        )}
 
-                
-                    <Divider className="w-full"/>
+                    {status === "authenticated" &&
+                        ["Mod"].includes(session?.user?.role) && (
+                            <CustomLink href="/Moderator" type="a">
+                                Switch to Moderator
+                            </CustomLink>
+                        )}
 
-                    
+                    <Divider className="w-full" />
+
                     <button onClick={() => signOut()}>Sign out</button>
-                    <Link
-                        className=""
-                        href="/Account/Edit"
-                    >
+                    <Link className="" href="/Account/Edit">
                         Edit profile
                     </Link>
                     <DeleteAccountModal id={id} name={name} />
-
-                    
                 </aside>
             </Drawer>
         </>
