@@ -55,7 +55,7 @@ export async function getMyData(url: string) {
 
 
 
-export async function getSquealData(url: string) {
+export async function getSquealData(url: string) { 
     const userInfo = await fetch("/api/squeals/info/" + url, {
         method: "GET",
         headers: {
