@@ -74,33 +74,43 @@ const handleImg = (file: any, setContentToUpdate = false) => {
 
 
 const Handlecontent = async (e: any) => {
-    switch (new_squeal_type.value) {
-        case "text":
-            //await handleText();
-            break;
 
-        case "image":
-            if (!e.target.files[0]) return;
+    if (!e.target.files[0]) return;
 
-            if (!e.target.files[0].type.startsWith('image')) {
-                console.log("file not supported");
-                return;
-            } else {
-                await handleImg(e.target, true);
-            }
-            break;
-
-        case "geolocation":
-            //await handlePos(e);
-            break;
-
-        default:
-            break;
+    if (!e.target.files[0].type.startsWith('image')) {
+        console.log("file not supported");
+        return;
+    } else {
+        await handleImg(e.target, true);
     }
 }
 
 
 const create_new_squeal = async () => {
+    //check if quota is enough to post the squeal
+    const MEDIA_LENGTH = 125
+    switch (new_squeal_type.value) {
+        case "text":
+            if (new_squeal_content.value.text.length > user.value.msg_quota.daily || new_squeal_content.value.text.length > user.value.msg_quota.weekly || new_squeal_content.value.text.length > user.value.msg_quota.monthly) {
+                alert("Not enough quota")
+                return;
+            }
+            break;
+        case "image":
+        case "geolocation":
+        case "video":
+            if (MEDIA_LENGTH > user.value.msg_quota.daily || MEDIA_LENGTH > user.value.msg_quota.weekly || MEDIA_LENGTH > user.value.msg_quota.monthly) {
+                alert("Not enough quota")
+                return;
+            }
+        break;
+
+
+    }
+
+
+
+
     let content = {
         ownerID: user.value._id,
         type: new_squeal_type.value,
@@ -213,7 +223,7 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
                                     geolocation: null,
                                     video: null
                                 },
-                                create_new_squeal()">post 1
+                                create_new_squeal()">post
                             </button>
                         </div>
                     </div>
@@ -222,13 +232,11 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
                         <input class="form-control" id="formFile1" @change="Handlecontent" accept="image/*" type="file" />
                         <div class="col-auto">
                             <button class="btn btn-outline-primary"
-                                @click=" new_squeal_type = 'image', create_new_squeal()">post 2</button>
+                                @click=" new_squeal_type = 'image', create_new_squeal()">post</button>
                         </div>
                     </div>
                     <div v-if="insert_new_pos == true"> <!--inserimento posizione-->
                         <Geolocation @markerPositionChanged="updateMarkerPosition"></Geolocation>
-                        <p>{{ markerPosition.lat }} lat</p>
-                        <p>{{ markerPosition.lng }} lng</p>
                         <div class="col-auto">
                             <button class="btn btn-outline-primary" @click="
                                 new_squeal_type = 'geolocation',
@@ -238,7 +246,7 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
                                     geolocation: { latitude: markerPosition.lat, longitude: markerPosition.lng },
                                     video: null
                                 },
-                                create_new_squeal()">post 3</button>
+                                create_new_squeal()">post</button>
                         </div>
                         <div class="col-auto">
 
@@ -262,11 +270,7 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
     </div>
 </template>
 
-<style>
-.squeal-box {
-    margin: auto;
-}
-</style>
+<style></style>
 
 
 

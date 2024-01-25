@@ -23,7 +23,7 @@ import "leaflet/dist/leaflet.css";
 
 const geolocation = defineProps(['geolocation'])
 
-let zoom = 13
+let zoom = 11 // Set the initial zoom level
 const mapCenter = ref<PointExpression>([0, 0]); // Set the initial center to (0, 0)
 const markerPosition = ref<LatLng>(new LatLng(0, 0)); // Set the initial marker position to (0, 0)
 

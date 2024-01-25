@@ -16,11 +16,26 @@ squeal.value.then((data: any) => {
 
 })
 
+function pad(number: any) {
+    return (number < 10 ? '0' : '') + number;
+}
+
+function formatDate(date: any) {
+    const d = new Date(date);
+    const month = pad(d.getMonth() + 1); // Aggiungo 1 al mese perché i mesi in JavaScript partono da 0
+    const day = pad(d.getDate());
+    const year = d.getFullYear();
+    const hour = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+
+    return day + "/" + month + "/" + year + " " + hour + ":" + minutes;
+}
+
 </script>
 
 
 <template>
-    <div v-if="waiting == false" class="squeal-box container w-auto text-start">
+    <div v-if="waiting == false" class="squeal-box rounded-3 container w-auto text-start">
         <div class="row">
             <div class="col-1">
                 <img :src="`data:${squeal.ownerID.img.mimetype};base64,${squeal.ownerID.img.blob}`" alt="user-img"
@@ -32,7 +47,7 @@ squeal.value.then((data: any) => {
                         <h6> @{{ squeal.ownerID.name }} </h6>
                     </div>
                     <div class="col-6 text-end">
-                        <h6> {{ squeal.datetime }} </h6>
+                        <h6> {{ formatDate(squeal.datetime) }} </h6>
                     </div>
                 </div>
                 <div class="row"> <!-- riga con le citazioni-->
