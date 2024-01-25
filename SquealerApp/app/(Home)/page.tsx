@@ -107,7 +107,8 @@ const Homepage = () => {
                 )}
                 <AnimatePresence mode="wait">
                     {searchParams?.has("q") ? (
-                        filteredData && filteredData?.length > 0 && (
+                        filteredData &&
+                        filteredData?.length > 0 && (
                             <motion.div
                                 variants={variants}
                                 initial="initial"
@@ -142,62 +143,32 @@ const Homepage = () => {
                             exit="exit"
                             key="feed"
                         >
-                            <Tabs>
-                                <Tab
-                                    label="Global"
-                                    content={
-                                        <section className="flex flex-col gap-2 w-full">
-                                            {data
-                                                ? data.map((page) => {
-                                                      return page?.map(
-                                                          (squeal, index) => (
-                                                              <Squeal
-                                                                  squealData={
-                                                                      squeal
-                                                                  }
-                                                                  type={
-                                                                      squeal.type
-                                                                  }
-                                                                  key={index}
-                                                                  id={
-                                                                      squeal._id
-                                                                  }
-                                                                  content={
-                                                                      squeal.content
-                                                                  }
-                                                                  owner={
-                                                                      squeal?.ownerID
-                                                                  }
-                                                                  date={
-                                                                      squeal?.datetime
-                                                                  }
-                                                                  reactions={
-                                                                      squeal?.reactions
-                                                                  }
-                                                                  recipients={
-                                                                      squeal?.recipients
-                                                                  }
-                                                              />
-                                                          )
-                                                      );
-                                                  })
-                                                : [1, 2, 3, 4, 5, 6, 7].map(
-                                                      (_, index) => (
-                                                          <div key={index}>
-                                                              <SquealSkeleton />
-                                                          </div>
-                                                      )
-                                                  )}
-                                            {isValidating ||
-                                                (isLoading && <Spinner />)}
-                                        </section>
-                                    }
-                                />
-                                <Tab
-                                    label="§RANDOM"
-                                    content={<div>random</div>}
-                                />
-                            </Tabs>
+                            <section className="flex flex-col gap-2 w-full">
+                                {data
+                                    ? data.map((page) => {
+                                          return page?.map((squeal, index) => (
+                                              <Squeal
+                                                  squealData={squeal}
+                                                  type={squeal.type}
+                                                  key={index}
+                                                  id={squeal._id}
+                                                  content={squeal.content}
+                                                  owner={squeal?.ownerID}
+                                                  date={squeal?.datetime}
+                                                  reactions={squeal?.reactions}
+                                                  recipients={
+                                                      squeal?.recipients
+                                                  }
+                                              />
+                                          ));
+                                      })
+                                    : [1, 2, 3, 4, 5, 6, 7].map((_, index) => (
+                                          <div key={index}>
+                                              <SquealSkeleton />
+                                          </div>
+                                      ))}
+                                {isValidating || (isLoading && <Spinner />)}
+                            </section>
                         </motion.div>
                     )}
                 </AnimatePresence>

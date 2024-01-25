@@ -64,7 +64,7 @@ const squealSchema = new mongoose.Schema({
     },
     keywords: [
         {
-            type: String
+            type: String,
         },
     ],
     mentions: [
@@ -523,7 +523,11 @@ const populateSquealAggregation = [
     {
         $addFields: {
             recipients: {
-                $setUnion: ["$recipientsFromCollection3", "$recipientsFromCollection1", "$recipientsFromCollection2",],
+                $setUnion: [
+                    "$recipientsFromCollection3",
+                    "$recipientsFromCollection1",
+                    "$recipientsFromCollection2",
+                ],
             },
         },
     },
@@ -535,11 +539,102 @@ const populateSquealAggregation = [
         },
     },
     {
-        $sort: {
-            datetime: -1,
+        // remove duplicates
+        $group: {
+            _id: null,
+            squeals: {
+                $push: "$$ROOT",
+            },
         },
     },
+    {
+        $sort: {
+            "squeals.datetime": -1,
+        },
+    },
+    {
+        $group: {
+            _id: null,
+            squeals: {
+                $push: "$squeals",
+            },
+        },
+    },
+    {
+        $project: {
+            _id: 0,
+            squeals: 1,
+        },
+    },
+    {
+        $addFields: {
+            squeals: {
+                $filter: {
+                    input: "$squeals",
+                    as: "squeal",
+                    cond: {
+                        $or: [
+                            { $eq: ["$$squeal.isAReply", false] },
+                            {
+                                $not: {
+                                    $in: [
+                                        "$$squeal.replyingTo",
+                                        {
+                                            $map: {
+                                                input: "$squeals",
+                                                as: "s",
+                                                in: "$$s._id",
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+        },
+    },
+    {
+        $unwind: {
+          path: "$squeals",
+          preserveNullAndEmptyArrays: true,
+        },
+      }, {
+        $unwind: {
+          path: "$squeals",
+        }
+      }, {
+        $replaceRoot: {
+          newRoot: "$squeals"
+        }
+      }
 ];
+
+exports.getAllSquealsByOwnerIDAggr = async function (
+    ownerID,
+    page = 0,
+    limit = 10
+) {
+    const skip = page * limit;
+
+    const squeals = await Squeal.aggregate([
+        {
+            $match: {
+                ownerID: new mongoose.Types.ObjectId(ownerID),
+            },
+        },
+        ...populateSquealAggregation,
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+    ]);
+
+    return squeals;
+};
 
 exports.getAllSquealsByFilter = async function (query, page = 0, limit = 10) {
     const skip = page * limit;

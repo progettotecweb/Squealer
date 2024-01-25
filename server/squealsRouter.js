@@ -32,7 +32,7 @@ router.get("/filter", async (req, res) => {
 })
 
 router.get("/:id", async (req, res) => {
-    const squeals = await squealsDB.getAllSquealsByOwnerID(req.params.id);
+    const squeals = await squealsDB.getAllSquealsByOwnerIDAggr(req.params.id);
     res.json({ results: squeals.reverse() });
 });
 

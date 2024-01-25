@@ -227,9 +227,10 @@ const Squeal: React.FC<SquealProps> = ({
     };
 
     return (
-        <div
+        <motion.div
             className={`${className} flex flex-col bg-gray-800 text-gray-50 shadow-none mx-2 p-4 rounded-md gap-2 `}
             ref={observe}
+            layout
         >
             <div className="flex flex-row gap-2 text-md flex-wrap">
                 {recipients?.map((recipient, index) => {
@@ -368,9 +369,12 @@ const Squeal: React.FC<SquealProps> = ({
                 <SquealReplyier session={session} parent={squealData} />
             )}
             {squealData?.replies?.length > 0 && (
-                <div className="flex flex-row w-full">
-                    <div className="border-l-2 border-l-solid" />
-                    <section className="flex flex-col gap-2 w-full">
+                <motion.div className="flex flex-row w-full" layout>
+                    <motion.div className="border-l-2 border-l-solid" layout />
+                    <motion.section
+                        className="flex flex-col gap-2 w-full"
+                        layout
+                    >
                         {squealData?.replies?.map((reply) => (
                             <Squeal
                                 key={reply._id}
@@ -384,10 +388,10 @@ const Squeal: React.FC<SquealProps> = ({
                                 className="w-full p-1"
                             />
                         ))}
-                    </section>
-                </div>
+                    </motion.section>
+                </motion.div>
             )}
-        </div>
+        </motion.div>
     );
 };
 
@@ -620,54 +624,69 @@ const SquealReplyier = (props: { parent; session }) => {
         },
     };
 
+    const handleInputResize = (e) => {
+        e.target.style.height = "inherit";
+        e.target.style.height = `${e.target.scrollHeight}px`;
+    };
+
     return (
-        <form className="flex">
+        <motion.form className="flex" layout layoutRoot>
             <AnimatePresence>
                 {!isContentEmpty() && (
                     <>
-                    
-                    <div className="sticky top-[1rem] right-[1rem]"></div>
-                    <motion.div
-                        key="counters"
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        variants={slideInFromRight}
-                        className="fixed top-[1rem] right-[1rem] p-4 rounded-lg bg-gray-800 text-slate-50 z-[1200] shadow-md shadow-gray-500"
-                    >
-                        <h1 className="md:text-xl mb-4">Characters</h1>
-                        <div className="flex flex-col">
-                            <Counter
-                                quota={user?.msg_quota?.daily}
-                                length={getContentSize()}
-                                maxLength={1000}
-                            />
-                            <Counter
-                                quota={user?.msg_quota?.weekly}
-                                length={getContentSize()}
-                                maxLength={6000}
-                            />
-                            <Counter
-                                quota={user?.msg_quota?.monthly}
-                                length={getContentSize()}
-                                maxLength={24000}
-                            />
-                        </div>
-                    </motion.div>
+                        <div className="sticky top-[1rem] right-[1rem]"></div>
+                        <motion.div
+                            key="counters"
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            variants={slideInFromRight}
+                            className="fixed top-[1rem] right-[1rem] p-4 rounded-lg bg-gray-800 text-slate-50 z-[1200] shadow-md shadow-gray-500"
+                        >
+                            <h1 className="md:text-xl mb-4">Characters</h1>
+                            <div className="flex flex-col">
+                                <Counter
+                                    quota={user?.msg_quota?.daily}
+                                    length={getContentSize()}
+                                    maxLength={1000}
+                                />
+                                <Counter
+                                    quota={user?.msg_quota?.weekly}
+                                    length={getContentSize()}
+                                    maxLength={6000}
+                                />
+                                <Counter
+                                    quota={user?.msg_quota?.monthly}
+                                    length={getContentSize()}
+                                    maxLength={24000}
+                                />
+                            </div>
+                        </motion.div>
                     </>
                 )}
             </AnimatePresence>
-            <div className="flex flex-1 bg-gray-700 rounded-md text-gray-50">
-                <div className="flex-1">
+            <motion.div
+                className="flex flex-1 bg-gray-700 rounded-md text-gray-50"
+                layout
+                animate={"height"}
+            >
+                <motion.div className="flex-1" layout>
                     {type === "text" ? (
-                        <motion.input
-                            name="reply"
-                            className="w-full bg-gray-700 rounded-md text-gray-50 p-2 flex-1 reply-input overflow-y-auto break-words resize-none"
-                            placeholder="Reply..."
-                            value={reply}
-                            onChange={(e) => handleContent(e)}
-                            disabled={!props.session}
-                        />
+                        <AnimatePresence mode="wait" initial={false}>
+                            <motion.textarea
+                                name="reply"
+                                className="w-full bg-gray-700 rounded-md text-gray-50 p-2 flex-1 reply-input overflow-hidden break-words resize-none transition-all "
+                                placeholder="Reply..."
+                                value={reply}
+                                onChange={(e) => handleContent(e)}
+                                disabled={!props.session}
+                                wrap="soft"
+                                rows={1}
+                                onKeyUp={handleInputResize}
+                                layout
+                                key={"reply_id" + props.parent._id}
+                            />
+                        </AnimatePresence>
                     ) : type === "image" ? (
                         img && (
                             <div className="flex flex-col gap-2">
@@ -683,10 +702,13 @@ const SquealReplyier = (props: { parent; session }) => {
                             <Geolocation onLocation={handleLocation} />
                         )
                     )}
-                </div>
-                <div
+                </motion.div>
+                <motion.div
+                    layout
                     className={`flex ${
-                        type === "text" ? "flex-row" : "flex-col p-4 h-full justify-center gap-4"
+                        type === "text"
+                            ? "flex-row"
+                            : "flex-col p-4 h-full justify-center gap-4"
                     }`}
                 >
                     {type !== "text" && (
@@ -733,8 +755,8 @@ const SquealReplyier = (props: { parent; session }) => {
                     >
                         <LocationOnOutlinedIcon className="text-gray-50" />
                     </SquealButton>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
             <SquealButton
                 disabled={!props.session || loading}
                 aria-label="share"
@@ -749,7 +771,7 @@ const SquealReplyier = (props: { parent; session }) => {
                     <ReplyOutlinedIcon className="text-gray-50" />
                 )}
             </SquealButton>
-        </form>
+        </motion.form>
     );
 };
 

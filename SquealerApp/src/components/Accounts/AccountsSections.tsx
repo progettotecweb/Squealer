@@ -291,7 +291,7 @@ export const SquealsSection = ({ id }) => {
     } = useSWR(`/api/squeals/${id}`, fetcher);
 
     return (
-        <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw]">
+        <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw] mb-16">
             {!squealsLoading
                 ? squeals?.results.map((squeal, index) => {
                       return (
@@ -304,6 +304,7 @@ export const SquealsSection = ({ id }) => {
                               date={squeal?.datetime}
                               reactions={squeal?.reactions}
                               squealData={squeal}
+                              recipients={squeal?.recipients}
                           />
                       );
                   })
