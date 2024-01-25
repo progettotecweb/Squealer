@@ -114,6 +114,7 @@ const Homepage = () => {
                                 animate="animate"
                                 exit="exit"
                                 key="search"
+                                className="flex flex-col w-full gap-2"
                             >
                                 {filteredData &&
                                     filteredData.map((page) => {
