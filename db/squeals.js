@@ -625,12 +625,6 @@ exports.getAllSquealsByOwnerIDAggr = async function (
             },
         },
         ...populateSquealAggregation,
-        {
-            $skip: skip,
-        },
-        {
-            $limit: limit,
-        },
     ]);
 
     return squeals;

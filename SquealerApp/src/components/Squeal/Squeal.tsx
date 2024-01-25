@@ -327,7 +327,7 @@ const Squeal: React.FC<SquealProps> = ({
                     }
                 })()}
             </div>
-            <div className="text-gray-50 fill-slate-50 flex items-center text-sm ">
+            <div className="text-gray-50 flex items-center gap-2 ">
                 <SquealButton
                     disabled={status === "unauthenticated"}
                     onClick={() =>
@@ -361,7 +361,7 @@ const Squeal: React.FC<SquealProps> = ({
                     😝 {reactions_.p2}
                 </SquealButton>
 
-                <div className="ml-auto mr-4">
+                <div className="ml-auto">
                     {squealData?.impressions} <RemoveRedEyeOutlinedIcon />
                 </div>
             </div>
@@ -372,7 +372,7 @@ const Squeal: React.FC<SquealProps> = ({
                 <motion.div className="flex flex-row w-full" layout>
                     <motion.div className="border-l-2 border-l-solid" layout />
                     <motion.section
-                        className="flex flex-col gap-2 w-full"
+                        className="flex flex-col gap-2 w-full *:p-1"
                         layout
                     >
                         {squealData?.replies?.map((reply) => (
@@ -630,7 +630,7 @@ const SquealReplyier = (props: { parent; session }) => {
     };
 
     return (
-        <motion.form className="flex" layout layoutRoot>
+        <form className="flex">
             <AnimatePresence>
                 {!isContentEmpty() && (
                     <>
@@ -665,17 +665,15 @@ const SquealReplyier = (props: { parent; session }) => {
                     </>
                 )}
             </AnimatePresence>
-            <motion.div
-                className="flex flex-1 bg-gray-700 rounded-md text-gray-50"
-                layout
-                animate={"height"}
+            <div
+                className="flex flex-1 bg-gray-700 rounded-md text-gray-50 items-center mr-2"
             >
-                <motion.div className="flex-1" layout>
+                <div className="flex-1 flex items-center">
                     {type === "text" ? (
                         <AnimatePresence mode="wait" initial={false}>
                             <motion.textarea
                                 name="reply"
-                                className="w-full bg-gray-700 rounded-md text-gray-50 p-2 flex-1 reply-input overflow-hidden break-words resize-none transition-all "
+                                className="w-full bg-gray-700 rounded-md m-0 text-gray-50 p-2 flex-1 reply-input overflow-hidden break-words resize-none transition-all focus-within:outline-none focus:outline-none outline-none"
                                 placeholder="Reply..."
                                 value={reply}
                                 onChange={(e) => handleContent(e)}
@@ -702,12 +700,12 @@ const SquealReplyier = (props: { parent; session }) => {
                             <Geolocation onLocation={handleLocation} />
                         )
                     )}
-                </motion.div>
-                <motion.div
-                    layout
+                </div>
+                <div
+                    
                     className={`flex ${
                         type === "text"
-                            ? "flex-row"
+                            ? "flex-row items-center gap-2 p-2"
                             : "flex-col p-4 h-full justify-center gap-4"
                     }`}
                 >
@@ -725,12 +723,13 @@ const SquealReplyier = (props: { parent; session }) => {
                     <SquealButton
                         disabled={!props.session}
                         aria-label="share"
-                        className="ml-auto"
+                        className=" flex items-center"
                         //onClick={() => switchType("image")}
                     >
                         {/* </SquealButton><CameraAltOutlinedIcon className="text-gray-50" /> */}
                         <label
                             htmlFor={`icon-button-file imginputref ${props.parent._id}`}
+                            className=""
                         >
                             <CameraAltOutlinedIcon className="text-gray-50" />
                         </label>
@@ -748,15 +747,15 @@ const SquealReplyier = (props: { parent; session }) => {
                     <SquealButton
                         disabled={!props.session}
                         aria-label="share"
-                        className="ml-auto"
+                        className=" "
                         onClick={() => {
                             switchType("geolocation");
                         }}
                     >
                         <LocationOnOutlinedIcon className="text-gray-50" />
                     </SquealButton>
-                </motion.div>
-            </motion.div>
+                </div>
+            </div>
             <SquealButton
                 disabled={!props.session || loading}
                 aria-label="share"
@@ -771,7 +770,7 @@ const SquealReplyier = (props: { parent; session }) => {
                     <ReplyOutlinedIcon className="text-gray-50" />
                 )}
             </SquealButton>
-        </motion.form>
+        </form>
     );
 };
 
@@ -784,15 +783,16 @@ const SquealButton = (props: {
     return (
         <motion.div
             whileHover={{ scale: 1.1 }}
-            className={`${props.className} text-sm flex items-center`}
+            className={`${props.className} flex items-center`}
         >
-            <IconButton
-                className="text-gray-50 disabled:text-gray-50 text-md"
+            <button
+                type="button"
+                className="text-gray-50 disabled:text-gray-50"
                 onClick={props.onClick}
                 disabled={props.disabled}
             >
                 {props.children}
-            </IconButton>
+            </button>
         </motion.div>
     );
 };

@@ -305,6 +305,8 @@ router.post("/post", auth, async (req, res) => {
 
         squealLen = len;
 
+       
+
         // mentions
         // mentions begin with @
         const regexp_mention = /@[\w|.|-|_]+/g;
@@ -364,6 +366,25 @@ router.post("/post", auth, async (req, res) => {
         }
 
         squealLen = 125;
+    }
+
+    if (newRecipients.length === 1 && newRecipients[0].type === "User" && privacy === 1) {
+        const user = await usersDB.searchUserByID(newRecipients[0].id);
+        user.notifications.push({
+            notificationType: "new",
+            text: `@${owner.name} sent you a private squeal.`,
+            link: `/Home/squeal/${newSqueal._id}`,
+            expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days
+        })
+
+        await user.save();
+
+        const payload = JSON.stringify({
+            title: `@${owner.name} sent you a private squeal`,
+            body: newSqueal.content.text && `${truncate(newSqueal.content.text, 20)}`,
+        });
+
+        await notifications.sendNotification(user._id, payload);
     }
 
     const getUserDebt = (len) => {

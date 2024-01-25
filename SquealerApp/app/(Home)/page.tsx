@@ -99,7 +99,7 @@ const Homepage = () => {
 
     return (
         <PageContainer key="home">
-            <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw]">
+            <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw] mb-16">
                 {session && session.user && (
                     <div className="hidden md:block">
                         <SquealCreator />

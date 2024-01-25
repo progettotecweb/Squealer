@@ -2,6 +2,23 @@
 
 import { useUser } from "@/hooks/useUser";
 
+const howMuchTimeAgo = (then: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+        return `${diffInSeconds} seconds ago`;
+    } else if (diffInSeconds < 3600) { // less than an hour
+        return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    } else if (diffInSeconds < 86400) { // less than a day
+        return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    } else if (diffInSeconds < 604800) { // less than a week
+        return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    } else { // more than a week
+        return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+    }
+}
+
 export default function NotificationMenu() {
     const { user, status, isLoading } = useUser();
 
@@ -15,7 +32,7 @@ export default function NotificationMenu() {
     const thisWeek: any[] = [];
     const thisMonth: any[] = [];
 
-    const notifications = user.notifications;
+    const notifications = user?.notifications;
 
     for (let i = 0; i < notifications.length; i++) {
         const notif = notifications[i];
@@ -32,17 +49,20 @@ export default function NotificationMenu() {
         var days_difference = time_difference / (1000 * 60 * 60 * 24);
 
         if (days_difference < 1) {
+            notif.ago = howMuchTimeAgo(then);
             today.push(notif);
         } else if (days_difference < 7) {
+            notif.ago = howMuchTimeAgo(then);
             thisWeek.push(notif);
         } else if (days_difference < 30) {
+            notif.ago = howMuchTimeAgo(then);
             thisMonth.push(notif);
         }
     }
 
     return (
         <div className="flex flex-col">
-            <h1 className="text-lg">Notifications</h1>
+            <h1 className="text-xl my-2">Notifications</h1>
             {today.length > 0 && (
                 <div className="flex flex-col">
                     <h2 className="text-md">Today</h2>
@@ -79,7 +99,6 @@ const Notification = ({ notif }: any) => (
             className="w-8 h-8 rounded-full object-cover"
         />
         <p className="text-sm">{notif.text}</p>
-
-        {/* <p className="text-xs">{notif.createdAt}</p> */}
+        <p className="text-sm text-gray-400 ml-auto">{notif.ago}</p>
     </div>
 );
