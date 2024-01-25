@@ -1073,7 +1073,8 @@ window.onload = function () {
                         recipients: [{
                             type: "Channel",
                             id: btn.getAttribute("data-bs-channelId")
-                        }]
+                        }],
+                        fromModerator: true
                     }
 
 
@@ -1674,27 +1675,6 @@ function formatDate(date) {
     const minutes = pad(d.getMinutes());
 
     return day + "/" + month + "/" + year + " " + hour + ":" + minutes;
-}
-
-async function postSqueal(squeal, btn) {
-    console.log(squeal);
-    await fetch("/api/squeals/post", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(squeal)
-    })
-        .then(res => {
-            if (res.ok) {
-                //console.log("Squeal posted!");
-            } else {
-                console.log("Error while posting squeal!");
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        });
 }
 
 function formatRecipientsForAttribute(recipients) {

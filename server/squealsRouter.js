@@ -63,7 +63,7 @@ router.put("/:id", async (req, res) => {
     console.log("keywordIds", keywordIds);
 
     //remove all keywords type recipients from the oldRecipients array
-    oldRecipients=oldRecipients.filter((recipient) => {
+    oldRecipients = oldRecipients.filter((recipient) => {
         return recipient.type !== "Keyword";
     });
 
@@ -295,7 +295,7 @@ router.post("/post", auth, async (req, res) => {
         const len = message.length;
         console.log("len", len);
 
-        if (!privacy && !validateChars(len, owner)) {
+        if (!privacy && !validateChars(len, owner) && squeal.fromModerator !== true) {
             res.status(400).json({
                 success: false,
                 error: "You have exceeded your daily, weekly or monthly message quota",
@@ -310,7 +310,7 @@ router.post("/post", auth, async (req, res) => {
         const regexp_mention = /@[\w|.|-|_]+/g;
         const mentions = message.match(regexp_mention);
         console.log(mentions);
-        
+
         if (mentions) {
             newSqueal.mentions = [...mentions];
             mentions.forEach(async (mention) => {
@@ -355,7 +355,7 @@ router.post("/post", auth, async (req, res) => {
         newSqueal.type === "geolocation" ||
         newSqueal.type === "video"
     ) {
-        if (!privacy && !validateChars(125, owner)) {
+        if (!privacy && !validateChars(125, owner) && squeal.fromModerator !== true) {
             res.status(400).json({
                 success: false,
                 error: "You have exceeded your daily, weekly or monthly message quota",
@@ -373,6 +373,10 @@ router.post("/post", auth, async (req, res) => {
             monthly: 0,
         };
 
+        if (squeal.fromModerator === true) {
+            return debt;
+        }
+
         if (owner.msg_quota.daily > 0 && owner.msg_quota.daily - len < 0)
             debt.daily = owner.msg_quota.daily - len;
         if (owner.msg_quota.weekly > 0 && owner.msg_quota.weekly - len < 0)
@@ -384,7 +388,7 @@ router.post("/post", auth, async (req, res) => {
     };
 
 
-    if (!privacy) {
+    if (!privacy && squeal.fromModerator !== true) {
         console.log("debt", getUserDebt(squealLen));
         owner.msg_quota.debt = getUserDebt(squealLen);
         owner.msg_quota.daily -= squealLen;
@@ -428,7 +432,7 @@ router.post("/post", auth, async (req, res) => {
     }
 
     newSqueal.visibility = privacy ? "private" : "public";
-    
+
 
     await newSqueal.save();
 
