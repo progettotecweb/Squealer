@@ -868,7 +868,6 @@ window.onload = function () {
             inputRecipients.setAttribute("data-bs-ids-type", databs.idsType);
             impressions.innerHTML = databs.impressions + " impression(s)";
             datetime.innerHTML = formatDate(databs.datetime);
-            console.log(databs.controversial)
             controversial.innerHTML = databs.controversial === 'true' ? '<i>Controversial</i>' : '<i>Not controversial</i>';
             cm.innerHTML = "<b>CM</b>: " + databs.cm;
             automatic.innerHTML = databs.automatic === 'true' ? "<b>Automatic</b>" : "<b>Not automatic</b>";

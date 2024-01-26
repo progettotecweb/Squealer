@@ -311,7 +311,7 @@ router.post("/post", auth, async (req, res) => {
 
         squealLen = len;
 
-       
+
 
         // mentions
         // mentions begin with @

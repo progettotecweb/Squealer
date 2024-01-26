@@ -409,7 +409,11 @@
         grid-gap: 1.5em;
         grid-row-gap: 1.5em;
         padding: 1em 10vw;
-        max-height: 87vh;
+        max-height: 70vh;
+    }
+
+    .my-card-squeal{
+        max-height: 20em;
     }
 
     .section-header ul li {
