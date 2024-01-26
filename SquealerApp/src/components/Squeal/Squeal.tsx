@@ -92,13 +92,28 @@ export interface SquealProps {
     ];
 }
 
+//find $URL=<url> in text, substitute it with <a> tag
+
 const SquealText = (props: { text: string }) => {
     return (
         <p className="text-md ml-4 mt-2">
             {regexifyString({
-                pattern: /@\w+|#\w+/g,
+                pattern: /@\w+|#\w+|(\[(.*?)\])?\$URL=(\S+)/g,
                 decorator: (match, index) => {
                     const link = match.startsWith("@");
+
+                    if (match.includes("$URL=")) {
+                        const [text, url] = match.split("$URL=");
+                        const displayText = text.replace(/[\[\]]/g, "");
+
+                        return (
+                            <a href={url} rel="noopener" target="_blank" key={"url"+index}
+                                className="text-blue-400 hover:text-blue-500"
+                            >
+                                {displayText || "More"}
+                            </a>
+                        );
+                    }
 
                     return link ? (
                         <CustomLink
@@ -665,9 +680,7 @@ const SquealReplyier = (props: { parent; session }) => {
                     </>
                 )}
             </AnimatePresence>
-            <div
-                className="flex flex-1 bg-gray-700 rounded-md text-gray-50 items-center mr-2"
-            >
+            <div className="flex flex-1 bg-gray-700 rounded-md text-gray-50 items-center mr-2">
                 <div className="flex-1 flex items-center">
                     {type === "text" ? (
                         <AnimatePresence mode="wait" initial={false}>
@@ -702,7 +715,6 @@ const SquealReplyier = (props: { parent; session }) => {
                     )}
                 </div>
                 <div
-                    
                     className={`flex ${
                         type === "text"
                             ? "flex-row items-center gap-2 p-2"

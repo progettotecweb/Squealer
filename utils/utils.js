@@ -40,7 +40,11 @@ const auth = async (req, res, next) => {
             );
         }
 
-        req.user = { role: user.role };
+        req.user = {
+            id: user._id,
+            name: user.name,
+            role: user.role,
+        };
         next();
     } else {
         res.status(401).sendFile(

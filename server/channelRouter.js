@@ -259,7 +259,7 @@ router.post("/createprivate", async (req, res) => {
         administrators: new Array(user),
     });
 
-    const creator = usersDB.searchUserByID(user);
+    const creator = await usersDB.searchUserByID(user, "following");
 
     if (creator) {
         creator.following.push(newChannel._id);

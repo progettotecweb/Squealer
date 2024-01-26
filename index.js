@@ -38,6 +38,8 @@ const usersRouter = require("./server/usersRouter.js");
 const apiRouter = require("./server/api.js");
 const subscriptionRouter = require("./server/subscriptionRouter.js")
 
+const bots = require("./bots/setup.js")
+
 const webpush = require("web-push")
 
 
@@ -103,6 +105,8 @@ appNext
 
 
         mymongo.connectToDB();
+
+        bots.setupBots();
 
         // #TODO-gianlo: separate routes in different files, maybe create a server directory?
 

@@ -32,8 +32,12 @@ router.get("/filter", async (req, res) => {
 })
 
 router.get("/:id", async (req, res) => {
-    const squeals = await squealsDB.getAllSquealsByOwnerIDAggr(req.params.id);
-    res.json({ results: squeals.reverse() });
+
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const squeals = await squealsDB.getAllSquealsByOwnerIDAggr(req.params.id, page, limit);
+    res.json(squeals);
 });
 
 router.put("/:id", async (req, res) => {
@@ -168,6 +172,8 @@ router.post("/post", auth, async (req, res) => {
     // #TODO: squeal validation
     console.log("squeal", squeal);
 
+    console.log(req.user)
+
     const owner = await usersDB.searchUserByID(squeal.ownerID);
     if (!owner) {
         res.status(400).json({ success: false, error: "User not found" });
@@ -237,7 +243,7 @@ router.post("/post", auth, async (req, res) => {
                         toBeRemoved.push(recipient);
                     }
                 } else {
-                    if (!channel.can_user_post) {
+                    if (!channel.can_user_post && !squeal?.fromModerator) {
                         if (
                             channel.administrators.includes(owner._id) ||
                             channel?.owner_id?.toString() === owner?._id?.toString()
@@ -394,7 +400,7 @@ router.post("/post", auth, async (req, res) => {
             monthly: 0,
         };
 
-        if (squeal.fromModerator === true) {
+        if (squeal.fromModerator) {
             return debt;
         }
 

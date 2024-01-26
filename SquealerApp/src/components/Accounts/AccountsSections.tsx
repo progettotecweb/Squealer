@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import Squeal, { SquealSkeleton } from "../Squeal/Squeal";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -15,6 +15,8 @@ import Drawer from "@mui/material/Drawer";
 import Divider from "../Divider";
 import Close from "@mui/icons-material/Close";
 import CustomLink from "../CustomLink";
+import useSWRInfinite from "swr/infinite";
+import Spinner from "../Spinner";
 
 const fetcher = (url: string) =>
     fetch(url)
@@ -36,31 +38,28 @@ export const UserCard = ({ id }) => {
 
     return (
         <section className="w-full md:w-[60vw] grid grid-cols-6">
-                <div className="w-full col-span-2 sm:grid sm:place-content-center flex justify-center pt-6">
-                    <img
-                        src={`data:${data?.img?.mimetype};base64,${data?.img?.blob}`}
-                        alt="Profile Picture"
-                        className="rounded-full w-24 h-24 sm:w-32 sm:h-32 col-span-2 object-cover"
-                    />
+            <div className="w-full col-span-2 sm:grid sm:place-content-center flex justify-center pt-6">
+                <img
+                    src={`data:${data?.img?.mimetype};base64,${data?.img?.blob}`}
+                    alt="Profile Picture"
+                    className="rounded-full w-24 h-24 sm:w-32 sm:h-32 col-span-2 object-cover"
+                />
+            </div>
+            <section className="p-4 flex flex-col h-full items-start gap-4 col-span-4">
+                <div className="flex gap-2 items-center">
+                    <h1 className="text-2xl font-bold text-white">
+                        {data?.name}
+                    </h1>
                 </div>
-                <section className="p-4 flex flex-col h-full items-start gap-4 col-span-4">
-                    <div className="flex gap-2 items-center">
-                        <h1 className="text-2xl font-bold text-white">
-                            {data?.name}
-                        </h1>
-                        
-                    </div>
-                    <div className="flex sm:text-lg gap-16 items-center justify-center">
-                        <h1 className="flex">{data.squeals.length} Squeals</h1>
-                        <h1 className="flex ">
-                            {data.following.length} Following
-                        </h1>
-                    </div>
-                    <div className="self-start h-full text-md max-w-full text-wrap overflow-x-auto">
-                        {data.bio}
-                    </div>
-                </section>
+                <div className="flex sm:text-lg gap-16 items-center justify-center">
+                    <h1 className="flex">{data.squeals.length} Squeals</h1>
+                    <h1 className="flex ">{data.following.length} Following</h1>
+                </div>
+                <div className="self-start h-full text-md max-w-full text-wrap overflow-x-auto">
+                    {data.bio}
+                </div>
             </section>
+        </section>
     );
 };
 
@@ -283,18 +282,64 @@ const DeleteAccountModal = (props: { id: string; name: string }) => {
 };
 
 export const SquealsSection = ({ id }) => {
+    // const {
+    //     data: squeals,
+    //     isLoading: squealsLoading,
+    //     mutate: mutateSqueals,
+    // } = useSWR(`/api/squeals/${id}`, fetcher);
+
+    const contentFinished = useRef<boolean>(false);
+
+    const getKey = (pageIndex: any, previousPageData: string | any[]) => {
+        if (previousPageData && !previousPageData.length) {
+            contentFinished.current = true;
+            return null;
+        } // reached the end
+
+        return `/api/squeals/${id}?page=${pageIndex}&limit=10`;
+    };
+
+    const fetcher = (url: string) =>
+        fetch(url)
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.length === 0) {
+                    contentFinished.current = true;
+                }
+
+                return data;
+            });
+
     const {
-        data: squeals,
+        data,
+        size,
+        setSize,
         isLoading: squealsLoading,
+        isValidating,
         mutate: mutateSqueals,
-    } = useSWR(`/api/squeals/${id}`, fetcher);
+    } = useSWRInfinite(getKey, fetcher);
+
+    useEffect(() => {
+        const handleScroll = (e) => {
+            const scrollHeight = e.target.documentElement.scrollHeight;
+            const currentHeight =
+                e.target.documentElement.scrollTop + window.innerHeight;
+            if (currentHeight + 1 >= scrollHeight && !contentFinished.current) {
+                //console.log(`Requesting next page (${contentFinished.current ? "finished" : "not finished"})`)
+                setSize(size + 1);
+            }
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
         <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw] mb-16">
-            {!squealsLoading
-                ? squeals?.results.map((squeal, index) => {
-                      return (
+            {data
+                ? data.map((page) => {
+                      return page?.map((squeal, index) => (
                           <Squeal
+                              squealData={squeal}
                               type={squeal.type}
                               key={index}
                               id={squeal._id}
@@ -302,14 +347,16 @@ export const SquealsSection = ({ id }) => {
                               owner={squeal?.ownerID}
                               date={squeal?.datetime}
                               reactions={squeal?.reactions}
-                              squealData={squeal}
                               recipients={squeal?.recipients}
                           />
-                      );
+                      ));
                   })
-                : [1, 2, 3, 4, 5, 6, 7].map((_, index) => {
-                      return <SquealSkeleton key={index} />;
-                  })}
+                : [1, 2, 3, 4, 5, 6, 7].map((_, index) => (
+                      <div key={index}>
+                          <SquealSkeleton />
+                      </div>
+                  ))}
+            {isValidating || (squealsLoading && <Spinner />)}
         </section>
     );
 };
