@@ -23,34 +23,53 @@ user.value.then((data: any) => {
 </script>
 
 <template >
-  <header class="navbar navbar-expand navbar-dark sticky-top">
-    <div class="d-flex justify-content-between w-100">
-      <h4 class="navbar-brand">SMM Dashboard</h4>
-      <div class="logo">
-        <img src="/public/squealer.png" alt="squealer-logo" class="img-fluid logo" />
+  <header class="navbar navbar-expand navbar-dark sticky-top ">
+    <div class="d-flex flex-row justify-content-between align-items-center w-100">
+      <div class="d-none d-lg-block w-25">
+        <p class="title"> SMM Dashboard</p>
       </div>
-      <div class="d-none d-lg-block">
-        <a href=""><button class="btn btn-outline-primary">Bottone</button></a>
+
+      <div class="logo d-flex justify-content-center w-25">
+          <img src="/public/squealer.png" alt="squealer-logo" class="img-fluid logo" />
+        <p class="title d-none d-lg-block">
+          Squealer
+        </p>
       </div>
+
+      <div class="w-25 d-flex justify-content-end" v-if="active_name == null">
+        
+          <a href="/home"><button class="btn btn-outline-info ">Back</button></a>
+        
+      </div>
+      <div class="w-25 d-flex justify-content-end" v-if="active_name != null">
+            
+              <button class="btn btn-outline-info " @click="active_name = null">Back</button>
+            
+      </div>
+      
     </div>
 
   </header>
   <div class="container-fluid ">
-    <div class="row flex-xl-nowrap">
+    <div class="row ">
       
-      <div class="col-12 col-md-3 col-xl-2 sidebar d-none d-lg-block">
-        <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
-        <p>@{{ user.name }}</p>
-        <a href="/home"><button class="btn btn-outline-primary ">Home</button></a>
+      <div class="col-md-3 col-xl-2 sidebar d-none d-lg-block  text-center"> <!--sidebar sinistra-->
+        <div class="row justify-content-center p-0">
+          <img class="p-0" v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
+        </div>
+        <div class="row">
+          <p>@{{ user.name }}</p>
+        </div>
+        <div class="row">
+          <a href="/home"><button class="btn btn-outline-info ">Home</button></a>
+        </div>
       </div>
 
       <main 
-      class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 flex flex-col justify-center items-center text-center text-w undefined text-slate-50"
-      role="main">
+      class="col-12 col-md-12 col-lg-9 col-xl-8"
+      role="main">  <!--main-->
         <div>
-          <div class="container text-end" v-if="active_name != null">
-            <button class="btn btn-outline-primary" @click="active_name = null">Back</button>
-          </div>
+          
           <div v-if="active_name == null" class="d-flex justify-content-around flex-wrap " > <!-- si vede se variabile Name == NULL-->
               <user_boxs
                   v-for="account in controlled_user"  
@@ -73,13 +92,18 @@ user.value.then((data: any) => {
 </template>
 
 <style>
-header {
-    background-color: #374e64;
+header{
+    background-color: #1f2937;
     color: aliceblue;
 }
+
 .logo {
     width: 30pt;
     height: 30pt;
+}
+.title {
+    font-size: 20pt;
+    font-weight: bold;
 }
 
 </style>

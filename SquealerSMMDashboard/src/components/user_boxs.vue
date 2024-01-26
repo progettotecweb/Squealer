@@ -33,7 +33,7 @@ const waiting = ref(true);
 <style>
 
     .user-box{
-        background-color: #3e5870;
+        background-color: #1f2937;
         border-radius: 10px;
         padding: 10px;
         margin: 10px;

@@ -19,13 +19,60 @@ const insert_new_pos = ref(false);
 
 const new_characters = ref(false);
 
-user.value = getMyData(id.id);
-user.value.then((data: any) => {
-    user.value = data,
-        user_squeals.value = user.value.squeals,
-        waiting.value = false
+let daily_quota = 0;
+let weekly_quota = 0;
+let monthly_quota = 0;
 
-})
+
+
+const update_user_value = () => {
+
+    waiting.value = true;
+    user.value = getMyData(id.id)
+    user.value.then((data: any) => {
+        user.value = data
+        user_squeals.value = user.value.squeals
+        daily_quota = user.value.msg_quota.daily;
+        weekly_quota = user.value.msg_quota.weekly;
+        monthly_quota = user.value.msg_quota.monthly;
+        waiting.value = false
+    })
+    
+}
+
+
+update_user_value();
+
+//add caracters and update user
+const add_characters = async () => {
+
+    let data = {
+        msg_quota: {
+            daily: user.value.msg_quota.daily + 140,
+            weekly: user.value.msg_quota.weekly + 140,
+            monthly: user.value.msg_quota.monthly + 140
+        }
+    }
+
+    await fetch("/api/users/"+id.id, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+        .then(res => {
+            if (res.ok) {
+                update_user_value();
+            } else {
+                console.log("Error while updating data!");
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
 
 const formatImg = (img: string | null) => {
     if (!img) {
@@ -47,7 +94,6 @@ const handleImg = (file: any, setContentToUpdate = false) => {
 
         reader.onload = () => {
             const imgDataUrl = reader.result as string;
-            console.log(imgDataUrl);
             if (setContentToUpdate) {
 
                 new_squeal_content.value = {
@@ -104,12 +150,7 @@ const create_new_squeal = async () => {
                 return;
             }
         break;
-
-
     }
-
-
-
 
     let content = {
         ownerID: user.value._id,
@@ -137,13 +178,7 @@ const create_new_squeal = async () => {
         })
 
 
-    waiting.value = true;
-    user.value = getMyData(id.id)
-    user.value.then((data: any) => {
-        user.value = data
-        user_squeals.value = user.value.squeals
-        waiting.value = false
-    })
+    update_user_value();
 }
 
 
@@ -185,37 +220,41 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
         </div>
 
         <div class="row">
-            <button class="btn btn-outline-primary col-auto" v-if="new_characters == false"
-                @click="new_squeal = !new_squeal">
+            <button class="btn btn-outline-info col-auto" 
+                @click="new_squeal = !new_squeal, new_characters = false">
                 create new post
             </button>
-            <button class="btn btn-outline-primary col-auto" v-if="new_squeal == false"
-                @click="new_characters = !new_characters">
+            <button class="btn btn-outline-info col-auto" 
+                @click="new_characters = !new_characters, new_squeal = false">
                 buy characters
             </button>
         </div>
 
 
-        <div v-if="new_squeal" class="row">
+        <div v-if="new_squeal" class="row"> <!--inserimento nuovo squeal-->
             <div class="col-12">
                 <div class="row">
-                    <button class="btn btn-outline-primary col-auto"
+                    <button class="btn btn-outline-info col-auto"
                         @click="insert_new_text = true, insert_new_img = false, insert_new_pos = false">text</button>
-                    <button class="btn btn-outline-primary col-auto"
+                    <button class="btn btn-outline-info col-auto"
                         @click="insert_new_text = false, insert_new_img = true, insert_new_pos = false">image</button>
-                    <button class="btn btn-outline-primary col-auto"
+                    <button class="btn btn-outline-info col-auto"
                         @click="insert_new_text = false, insert_new_img = false, insert_new_pos = true">geolocation</button>
                 </div>
                 <div class="row">
                     <div v-if="insert_new_text == true"> <!--inserimento testo-->
                         <div>
-                            <textarea class="form-control" v-model="new_squeal_content" placeholder="tell me the news"
-                                id="new_squeal_text_input" rows="4">
+                            <textarea class="form-control" 
+                                v-model="new_squeal_content" 
+                                @input="user.msg_quota.daily = daily_quota-new_squeal_content.length, user.msg_quota.weekly = weekly_quota-new_squeal_content.length, user.msg_quota.monthly = monthly_quota-new_squeal_content.length" 
+                                placeholder="What's happening?"
+                                id="new_squeal_text_input" 
+                                rows="4">
                             </textarea>
                         </div>
                         <div class="col-auto">
 
-                            <button class="btn btn-outline-primary" @click="
+                            <button class="btn btn-outline-info" @click="
                                 new_squeal_type = 'text',
                                 new_squeal_content = {
                                     text: new_squeal_content,
@@ -223,7 +262,8 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
                                     geolocation: null,
                                     video: null
                                 },
-                                create_new_squeal()">post
+                                create_new_squeal(),
+                                new_squeal_content = null">post
                             </button>
                         </div>
                     </div>
@@ -231,14 +271,16 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
                         <label for="formFile1" class="form-label">select an image to squeal</label>
                         <input class="form-control" id="formFile1" @change="Handlecontent" accept="image/*" type="file" />
                         <div class="col-auto">
-                            <button class="btn btn-outline-primary"
-                                @click=" new_squeal_type = 'image', create_new_squeal()">post</button>
+                            <button class="btn btn-outline-info"
+                                @click=" new_squeal_type = 'image', 
+                                create_new_squeal(),
+                                new_squeal_content = null">post</button>
                         </div>
                     </div>
                     <div v-if="insert_new_pos == true"> <!--inserimento posizione-->
-                        <Geolocation @markerPositionChanged="updateMarkerPosition"></Geolocation>
                         <div class="col-auto">
-                            <button class="btn btn-outline-primary" @click="
+                        <Geolocation  @markerPositionChanged="updateMarkerPosition"></Geolocation>
+                            <button class="btn btn-outline-info" @click="
                                 new_squeal_type = 'geolocation',
                                 new_squeal_content = {
                                     text: null,
@@ -246,22 +288,25 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
                                     geolocation: { latitude: markerPosition.lat, longitude: markerPosition.lng },
                                     video: null
                                 },
-                                create_new_squeal()">post</button>
+                                create_new_squeal(),
+                                new_squeal_content = null">post</button>
                         </div>
-                        <div class="col-auto">
-
-                        </div>
+                        
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div v-if="new_characters"><!--buy new caracters-->
 
+            <button class="btn btn-outline-info" @click="add_characters()" > aggiungi 140 caratteri</button>
+            
 
         </div>
 
 
 
-        <div class="container ">
+        <div class="container d-flex flex-column-reverse ">
             <squeal_box class="m-3" v-for="squeal in user_squeals" :id="squeal">
             </squeal_box>
             <!--clicca uno squils per vedere le statistiche -->

@@ -6,14 +6,27 @@
 html, body {
     height: 100vh;
     width: 100vw;
-    background-color: #2c3e50;
+    background-color: #111b21;
 }
 
 #app {
     height: 100%;
     width: 100%;
-    background-color: #2c3e50;
+    background-color: #111b21;
         color: aliceblue;
 }
 
+.btn{
+    margin: 3px;
+}
 
+
+html::-webkit-scrollbar {
+    display: none;
+}
+
+
+html {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

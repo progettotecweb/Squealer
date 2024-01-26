@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 25vh; width: 100%;">
+  <div  style="height: 25vh; width: 100%;">
     <l-map :zoom="zoom" :center="mapCenter" @ready="initMap()">
       <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"></l-tile-layer>
 
