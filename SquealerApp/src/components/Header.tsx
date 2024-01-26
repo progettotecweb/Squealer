@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import SearchOutlined from "@mui/icons-material/SearchOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import { MobileAccountMenu } from "./Accounts/AccountsSections";
+import { useSession } from "next-auth/react";
 
 //fade in fade out
 const variants = {
@@ -79,6 +80,8 @@ const Header: React.FC = () => {
 
     const [isSearching, setIsSearching] = useState(false);
 
+    const { data: session } = useSession();
+
     const [search, setSearch] = useState("");
 
     useEffect(() => {
@@ -91,7 +94,7 @@ const Header: React.FC = () => {
 
     return (
         <>
-            <header className="hidden sm:flex z-[2001] justify-center flex-column items-center bg-[#111B21] sticky top-0  w-full text-center text-stone-50 h-16">
+            <header className="hidden sm:flex z-[100] justify-center flex-column items-center bg-[#111B21] sticky top-0  w-full text-center text-stone-50 h-16">
                 <Link
                     href="/"
                     className=" text-2xl flex justify-center items-center"
@@ -202,7 +205,9 @@ const Header: React.FC = () => {
                                 exit="exit"
                                 key="home-notifications"
                             >
-                                <NotificationsNoneIcon />
+                                <Link href="/Account/Notifications">
+                                    <NotificationsNoneIcon />
+                                </Link>
                             </motion.button>
                         ) : (
                             pathname === "/Account" && (
@@ -213,7 +218,10 @@ const Header: React.FC = () => {
                                     exit="exit"
                                     key="account"
                                 >
-                                    <MobileAccountMenu />
+                                    <MobileAccountMenu
+                                        id={session?.user?.id}
+                                        name={session?.user?.name}
+                                    />
                                 </motion.div>
                             )
                         )}
