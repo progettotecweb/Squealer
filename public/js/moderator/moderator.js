@@ -772,6 +772,14 @@ window.onload = function () {
 
             modalTitle.textContent = databs.name
 
+            const postBtn = channelSquealsModal.querySelector('#btn-savechanges');
+            if (databs.visibility === "private") {
+                //mod cannot post in private channels
+                postBtn.setAttribute("disabled", "")
+            } else {
+                postBtn.removeAttribute("disabled")
+            }
+
             const viewSquealsDiv = channelSquealsModal.querySelector(".channel-view-squeals");
             viewSquealsDiv.innerHTML = "";
 
