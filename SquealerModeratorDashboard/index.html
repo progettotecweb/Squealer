@@ -188,7 +188,7 @@
                                     <input type="text" class="form-text " id="channel-administrators"
                                         data-bs-value_administrators="administrators">
                                     <input type="button" class="btn btn-warning btn-check-input"
-                                        id="channel-administrators-checkbox" value="Check admins"/><br>
+                                        id="channel-administrators-checkbox" value="Check admins" /><br>
                                     <span class="label" id="channel-administrators-label">Insert @username(s)
                                         separated
                                         by a comma</span>
@@ -284,11 +284,13 @@
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <p class="selected-squeal-info">
-                                <p class="h6">Original owner:
-                                    <span id="squeal-owner"></span>
-                                </p> <br>
-
+                                <div class="d-flex justify-content-between">
+                                    <p class="h6">Original owner:
+                                        <span id="squeal-owner"></span>
+                                    </p> <br>
+                                    <p id="squeal-modal-datetime"></p>
+                                </div>
+                                <hr>
                                 <label for="squeal-recipients" class="h6 ">Recipients: </label>
                                 <input type="text" class="form-text " id="squeal-recipients"
                                     data-bs-value_recipients="recipients">
@@ -311,7 +313,15 @@
                                 <label for="squeal-reactions-p2" class="label">😝</label>
                                 <input type="number" class="form-number w-25" id="squeal-reactions-p2"
                                     data-bs-value_reactions_p2="0"><br>
-
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <p class="w-33 text-center" id="squeal-modal-cm"></p>
+                                    <p class="w-33 text-center" id="squeal-modal-impressions"></p>
+                                    <p class="w-33 text-center" id="squeal-modal-controversial"></p>
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    <p class="w-33 text-center" id="squeal-modal-automatic"></p>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"

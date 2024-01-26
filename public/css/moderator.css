@@ -193,6 +193,10 @@
     padding: 0.15em 0.7em;
 }
 
+.squeal-owner-div{
+    max-height: 3em;
+}
+
 .squeal-owner-div .user-pic {
     width: 3em;
     height: 3em;
@@ -200,9 +204,9 @@
 }
 
 .squeal-content {
-    padding: 0.1em;
+    padding: 0.1em 0.1em 0em 0.1em;
     min-height: 10em;
-    margin-bottom: 2em;
+    margin-bottom: 0em;
     overflow-y: auto;
 }
 
@@ -264,6 +268,10 @@
 .squeal-footer-br {
     text-align: end;
     grid-area: 2 / 2 / 3 / 3;
+}
+
+.w-33{
+    width: 33%;
 }
 
 .squeal-header {

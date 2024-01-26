@@ -830,7 +830,12 @@ window.onload = function () {
                     p2: button.getAttribute('data-bs-squealReactions-p2')
                 },
                 recipientsId: button.getAttribute('data-bs-squealRecipientsId'),
-                idsType: button.getAttribute('data-bs-idsType')
+                idsType: button.getAttribute('data-bs-idsType'),
+                impressions: button.getAttribute('data-bs-squealImpressions'),
+                datetime: button.getAttribute('data-bs-squealDatetime'),
+                controversial: button.getAttribute('data-bs-squealControversial'),
+                cm: button.getAttribute('data-bs-squealCm'),
+                automatic: button.getAttribute('data-bs-squealAutomatic')
             }
 
             // Update the modal's content.
@@ -843,6 +848,11 @@ window.onload = function () {
                 p1: squealsModal.querySelector('#squeal-reactions-p1'),
                 p2: squealsModal.querySelector('#squeal-reactions-p2')
             }
+            const impressions = squealsModal.querySelector('#squeal-modal-impressions');
+            const datetime = squealsModal.querySelector('#squeal-modal-datetime');
+            const controversial = squealsModal.querySelector('#squeal-modal-controversial');
+            const cm = squealsModal.querySelector('#squeal-modal-cm');
+            const automatic = squealsModal.querySelector('#squeal-modal-automatic');
 
             const btnSave = squealsModal.querySelector("#btn-savechanges");
 
@@ -856,6 +866,12 @@ window.onload = function () {
             squealId = databs.id;
             inputRecipients.setAttribute("data-bs-recipients-id", databs.recipientsId);
             inputRecipients.setAttribute("data-bs-ids-type", databs.idsType);
+            impressions.innerHTML = databs.impressions + " impression(s)";
+            datetime.innerHTML = formatDate(databs.datetime);
+            console.log(databs.controversial)
+            controversial.innerHTML = databs.controversial === 'true' ? '<i>Controversial</i>' : '<i>Not controversial</i>';
+            cm.innerHTML = "<b>CM</b>: " + databs.cm;
+            automatic.innerHTML = databs.automatic === 'true' ? "<b>Automatic</b>" : "<b>Not automatic</b>";
 
             //recipients
             //reset check admins label and checkbox
@@ -1624,6 +1640,12 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
             + 'data-bs-squealReactions-p2="' + squeal.reactions.p2 + '"'
             + 'data-bs-squealRecipientsId="' + formatRecipientsIdsToAttribute(squeal.recipients) + '"'
             + 'data-bs-idsType="' + getIdsType(squeal.recipients) + '"'
+            + 'data-bs-squealControversial="' + squeal.controversial + '"'
+            + 'data-bs-squealImpressions="' + squeal.impressions + '"'
+            + 'data-bs-squealCm="' + squeal.cm.label + '"'
+            + 'data-bs-squealAutomatic="' + squeal.automatic + '"'
+            + 'data-bs-squealDatetime="' + squeal.datetime + '"'
+
             + ' /></div>';
     }
     let mycard = "<div class='d-flex justify-content-between flex-column my-card-squeal channel-squeal'>";
