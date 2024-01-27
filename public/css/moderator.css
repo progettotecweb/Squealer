@@ -109,7 +109,7 @@
 }
 
 .my-card {
-    width: 15em;
+    width: 20vw;
     max-height: 15em;
 
     /*border: 1px solid black;*/
@@ -189,11 +189,11 @@
     box-shadow: 0px 0px 2px 0px #000000;
 }
 
-.btn-check-input{
+.btn-check-input {
     padding: 0.15em 0.7em;
 }
 
-.squeal-owner-div{
+.squeal-owner-div {
     max-height: 3em;
 }
 
@@ -270,7 +270,7 @@
     grid-area: 2 / 2 / 3 / 3;
 }
 
-.w-33{
+.w-33 {
     width: 33%;
 }
 
@@ -285,6 +285,7 @@
 .squeal-recipients-div {
     text-align: end;
     min-height: 1.5em;
+    max-height: 1.5em;
     overflow-y: auto;
 }
 
@@ -408,11 +409,11 @@
         grid-template-columns: repeat(2, 1fr);
         grid-gap: 1.5em;
         grid-row-gap: 1.5em;
-        padding: 1em 10vw;
-        max-height: 70vh;
+        /* padding: 1em 1em;*/
+        max-height: 80vh;
     }
 
-    .my-card-squeal{
+    .my-card-squeal {
         max-height: 20em;
     }
 
@@ -454,4 +455,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+@media only screen and (max-width: 900px) {
+    #box-content {
+        grid-template-columns: repeat(1, 1fr);
+        grid-gap: 1.5em;
+        grid-row-gap: 1.5em;
+        /* padding: 1em 1em;*/
+        max-height: 80vh;
+    }
+
+    .my-card {
+        justify-self: center;
+    }
 }
