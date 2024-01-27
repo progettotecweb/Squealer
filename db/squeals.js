@@ -398,7 +398,7 @@ exports.getAllSqueals = async function () {
 
 exports.updateSquealByID = async function (id, newSqueal) {
     //console.log("newSqueal", newSqueal);
-    await Squeal.findByIdAndUpdate(id, newSqueal, { new: true })
+    return await Squeal.findByIdAndUpdate(id, newSqueal, { new: true })
         .then((squeal) => {
             return squeal;
         })
