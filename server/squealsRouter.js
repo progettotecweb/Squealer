@@ -42,6 +42,9 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
     const squeal = await squealsDB.getSquealByID(req.params.id);
+
+    console.log("Body: ", req.body)
+
     if (!squeal) {
         res.status(404).json({ success: false, error: "Squeal not found" });
         return;
@@ -119,6 +122,10 @@ router.put("/:id", async (req, res) => {
         }
     }
 
+    const user = await usersDB.searchUserByID(squeal.ownerID);
+
+    await squealsDB.updateSquealMetadata(squeal, user);
+
     res.status(200).json({ ok: true });
 });
 
@@ -177,6 +184,11 @@ router.post("/post", auth, async (req, res) => {
     const owner = await usersDB.searchUserByID(squeal.ownerID);
     if (!owner) {
         res.status(400).json({ success: false, error: "User not found" });
+    }
+
+    if(owner.blocked) {
+        res.status(400).json({ success: false, error: "You are blocked you silly bitch what did you do?" });
+        return;
     }
 
     // Squeal creation

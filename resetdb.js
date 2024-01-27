@@ -36,10 +36,7 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
-    img: {
-        mimetype: String,
-        blob: String,
-    },
+    img: String,
     following: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -116,24 +113,12 @@ const squealSchema = new mongoose.Schema({
             default: null
         },
         img: {
-            mimetype: {
-                type: String,
-                default: null
-            },
-            blob: {
-                type: String,
-                default: null
-            },
+            type: String,
+            default: null
         },
         video: {
-            mimetype: {
-                type: String,
-                default: null
-            },
-            blob: {
-                type: String,
-                default: null
-            },
+            type: String,
+            default: null
         },
         geolocation: {
             latitude: {
@@ -203,6 +188,14 @@ const squealSchema = new mongoose.Schema({
     isAReply: { type: Boolean, default: false },
 });
 
+const MediaSchema = new mongoose.Schema({
+    mimetype: String,
+    data: String,
+    name: String,
+});
+
+const Media = mongoose.model("Media", MediaSchema)
+
 const Squeal = mongoose.model("Squeal", squealSchema);
 const Channel = mongoose.model("Channel", channelSchema);
 const User = mongoose.model("User", userSchema);
@@ -211,9 +204,9 @@ create();
 
 //read json file
 
-function readJsonData(fileName) {
+function readJsonData(fileName, subdir = "db") {
     //console.log("path:", path.resolve("../db/", fileName));
-    const patt = path.join(process.cwd(), "/db/", fileName);
+    const patt = path.join(process.cwd(), "/" + subdir + "/", fileName);
     console.log("path:", patt);
     return (jsonData = JSON.parse(
         fs.readFileSync(patt)
@@ -249,15 +242,34 @@ async function create() {
         await db.dropCollection("squeals");
         await db.dropCollection("keywords");
         await db.dropCollection("subscriptions");
+        await db.dropCollection("media");
 
         //leggo le collezioni
         let usersData = readJsonData("users.json");
         let channelsData = readJsonData("channels.json");
+        let default_img = readJsonData("default_image.json", "utils");
         // let squealsData = readJsonData("squeals.json");
+
+        const d = new Media({
+            mimetype: default_img.mimetype,
+            data: default_img.blob,
+            name: "default_img",
+        })
+
+        await d.save()
+
+        // // Inserisco i default_img
+
+        for (let i = 0; i < usersData.length; i++) {
+            usersData[i].img = d._id
+        }
 
         // Inserisco le collezioni lette
         await User.insertMany(usersData);
         await Channel.insertMany(channelsData);
+
+        
+
         //await Squeal.insertMany(squealsData);
 
         console.log("Database popolato con successo");

@@ -7,46 +7,66 @@ const squealsDB = require("../db/squeals");
 const keywordsDB = require("../db/keywords");
 const { personalRoute, auth } = require("../utils/utils");
 
+const mediaDB = require("../db/media");
+
 router.use("/squeals", require("./squealsRouter"));
 
 router.get("/search", async (req, res) => {
-    const query = req.query.q
+    const query = req.query.q;
 
-    const type = query[0]
+    const type = query[0];
 
     switch (type) {
         case "@": {
-            const users = await usersDB.searchUser("name", query.slice(1))
-            res.json({ results: users.map(user => { return { name: user.name, id: user._id } }) })
+            const users = await usersDB.searchUser("name", query.slice(1));
+            res.json({
+                results: users.map((user) => {
+                    return { name: user.name, id: user._id };
+                }),
+            });
             break;
         }
         case "§": {
-            const channels = await channelsDB.searchChannel("name", query.slice(1))
-            res.json({ results: channels.map(channel => { return { name: channel.name, id: channel._id } }) })
+            const channels = await channelsDB.searchChannel(
+                "name",
+                query.slice(1)
+            );
+            res.json({
+                results: channels.map((channel) => {
+                    return { name: channel.name, id: channel._id };
+                }),
+            });
             break;
         }
         case "#": {
-            const keywords = await keywordsDB.searchKeyword("name", query.slice(1))
-            res.json({ results: keywords.map(keyword => { return { name: keyword.name, id: keyword._id } }) })
+            const keywords = await keywordsDB.searchKeyword(
+                "name",
+                query.slice(1)
+            );
+            res.json({
+                results: keywords.map((keyword) => {
+                    return { name: keyword.name, id: keyword._id };
+                }),
+            });
             break;
         }
         default: {
-            res.json({ results: [] })
+            res.json({ results: [] });
             break;
         }
     }
-})
+});
 
 router.get("/globalFeed", async (req, res) => {
-    const feed = await squealsDB.getGlobalFeed()
-    res.json(feed)
-})
+    const feed = await squealsDB.getGlobalFeed();
+    res.json(feed);
+});
 
 //this should be a personal route
-router.post("/shop/:id",auth, async (req, res) => {
-    const type = req.params.id
+router.post("/shop/:id", auth, async (req, res) => {
+    const type = req.params.id;
 
-    const user = await usersDB.searchUserByID(req.body.user, "name msg_quota")
+    const user = await usersDB.searchUserByID(req.body.user, "name msg_quota role");
 
     // if(req.body.user !== req.user.id) {
     //     res.status(401).json({error: "Unauthorized"})
@@ -68,11 +88,12 @@ router.post("/shop/:id",auth, async (req, res) => {
         }
         case "vip": {
             //check if user role is user
-            if(user.role !== "user") {
+            if (user.role !== "User") {
+                break;
+            } else {
+                user.role = "Pro";
                 break;
             }
-            user.role="Pro";
-            break;
         }
         case "maxi": {
             user.msg_quota.monthly += 5000;
@@ -83,13 +104,44 @@ router.post("/shop/:id",auth, async (req, res) => {
         default: {
             break;
         }
-        
     }
 
     await user.save();
 
-    res.json({ success: true })
+    res.json({ success: true });
+});
 
+router.get("/media/:id", async (req, res) => {
+    const media = await mediaDB.getMediaByID(req.params.id);
+
+    if (!media) {
+        res.status(404).json({ error: "Media not found" });
+        return;
+    }
+
+    var img = Buffer.from(media.data, "base64");
+
+    res.writeHead(200, {
+        "Content-Type": media.mimetype,
+        "Content-Length": img.length,
+    });
+
+    res.end(img);
+});
+
+router.head("/media/:id", async (req, res) => {
+    const media = await mediaDB.getMediaByID(req.params.id);
+
+    if (!media) {
+        res.status(404).json({ error: "Media not found" });
+        return;
+    }
+
+    res.writeHead(200, {
+        "Content-Type": media.mimetype,
+    });
+
+    res.end();
 })
 
 module.exports = router;

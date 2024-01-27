@@ -40,7 +40,7 @@ export const UserCard = ({ id }) => {
         <section className="w-full md:w-[60vw] grid grid-cols-6">
             <div className="w-full col-span-2 sm:grid sm:place-content-center flex justify-center pt-6">
                 <img
-                    src={`data:${data?.img?.mimetype};base64,${data?.img?.blob}`}
+                    src={`/api/media/${data.img}`}
                     alt="Profile Picture"
                     className="rounded-full w-24 h-24 sm:w-32 sm:h-32 col-span-2 object-cover"
                 />
@@ -98,7 +98,7 @@ export const AccountUserCard = ({ id }) => {
             <section className="w-full md:w-[60vw] grid grid-cols-6">
                 <div className="w-full col-span-2 sm:grid sm:place-content-center flex justify-center pt-6">
                     <img
-                        src={`data:${data?.img?.mimetype};base64,${data?.img?.blob}`}
+                        src={`/api/media/${data.img}`}
                         alt="Profile Picture"
                         className="rounded-full w-24 h-24 sm:w-32 sm:h-32 col-span-2 object-cover"
                     />

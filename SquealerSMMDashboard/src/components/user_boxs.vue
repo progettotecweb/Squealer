@@ -23,7 +23,7 @@ const waiting = ref(true);
 <template>
     <div class="user-box">
         <div class="user-img-box">
-            <img v-if="waiting == false"   :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" class="img-fluid img-thumbnail"/> 
+            <img v-if="waiting == false"   :src="`/api/media/${user.img}`" alt="user-img" class="img-fluid img-thumbnail"/> 
         </div>
         <h1>{{ user.name}}</h1>
        
