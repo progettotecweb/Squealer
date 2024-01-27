@@ -83,11 +83,11 @@ const ChooseSMMPage = () => {
     return (
         <PageContainer className="gap-4 p-4">
             {user?.controlled_by && (
-                <section className="flex flex-col w-full text-start">
+                <section className="flex flex-col w-full sm:w-[60vw] text-start">
                     <h1 className="text-lg">Your SMM</h1>
                     <div className="flex flex-row gap-2 items-center bg-gray-800 rounded-md p-4 w-full">
                         <img
-                            src={`data:${user.controlled_by.img.mimetype};base64,${user.controlled_by.img.blob}`}
+                            src={`/api/media/${user.controlled_by.img}`}
                             alt="Profile picture"
                             className="rounded-full w-12 h-12"
                         />
@@ -104,11 +104,13 @@ const ChooseSMMPage = () => {
                 </section>
             )}
 
-            <section className="flex flex-col w-full">
-                <h1 className="text-lg text-start w-full">Choose your SMM</h1>
-                <form className="w-full sm:w-[50vw] px-2 bg-gray-700 flex flex-row items-center rounded-md">
+            <section className="flex flex-col w-full sm:w-[60vw] items-center">
+                <label htmlFor="smm-choose" className="text-lg text-start w-full">Choose your SMM</label>
+                <form className="w-full px-2 bg-gray-700 flex flex-row items-center rounded-md">
                     <input
                         type="text"
+                        id="smm-choose"
+
                         placeholder="Search for SMM"
                         value={smmName}
                         onChange={onChange}
@@ -131,7 +133,7 @@ const ChooseSMMPage = () => {
                                 className="flex flex-row gap-2 items-center bg-gray-800 rounded-md p-4"
                             >
                                 <img
-                                    src={`data:${smm.img.mimetype};base64,${smm.img.blob}`}
+                                    src={`/api/media/${smm.img}`}
                                     alt="Profile picture"
                                     className="rounded-full w-12 h-12"
                                 />

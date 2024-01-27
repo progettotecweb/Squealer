@@ -8,16 +8,20 @@ const howMuchTimeAgo = (then: Date) => {
 
     if (diffInSeconds < 60) {
         return `${diffInSeconds} seconds ago`;
-    } else if (diffInSeconds < 3600) { // less than an hour
+    } else if (diffInSeconds < 3600) {
+        // less than an hour
         return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    } else if (diffInSeconds < 86400) { // less than a day
+    } else if (diffInSeconds < 86400) {
+        // less than a day
         return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    } else if (diffInSeconds < 604800) { // less than a week
+    } else if (diffInSeconds < 604800) {
+        // less than a week
         return `${Math.floor(diffInSeconds / 86400)} days ago`;
-    } else { // more than a week
+    } else {
+        // more than a week
         return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
     }
-}
+};
 
 export default function NotificationMenu() {
     const { user, status, isLoading } = useUser();
@@ -34,35 +38,37 @@ export default function NotificationMenu() {
 
     const notifications = user?.notifications;
 
-    for (let i = 0; i < notifications.length; i++) {
-        const notif = notifications[i];
+    if (notifications) {
+        for (let i = 0; i < notifications.length; i++) {
+            const notif = notifications[i];
 
-        if (notif.createdAt === null) continue;
+            if (notif.createdAt === null) continue;
 
-        //get time difference from now
-        const now = new Date();
-        const then = new Date(notif.createdAt);
+            //get time difference from now
+            const now = new Date();
+            const then = new Date(notif.createdAt);
 
-        var time_difference = now.getTime() - then.getTime();
+            var time_difference = now.getTime() - then.getTime();
 
-        //calculate days difference by dividing total milliseconds in a day
-        var days_difference = time_difference / (1000 * 60 * 60 * 24);
+            //calculate days difference by dividing total milliseconds in a day
+            var days_difference = time_difference / (1000 * 60 * 60 * 24);
 
-        if (days_difference < 1) {
-            notif.ago = howMuchTimeAgo(then);
-            today.push(notif);
-        } else if (days_difference < 7) {
-            notif.ago = howMuchTimeAgo(then);
-            thisWeek.push(notif);
-        } else if (days_difference < 30) {
-            notif.ago = howMuchTimeAgo(then);
-            thisMonth.push(notif);
+            if (days_difference < 1) {
+                notif.ago = howMuchTimeAgo(then);
+                today.push(notif);
+            } else if (days_difference < 7) {
+                notif.ago = howMuchTimeAgo(then);
+                thisWeek.push(notif);
+            } else if (days_difference < 30) {
+                notif.ago = howMuchTimeAgo(then);
+                thisMonth.push(notif);
+            }
         }
     }
 
     return (
         <div className="flex flex-col">
-            <h1 className="text-xl my-2">Notifications</h1>
+            <h1 className="text-2xl mb-2">Notifications</h1>
             {today.length > 0 && (
                 <div className="flex flex-col">
                     <h2 className="text-md">Today</h2>
@@ -87,6 +93,14 @@ export default function NotificationMenu() {
                     ))}
                 </div>
             )}
+            {today.length === 0 &&
+                thisWeek.length === 0 &&
+                thisMonth.length === 0 && (
+                    <div className="text-md text-gray-400">
+                        You have no notifications!
+                    </div>
+                )
+            }
         </div>
     );
 }
@@ -94,7 +108,7 @@ export default function NotificationMenu() {
 const Notification = ({ notif }: any) => (
     <div className="flex flex-row gap-2 p-2 items-center">
         <img
-            src={`data:${notif.author?.img.mimetype};base64,${notif.author?.img.blob}`}
+            src={`/api/media/${notif.author?.img}`}
             alt="Profile Picture"
             className="w-8 h-8 rounded-full object-cover"
         />

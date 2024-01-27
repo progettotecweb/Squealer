@@ -14,38 +14,48 @@ import { Drawer as MUIDrawer } from "@mui/material";
 import CustomLink from "../CustomLink";
 
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import StorefrontIcon from "@mui/icons-material/Storefront";
+import HomeIcon from "@mui/icons-material/Home";
+
+
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+
 import Spinner from "../Spinner";
 
+import ForumIconOutlined from '@mui/icons-material/ForumOutlined';
 import ForumIcon from "@mui/icons-material/Forum";
+
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
     const { user, status, isLoading } = useUser();
 
     const [openDialog, setOpenDialog] = useState(false);
 
+    const pathname = usePathname();
+
     return (
         <>
             {!isLoading && (
                 <nav className="fixed bottom-0 left-0 h-16 bg-[#111B21] w-full flex flex-row items-center justify-evenly  md:hidden z-[1100] text-slate-50">
                     <CustomLink href="/">
-                        <HomeOutlinedIcon className="h-8 w-8" />
+                        {pathname === "/" ? <HomeIcon className="h-8 w-8" /> : <HomeOutlinedIcon className="h-8 w-8" />}
                     </CustomLink>
 
                     <CustomLink href="/Channels">
-                        <ForumIcon className="h-8 w-8 text-gray-50" />
+                        {pathname?.startsWith("/Channels") ? <ForumIcon className="h-8 w-8 text-gray-50" /> : <ForumIconOutlined className="h-8 w-8" />}
                     </CustomLink>
                     <CustomIcon
                         icon={<IconAdd className="h-8 w-8 text-gray-50" />}
                         onClick={() => setOpenDialog(!openDialog)}
                     />
                     <CustomLink href="/Shop">
-                        <StorefrontIcon className="h-8 w-8" />
+                        {pathname?.startsWith("/Shop") ? <ShoppingBagIcon className="h-8 w-8" /> : <ShoppingBagOutlinedIcon className="h-8 w-8" />}
                     </CustomLink>
                     <CustomLink href="/Account">
                         {status === "authenticated" ? (
                             <img
-                                src={`data:${user?.img?.mimetype};base64,${user?.img?.blob}`}
+                                src={`/api/media/${user?.img}`}
                                 alt="Profile Picture"
                                 className="w-8 h-8 rounded-full object-cover"
                             />

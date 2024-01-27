@@ -73,8 +73,8 @@ export default function Page({ params }: { params: { name: string } }) {
         );
 
     return (
-        <PageContainer className="p-2" key="channel-page">
-            <div className="flex flex-col items-center">
+        <PageContainer className="p-4" key="channel-page">
+            <div className="flex flex-col items-center mb-16  sm:w-[60vw] w-full">
                 <section className="flex flex-col relative h-[15rem] w-full">
                     {data?.banner.mimetype ? (
                         <img
@@ -119,7 +119,7 @@ export default function Page({ params }: { params: { name: string } }) {
                         </div>
                     )}
                 </section>
-                <div className="w-full flex flex-col">
+                <div className="w-full sticky top-16 z-[200] flex-col drop-shadow-xl divide-red-100" onClick={() => window.scroll(0, 0)}>
                     <AnimatePresence mode="wait">
                         {data ? (
                             <motion.div

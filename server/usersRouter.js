@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const mediaDB = require("../db/media");
+
 const default_img = require("../utils/default_image.json");
 const bcrypt = require("bcrypt");
 const usersDB = require("../db/users");
@@ -73,7 +75,7 @@ router.post("/removeSmm", async (req, res) => {
     }
 
     //link the user to the SMM
-    const updatedUser = await usersDB.removeSMM(user_id);
+    const updatedUser = await usersDB.removeSMM(user_id, smm_id);
 
     if (!updatedUser) {
         res.status(404).json({
@@ -103,11 +105,15 @@ router.post("/register", async (req, res) => {
 
     const officialChannels = await channelsDB.getOfficialChannels();
 
+    const propic = req.body.img
+        ? await mediaDB.addNewMedia(req.body.img.mimetype, req.body.img.blob)
+        : await mediaDB.getDefaultProfilePicture();
+
     const newUser = {
         name: req.body.username,
         password: hashedPassword,
         salt: salt,
-        img: req.body.img || default_img,
+        img: propic,
         bio: req.body.bio,
         following: officialChannels,
     };
@@ -240,6 +246,11 @@ router.put("/:id/edit", async (req, res) => {
             error: "User not found",
         });
         return;
+    }
+
+    if(req.body.img) {
+        const propic = await mediaDB.addNewMedia(req.body.img.mimetype, req.body.img.blob);
+        req.body.img = propic;
     }
 
     const updatedUser = {

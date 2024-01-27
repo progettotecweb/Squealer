@@ -32,12 +32,19 @@ router.get("/filter", async (req, res) => {
 })
 
 router.get("/:id", async (req, res) => {
-    const squeals = await squealsDB.getAllSquealsByOwnerIDAggr(req.params.id);
-    res.json({ results: squeals.reverse() });
+
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const squeals = await squealsDB.getAllSquealsByOwnerIDAggr(req.params.id, page, limit);
+    res.json(squeals);
 });
 
 router.put("/:id", async (req, res) => {
     const squeal = await squealsDB.getSquealByID(req.params.id);
+
+    console.log("Body: ", req.body)
+
     if (!squeal) {
         res.status(404).json({ success: false, error: "Squeal not found" });
         return;
@@ -75,14 +82,14 @@ router.put("/:id", async (req, res) => {
         updatedRecipients.push({ id: id, type: "Keyword" });
     }
 
-    const updatedSqueal = {
+    const updatedSquealInfo = {
         recipients: updatedRecipients,
         reactions: req.body.reactions,
     };
     console.log("oldSqueal", req.body.recipients);
-    console.log("updatedSqueal", updatedSqueal);
+    console.log("updatedSquealInfo", updatedSquealInfo);
 
-    await squealsDB.updateSquealByID(squeal._id, updatedSqueal);
+    const updatedSqueal = await squealsDB.updateSquealByID(squeal._id, updatedSquealInfo);
 
     // Squeal distribution
     //first we have to remove the squeal from the old recipients
@@ -102,7 +109,7 @@ router.put("/:id", async (req, res) => {
     }
 
     //then we add the squeal to the new recipients
-    const recipients = updatedSqueal.recipients;
+    const recipients = updatedSquealInfo.recipients;
     for (const recipient of recipients) {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
@@ -114,6 +121,12 @@ router.put("/:id", async (req, res) => {
             channel.save();
         }
     }
+
+    console.log("updatedSqueal", updatedSqueal)
+
+    const user = await usersDB.searchUserByID(updatedSqueal.ownerID);
+
+    await squealsDB.updateSquealMetadata(updatedSqueal, user);
 
     res.status(200).json({ ok: true });
 });
@@ -168,9 +181,16 @@ router.post("/post", auth, async (req, res) => {
     // #TODO: squeal validation
     console.log("squeal", squeal);
 
+    console.log(req.user)
+
     const owner = await usersDB.searchUserByID(squeal.ownerID);
     if (!owner) {
         res.status(400).json({ success: false, error: "User not found" });
+    }
+
+    if(owner.blocked) {
+        res.status(400).json({ success: false, error: "You are blocked you silly bitch what did you do?" });
+        return;
     }
 
     // Squeal creation
@@ -211,7 +231,7 @@ router.post("/post", auth, async (req, res) => {
 
     let privacy = 0;
 
-    if (recipients.length === 1 && recipients[0].type === "User") privacy = 1;
+    //if (recipients.length === 1 && recipients[0].type === "User") privacy = 1;
 
     const toBeRemoved = [];
 
@@ -229,7 +249,7 @@ router.post("/post", auth, async (req, res) => {
             if (channel) {
                 if (channel.visibility === "private") {
                     if (
-                        channel.administrators.includes(owner._id) ||
+                        channel?.administrators.includes(owner._id) ||
                         channel?.owner_id?.toString() === owner?._id?.toString()
                     ) {
                         privacy ||= 1;
@@ -237,9 +257,9 @@ router.post("/post", auth, async (req, res) => {
                         toBeRemoved.push(recipient);
                     }
                 } else {
-                    if (!channel.can_user_post) {
+                    if (!channel.can_user_post && !squeal?.fromModerator) {
                         if (
-                            channel.administrators.includes(owner._id) ||
+                            channel?.administrators.includes(owner._id) ||
                             channel?.owner_id?.toString() === owner?._id?.toString()
                         ) {
                         } else {
@@ -262,6 +282,8 @@ router.post("/post", auth, async (req, res) => {
     const newRecipients = recipients.filter((recipient) => {
         return !toBeRemoved.includes(recipient);
     });
+
+    if (newRecipients.length === 1 && newRecipients[0].type === "User") privacy = 1;
 
     console.log("Computed privacy: " + (privacy ? "private" : "public"));
 
@@ -305,7 +327,7 @@ router.post("/post", auth, async (req, res) => {
 
         squealLen = len;
 
-       
+
 
         // mentions
         // mentions begin with @
@@ -394,7 +416,7 @@ router.post("/post", auth, async (req, res) => {
             monthly: 0,
         };
 
-        if (squeal.fromModerator === true) {
+        if (squeal.fromModerator) {
             return debt;
         }
 

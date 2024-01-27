@@ -5,6 +5,7 @@ import PageContainer from "@/components/PageContainer";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Link from "next/link";
 
 interface ShopItemProps {
     title: string;
@@ -45,12 +46,12 @@ const ShopItem = ({
             >
                 <h1 className="text-xl">{title}</h1>
                 <p className="text-left">{description}</p>
-                <CustomLink
+                <Link
                     href={`/Shop/Payment?q=${title}&r=${redirect}&id=${id}`}
                     className="border border-slate-50 rounded-md p-2 mt-auto px-10"
                 >
                     ${price}
-                </CustomLink>
+                </Link>
             </div>
             {!isVip && !vip && (
                 <motion.div
@@ -116,29 +117,29 @@ const ShopPage = () => {
 
     if (status === "authenticated")
         return (
-            <PageContainer key="shop" className="gap-4 mb-[4rem]">
-                <motion.div className=" flex flex-col gap-4 w-full sm:w-[60vw] ">
-                    <h1 className="text-4xl font-bold">Shop</h1>
-                    <p className="text-xl">
+            <PageContainer key="shop" className="gap-4 mb-[4rem] p-4">
+                <motion.div className=" flex flex-col gap-4 w-full sm:w-[60vw] text-start">
+                    <h1 className="text-2xl sm:text-4xl font-bold">Shop</h1>
+                    <p className="text-xl text-start">
                         Buy more characters, or your own private channel!
-                        {!["Pro", "Mod"].includes(session?.user?.role) && <motion.p
+                        {!["Pro", "Mod"].includes(session?.user?.role) && <motion.span
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="text-center text-white opacity-0"
+                            className="text-start text-white opacity-0 "
                         >
                             You need to have a professional account to buy items in the shop.
-                        </motion.p>}
+                        </motion.span>}
                     </p>
                     <ShopItem
-                        title="VIP"
-                        description="Get access to the VIP lounge!"
+                        title="Professional Account"
+                        description="Get access to the vip lounge!"
                         price="5.99"
                         vip
                         redirect="/Shop"
                         id="vip"
                         session={session}
                     />
-                    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8">
+                    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
                         {shopItems.map((item, index) => (
                             <ShopItem
                                 key={index}

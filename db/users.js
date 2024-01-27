@@ -46,10 +46,7 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
-    img: {
-        mimetype: String,
-        blob: String,
-    },
+    img: String,
     following: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -83,6 +80,11 @@ const userSchema = new mongoose.Schema({
             createdAt: Date,
         },
     ],
+    metadata: {
+        popularCount: { type: Number, default: 0 },
+        impopularCount: { type: Number, default: 0 },
+        controversialCount: { type: Number, default: 0 },
+    }
 });
 
 const User = mongoose.model("User", userSchema);
@@ -396,7 +398,8 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                         {
                             $project: {
                                 name: 1,
-                                id: 1,
+                                id: "$_id",
+                                _id: 0,
                                 type: "Keyword",
                             },
                         },
@@ -419,7 +422,8 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                         {
                             $project: {
                                 name: 1,
-                                id: 1,
+                                id: "$_id",
+                                _id: 0,
                                 type: "User",
                             },
                         },
@@ -442,7 +446,8 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                         {
                             $project: {
                                 name: 1,
-                                id: 1,
+                                id: "$_id",
+                                _id: 0,
                                 type: "Channel",
                             },
                         },

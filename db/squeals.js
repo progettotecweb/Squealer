@@ -4,6 +4,9 @@ const conditionsDB = require("./conditions");
 const { Channel } = require("./channels");
 const { CronJob } = require("cron");
 
+const mediaDB = require("./media");
+const { sendNotification } = require("../server/notifications/notifications");
+
 const squealSchema = new mongoose.Schema({
     ownerID: {
         type: mongoose.Schema.Types.ObjectId,
@@ -31,26 +34,8 @@ const squealSchema = new mongoose.Schema({
             type: String,
             default: null,
         },
-        img: {
-            mimetype: {
-                type: String,
-                default: null,
-            },
-            blob: {
-                type: String,
-                default: null,
-            },
-        },
-        video: {
-            mimetype: {
-                type: String,
-                default: null,
-            },
-            blob: {
-                type: String,
-                default: null,
-            },
-        },
+        img: String,
+        video: String,
         geolocation: {
             latitude: {
                 type: Number,
@@ -146,8 +131,19 @@ const squealSchema = new mongoose.Schema({
 const Squeal = mongoose.model("Squeal", squealSchema);
 
 exports.createNewSqueal = async function (squeal) {
+    if (squeal.type === "image" || squeal.type === "video") {
+        const media = await mediaDB.addNewMedia(
+            squeal.content[squeal.type === "image" ? "img" : "video"].mimetype,
+            squeal.content[squeal.type === "image" ? "img" : "video"].blob
+        );
+        squeal.content[squeal.type === "image" ? "img" : "video"] = media;
+        console.log(media._id);
+    }
+
     const newSqueal = new Squeal(squeal);
-    //await newSqueal.save();
+
+    await newSqueal.save();
+
     return newSqueal;
 };
 
@@ -179,17 +175,16 @@ exports.getAllSquealsByOwnerID = async function (ownerID) {
     return res;
 };
 
-exports.getAllSquealsByRecipientID = function (type, recipientID) {
-    const res = Squeal.find({
-        recipients: { $elemMatch: { type: type, id: recipientID } },
-    })
-        .populate("ownerID", "name img")
-        .populate({
-            path: "replies",
-            populate: { path: "ownerID", select: "name img" },
-            select: " type ownerID content datetime _id reactions isAReply impressions",
-        })
-        .exec();
+exports.getAllSquealsByRecipientID = async (type, recipientID) => {
+    const res = await Squeal.aggregate([
+        {
+            $match: {
+                "recipients.id": new mongoose.Types.ObjectId(recipientID),
+            },
+        },
+
+        ...populateSquealAggregation,
+    ]);
 
     return res;
 };
@@ -218,6 +213,7 @@ exports.deleteSquealByID = async function (id) {
 
 exports.updateSquealReactionByID = async function (id, reaction, userid) {
     const res = await Squeal.findById(id);
+    const user = await usersDB.searchUserByID(userid);
 
     if (
         res.reactions.usersReactions.some(
@@ -235,6 +231,7 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
                 (userReaction) => userReaction.userID.toString() !== userid
             );
             res.save();
+            await updateSquealMetadata(res, user);
             return res;
         } else {
             res.reactions[old] -= 1;
@@ -243,6 +240,7 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
                 (userReaction) => userReaction.userID.toString() === userid
             ).reaction = reaction;
             res.save();
+            await updateSquealMetadata(res, user);
             return res;
         }
     } else {
@@ -253,7 +251,7 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
         res.reactions[reaction] += 1;
     }
 
-    await updateSquealMetadata(res);
+    await updateSquealMetadata(res, user);
 
     await res.save();
 
@@ -262,37 +260,133 @@ exports.updateSquealReactionByID = async function (id, reaction, userid) {
 
 const MIN_IMPRESSION_COUNT = 10;
 
-const updateSquealMetadata = async (squeal) => {
-    if (!squeal.cm) squeal.cm = {};
+const updateSquealMetadata = async (squeal, user) => {
+    if (!squeal.cm)
+        squeal.cm = {
+            label: "neutral",
+            Rm: 0,
+            Rp: 0,
+        };
 
-    conditionsDB.executeAll(squeal, ["reaction", "view"]);
+    await conditionsDB.executeAll(squeal, ["reaction", "view"]);
 
     if (squeal.impressions < MIN_IMPRESSION_COUNT) return;
 
     squeal.cm.Rp = squeal.reactions.p1 + 2 * squeal.reactions.p2;
     squeal.cm.Rm = squeal.reactions.m1 + 2 * squeal.reactions.m2;
 
+    let newLabel = squeal.cm.label;
     if (
         squeal.cm.Rm > squeal.impressions * 0.25 &&
         squeal.cm.Rp > squeal.impressions * 0.25
     ) {
-        squeal.cm.label = "controversial";
-        const contr = Channel.findOne({ name: "Controversial" }, "_id");
-        squeal.recipients.push({ id: contr._id, type: "Channel" });
-
-        return;
+        newLabel = "controversial";
+    } else if (squeal.cm.Rp > squeal.impressions * 0.25) {
+        newLabel = "popular";
+    } else if (squeal.cm.Rm > squeal.impressions * 0.25) {
+        newLabel = "impopular";
     }
 
-    if (squeal.cm.Rp > squeal.impressions * 0.25) {
-        squeal.cm.label = "popular";
-    }
+    console.log("NEW LABEL", newLabel);
+    console.log("OLD LABEL", squeal.cm.label);
+    console.log("COMPUTED CM: ", squeal.cm);
 
-    if (squeal.cm.Rm > squeal.impressions * 0.25) {
-        squeal.cm.label = "impopular";
-    }
+    if (squeal.cm.label !== newLabel) {
+        squeal.cm.label = newLabel;
 
-    await squeal.save();
+        const contr = await Channel.findOne({ name: "CONTROVERSIAL" }, "_id");
+
+        switch (newLabel) {
+            case "popular":
+                if (
+                    squeal.recipients.some(
+                        (rec) => rec.id.toString() === contr._id.toString()
+                    )
+                )
+                    squeal.recipients = squeal.recipients.filter(
+                        (rec) => rec.id.toString() !== contr._id.toString()
+                    );
+
+                user.metadata.popularCount += 1;
+
+                if (user.metadata.popularCount % 10 === 0) {
+                    user.msg_quota.daily += 10;
+                    user.msg_quota.weekly += 60;
+                    user.msg_quota.monthly += 240;
+                }
+
+                const payload = {
+                    title: "A squeal you sent is now popular!",
+                };
+
+                await sendNotification(user._id, payload);
+
+                await user.save();
+
+                break;
+            case "impopular":
+                if (
+                    squeal.recipients.some(
+                        (rec) => rec.id.toString() === contr._id.toString()
+                    )
+                )
+                    squeal.recipients = squeal.recipients.filter(
+                        (rec) => rec.id.toString() !== contr._id.toString()
+                    );
+
+                user.metadata.impopularCount += 1;
+
+                if (user.metadata.impopularCount % 3 === 0) {
+                    user.msg_quota.daily -= 10;
+                    user.msg_quota.weekly -= 60;
+                    user.msg_quota.monthly -= 240;
+                }
+
+                const payload2 = {
+                    title: "A squeal you sent is now impopular!",
+                };
+
+                await sendNotification(user._id, payload2);
+
+                await user.save();
+
+                break;
+            case "controversial":
+                if (
+                    squeal.recipients.some(
+                        (rec) => rec.id.toString() === contr._id.toString()
+                    )
+                )
+                    break;
+                squeal.recipients.push({ id: contr._id, type: "Channel" });
+
+                user.metadata.controversialCount += 1;
+
+                const payload3 = {
+                    title: "A squeal you sent is now controversial!",
+                    body: "You silly goose!",
+                };
+
+                await sendNotification(user._id, payload3);
+
+                break;
+            case "neutral":
+                if (
+                    squeal.recipients.some(
+                        (rec) => rec.id.toString() === contr._id.toString()
+                    )
+                )
+                    squeal.recipients = squeal.recipients.filter(
+                        (rec) => rec.id.toString() !== contr._id.toString()
+                    );
+                break;
+        }
+
+        await squeal.save();
+    }
 };
+
+exports.updateSquealMetadata = updateSquealMetadata;
 
 exports.getAllSqueals = async function () {
     const res = await Squeal.find({})
@@ -304,7 +398,7 @@ exports.getAllSqueals = async function () {
 
 exports.updateSquealByID = async function (id, newSqueal) {
     //console.log("newSqueal", newSqueal);
-    await Squeal.findByIdAndUpdate(id, newSqueal, { new: true })
+    return await Squeal.findByIdAndUpdate(id, newSqueal, { new: true })
         .then((squeal) => {
             return squeal;
         })
@@ -372,7 +466,8 @@ exports.scheduleSqueal = async function (id, cronJobExpr, ownerID) {
 exports.updateSquealImpressions = async function (id) {
     const squeal = await Squeal.findById(id);
     squeal.impressions += 1;
-    await updateSquealMetadata(squeal);
+    const user = await usersDB.searchUserByID(squeal.ownerID);
+    await updateSquealMetadata(squeal, user);
     await squeal.save();
 };
 
@@ -421,6 +516,7 @@ const populateSquealAggregation = [
                         reactions: 1,
                         isAReply: 1,
                         impressions: 1,
+                        replyingTo: 1,
                     },
                 },
                 {
@@ -467,7 +563,8 @@ const populateSquealAggregation = [
                 {
                     $project: {
                         name: 1,
-                        id: 1,
+                        id: "$_id",
+                        _id: 0,
                         type: "Channel",
                     },
                 },
@@ -490,7 +587,8 @@ const populateSquealAggregation = [
                 {
                     $project: {
                         name: 1,
-                        id: 1,
+                        id: "$_id",
+                        _id: 0,
                         type: "Keyword",
                     },
                 },
@@ -513,7 +611,8 @@ const populateSquealAggregation = [
                 {
                     $project: {
                         name: 1,
-                        id: 1,
+                        id: "$_id",
+                        _id: 0,
                         type: "User",
                     },
                 },
@@ -547,25 +646,7 @@ const populateSquealAggregation = [
             },
         },
     },
-    {
-        $sort: {
-            "squeals.datetime": -1,
-        },
-    },
-    {
-        $group: {
-            _id: null,
-            squeals: {
-                $push: "$squeals",
-            },
-        },
-    },
-    {
-        $project: {
-            _id: 0,
-            squeals: 1,
-        },
-    },
+
     {
         $addFields: {
             squeals: {
@@ -573,10 +654,10 @@ const populateSquealAggregation = [
                     input: "$squeals",
                     as: "squeal",
                     cond: {
-                        $or: [
-                            { $eq: ["$$squeal.isAReply", false] },
-                            {
-                                $not: {
+                        $not: {
+                            $and: [
+                                { $eq: ["$$squeal.isAReply", true] },
+                                {
                                     $in: [
                                         "$$squeal.replyingTo",
                                         {
@@ -588,8 +669,8 @@ const populateSquealAggregation = [
                                         },
                                     ],
                                 },
-                            },
-                        ],
+                            ],
+                        },
                     },
                 },
             },
@@ -597,18 +678,19 @@ const populateSquealAggregation = [
     },
     {
         $unwind: {
-          path: "$squeals",
-          preserveNullAndEmptyArrays: true,
+            path: "$squeals",
         },
-      }, {
-        $unwind: {
-          path: "$squeals",
-        }
-      }, {
+    },
+    {
         $replaceRoot: {
-          newRoot: "$squeals"
-        }
-      }
+            newRoot: "$squeals",
+        },
+    },
+    {
+        $sort: {
+            datetime: -1,
+        },
+    },
 ];
 
 exports.getAllSquealsByOwnerIDAggr = async function (
@@ -625,6 +707,12 @@ exports.getAllSquealsByOwnerIDAggr = async function (
             },
         },
         ...populateSquealAggregation,
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
     ]);
 
     return squeals;

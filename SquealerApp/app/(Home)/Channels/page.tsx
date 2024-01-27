@@ -91,9 +91,9 @@ const ChannelsPage = () => {
         );
 
     return (
-        <PageContainer key="settings" className="p-2">
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8l w-[80%] ">
+        <PageContainer key="settings" className="p-2 ">
+            <h1 className="text-2xl text-start sm:text-center w-full mb-4">Channels</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full sm:w-[80%] mb-16">
                 {data?.results.map((result, i) => {
                     return (
                         <ChannelCard

@@ -52,7 +52,7 @@ async function getUserData() {
 
     //riempio i campi 
     document.getElementById("master-user-name").innerHTML = userInfo.name;
-    const blobsrc = "data:" + userInfo.img.mimetype + ";base64," + userInfo.img.blob;
+    const blobsrc = "/api/media/" + userInfo.img;
     document.getElementById("master-user-img").src = blobsrc;
     //add data-bs master user id
     document.getElementById("master-user-name").setAttribute("data-bs-master_user_id", userInfo._id);
@@ -172,7 +172,7 @@ window.onload = function () {
 
                     let mycard = "<div class='my-card my-card-grid-tl-tr-b'>";
 
-                    const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
+                    const blobsrc = "/api/media/" + data[i].img;
                     let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s profile picture' class='user-pic my-card-grid-tl'/>";
                     mycard += img;
                     mycard += '<div class="user-content my-card-grid-tr">';
@@ -772,6 +772,14 @@ window.onload = function () {
 
             modalTitle.textContent = databs.name
 
+            const postBtn = channelSquealsModal.querySelector('#btn-savechanges');
+            if (databs.visibility === "private") {
+                //mod cannot post in private channels
+                postBtn.setAttribute("disabled", "")
+            } else {
+                postBtn.removeAttribute("disabled")
+            }
+
             const viewSquealsDiv = channelSquealsModal.querySelector(".channel-view-squeals");
             viewSquealsDiv.innerHTML = "";
 
@@ -822,7 +830,12 @@ window.onload = function () {
                     p2: button.getAttribute('data-bs-squealReactions-p2')
                 },
                 recipientsId: button.getAttribute('data-bs-squealRecipientsId'),
-                idsType: button.getAttribute('data-bs-idsType')
+                idsType: button.getAttribute('data-bs-idsType'),
+                impressions: button.getAttribute('data-bs-squealImpressions'),
+                datetime: button.getAttribute('data-bs-squealDatetime'),
+                controversial: button.getAttribute('data-bs-squealControversial'),
+                cm: button.getAttribute('data-bs-squealCm'),
+                automatic: button.getAttribute('data-bs-squealAutomatic')
             }
 
             // Update the modal's content.
@@ -835,6 +848,11 @@ window.onload = function () {
                 p1: squealsModal.querySelector('#squeal-reactions-p1'),
                 p2: squealsModal.querySelector('#squeal-reactions-p2')
             }
+            const impressions = squealsModal.querySelector('#squeal-modal-impressions');
+            const datetime = squealsModal.querySelector('#squeal-modal-datetime');
+            const controversial = squealsModal.querySelector('#squeal-modal-controversial');
+            const cm = squealsModal.querySelector('#squeal-modal-cm');
+            const automatic = squealsModal.querySelector('#squeal-modal-automatic');
 
             const btnSave = squealsModal.querySelector("#btn-savechanges");
 
@@ -848,6 +866,11 @@ window.onload = function () {
             squealId = databs.id;
             inputRecipients.setAttribute("data-bs-recipients-id", databs.recipientsId);
             inputRecipients.setAttribute("data-bs-ids-type", databs.idsType);
+            impressions.innerHTML = databs.impressions + " impression(s)";
+            datetime.innerHTML = formatDate(databs.datetime);
+            //controversial.innerHTML = databs.controversial === 'true' ? '<i>Controversial</i>' : '<i>Not controversial</i>';
+            cm.innerHTML = "<b>CM</b>: " + databs.cm;
+            automatic.innerHTML = databs.automatic === 'true' ? "<b>Automatic</b>" : "<b>Not automatic</b>";
 
             //recipients
             //reset check admins label and checkbox
@@ -1044,13 +1067,14 @@ window.onload = function () {
                     data[key] = dataToUpdate[key];
                 });
 
+
                 //update table
-                await fetch("/api/" + table + "/" + id, {
+                fetch("/api/" + table + "/" + id, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(dataToUpdate)
                 })
                     .then(res => {
                         if (res.ok) {
@@ -1488,6 +1512,7 @@ async function searchAndAddSqueals(squealsId, div) {
     }
 }
 
+
 function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     //create the card
     let recipientsDiv = '';
@@ -1525,7 +1550,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     }
     let header = '<div class="squeal-header d-flex justify-content-between">';
     let ownerDiv = squeal.ownerID ? '<div class="squeal-owner-div p-1 align-self-between">'
-        + '<img src="data:' + squeal.ownerID.img.mimetype + ';base64,' + squeal.ownerID.img.blob + '" alt="' + squeal.ownerID.name + '\'s propic" class="user-pic"/>'
+        + '<img src="/api/media/' + squeal.ownerID.img + '" alt="' + squeal.ownerID.name + '\'s propic" class="user-pic"/>'
         + '<span class="squeal-owner-name h6 m-2">' + squeal.ownerID.name + '</span>'
         + '</div>'
         :
@@ -1538,7 +1563,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
         + '</div>';
     let automatic = '';
     if (squeal.automatic === true) {
-        automatic += '<div class="squeal-automatic-div align-self-center text-center">' +
+        automatic += '<div class=" w-33 squeal-automatic-div">' +
             '<span class="squeal-automatic"><b>' + (squeal.automatic === true ? 'Automatic' : '') + '</b></span>' +
             '</div>';
     }
@@ -1551,11 +1576,14 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
     let content = '<div class="squeal-content">';
     let text = '<p class="squeal-text">' + squeal.content.text + '</p>';
-    const imgblobsrc = "data:" + squeal.content.img.mimetype + ";base64," + squeal.content.img.blob;
-    const videoblobsrc = "data:" + squeal.content.video.mimetype + ";base64," + squeal.content.video.blob;
+    const imgblobsrc = "/api/media/" + squeal.content.img;
+    const videoblobsrc = "/api/media/" + squeal.content.video;
     const alt = "Picture";
     let img = `<div class='d-flex justify-content-center'><img src=${imgblobsrc} alt=${alt} class='img-squeal'/></div>`;
-    let video = `<div class='d-flex justify-content-center'><video class='video-squeal' controls><source src=${videoblobsrc} type=${squeal.content.video.mimetype}></video></div>`;
+
+
+    let video = `<div class='d-flex justify-content-center'><video controls src=${videoblobsrc} class='video-squeal' type="video/mp4" ></video></div>`;
+
     let geolocation = `<div class="geo-squeal-container"><div class="geo-squeal" id=${"map-" + squeal._id}></div></div>`
     let replies = '<div class="squeal-replies">';
     replies += '</div>';
@@ -1577,28 +1605,30 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     content += '</div>';
 
     let footer = '<div class="squeal-footer">';
-    let reactions = '<div class="squeal-reactions squeal-footer-tl">'
-        + '<span>'
-        + '😡' + squeal.reactions.m2 + ' '
-        + '😒' + squeal.reactions.m1 + ' '
-        + '😄' + squeal.reactions.p1 + ' '
-        + '😝' + squeal.reactions.p2 + ' '
+    let reactions = '<div class="mb-1 mt-1 squeal-reactions d-flex justify-content-around">'
+        + '<div>😡 ' + squeal.reactions.m2 + '</div>'
+        + '<div>😒 ' + squeal.reactions.m1 + '</div>'
+        + '<div>😄 ' + squeal.reactions.p1 + '</div>'
+        + '<div>😝 ' + squeal.reactions.p2 + '</div>'
         + '</span>'
         + '</div>';
-    let CM = '<div class="squeal-cm squeal-footer-bl">'
-        + '<span><b>CM</b>: ' + squeal.cm.label + '</span>'
+    let CM = '<div class="w-33 text-capitalize squeal-cm">'
+        + '<span><i>' + squeal.cm.label + '</i></span>'
         + '</div>';
-    let impressions = '<div class="squeal-impressions squeal-footer-tr">'
-        + '<span>' + squeal.impressions + ' impression(s)</span>'
+    let impressions = '<div  class="w-33 squeal-impressions text-end">'
+        + '<span><i>' + squeal.impressions + '</i>' + ` <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M15 12c0 1.657-1.343 3-3 3s-3-1.343-3-3c0-.199.02-.393.057-.581 1.474.541 2.927-.882 2.405-2.371.174-.03.354-.048.538-.048 1.657 0 3 1.344 3 3zm-2.985-7c-7.569 0-12.015 6.551-12.015 6.551s4.835 7.449 12.015 7.449c7.733 0 11.985-7.449 11.985-7.449s-4.291-6.551-11.985-6.551zm-.015 12c-2.761 0-5-2.238-5-5 0-2.761 2.239-5 5-5 2.762 0 5 2.239 5 5 0 2.762-2.238 5-5 5z"/></svg>` + '</span>'
         + '</div>';
     let controversial = '<div class="squeal-controversial squeal-footer-br">'
         + '<span><i>' + (squeal.controversial === 'true' ? 'Controversial' : 'Not controversial') + '</i></span>'
         + '</div>';
 
     footer += reactions;
+    footer += "<div class='d-flex justify-content-between'>";
     footer += CM;
+    footer += automatic
     footer += impressions;
-    footer += controversial;
+    footer += '</div>';
+    //footer += controversial;
     footer += '</div>';
     let btnDelete = '';
     if (del) {
@@ -1616,6 +1646,12 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
             + 'data-bs-squealReactions-p2="' + squeal.reactions.p2 + '"'
             + 'data-bs-squealRecipientsId="' + formatRecipientsIdsToAttribute(squeal.recipients) + '"'
             + 'data-bs-idsType="' + getIdsType(squeal.recipients) + '"'
+            + 'data-bs-squealControversial="' + squeal.controversial + '"'
+            + 'data-bs-squealImpressions="' + squeal.impressions + '"'
+            + 'data-bs-squealCm="' + squeal.cm.label + '"'
+            + 'data-bs-squealAutomatic="' + squeal.automatic + '"'
+            + 'data-bs-squealDatetime="' + squeal.datetime + '"'
+
             + ' /></div>';
     }
     let mycard = "<div class='d-flex justify-content-between flex-column my-card-squeal channel-squeal'>";
@@ -1623,7 +1659,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     mycard += header;
     mycard += content;
     mycard += footer;
-    mycard += automatic;
+    //mycard += automatic;
     mycard += btnDelete;
     mycard += btnViewMore;
     mycard += '</div>'

@@ -145,7 +145,7 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 href="/Account"
                                 icon={
                                     <img
-                                        src={`data:${user?.img?.mimetype};base64,${user?.img?.blob}`}
+                                        src={`/api/media/${user.img}`}
                                         alt="Profile Picture"
                                         className="w-8 h-8 rounded-full object-cover"
                                     />

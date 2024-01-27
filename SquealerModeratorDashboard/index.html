@@ -57,7 +57,12 @@
                     <div class="select-container d-flex">
                         <div class="btn-filter-container align-self-center">
                             <button type="button" class="btn btn-success" id="btn-filter" data-bs-toggle="modal"
-                                data-bs-target="#userFilterModal"> Filter </button>
+                                data-bs-target="#userFilterModal"><label id="filterLabel">Filter</label> <svg
+                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-funnel-fill" viewBox="0 0 16 16">
+                                    <path
+                                        d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5z" />
+                                </svg></button>
                         </div>
                     </div>
                 </div>
@@ -188,7 +193,7 @@
                                     <input type="text" class="form-text " id="channel-administrators"
                                         data-bs-value_administrators="administrators">
                                     <input type="button" class="btn btn-warning btn-check-input"
-                                        id="channel-administrators-checkbox" value="Check admins"/><br>
+                                        id="channel-administrators-checkbox" value="Check admins" /><br>
                                     <span class="label" id="channel-administrators-label">Insert @username(s)
                                         separated
                                         by a comma</span>
@@ -284,11 +289,13 @@
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <p class="selected-squeal-info">
-                                <p class="h6">Original owner:
-                                    <span id="squeal-owner"></span>
-                                </p> <br>
-
+                                <div class="d-flex justify-content-between">
+                                    <p class="h6">Original owner:
+                                        <span id="squeal-owner"></span>
+                                    </p> <br>
+                                    <p id="squeal-modal-datetime"></p>
+                                </div>
+                                <hr>
                                 <label for="squeal-recipients" class="h6 ">Recipients: </label>
                                 <input type="text" class="form-text " id="squeal-recipients"
                                     data-bs-value_recipients="recipients">
@@ -311,7 +318,15 @@
                                 <label for="squeal-reactions-p2" class="label">😝</label>
                                 <input type="number" class="form-number w-25" id="squeal-reactions-p2"
                                     data-bs-value_reactions_p2="0"><br>
-
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <p class="w-33 text-center" id="squeal-modal-cm"></p>
+                                    <p class="w-33 text-center" id="squeal-modal-impressions"></p>
+                                    <!-- <p class="w-33 text-center" id="squeal-modal-controversial"></p>-->
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    <p class="w-33 text-center" id="squeal-modal-automatic"></p>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"

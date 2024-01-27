@@ -45,7 +45,7 @@ function formatDate(date: any) {
     <div v-if="waiting == false" class="squeal-box rounded-3 container w-auto text-start">
         <div class="row">
             <div class="col-1 p-0">
-                <img :src="`data:${squeal.ownerID.img.mimetype};base64,${squeal.ownerID.img.blob}`" alt="user-img"
+                <img :src="`/api/media/${squeal.ownerID.img}`" alt="user-img"
                     class="img-fluid img-thumbnail" />
             </div>
             <div class="col-11">
@@ -72,7 +72,7 @@ function formatDate(date: any) {
                         <h6> {{ squeal.content.text }} </h6>
                     </div>
                     <div v-if="squeal.type === 'image'">
-                        <img :src="`data:${squeal.content.img.mimetype};base64,${squeal.content.img.blob}`" alt="user-img"
+                        <img :src="`/api/media/${squeal.content.img}`" alt="user-img"
                             class="img-fluid img-thumbnail" />
                     </div>
                     <div v-if="squeal.type === 'video'">

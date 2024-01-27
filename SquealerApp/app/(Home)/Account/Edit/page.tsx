@@ -25,7 +25,10 @@ export default function EditPage() {
     const [desc, newDesc] = useState<string>(data?.bio);
     const textRef = useRef<HTMLTextAreaElement>(null);
 
-    const [img, setImg] = useState(data?.img);
+    const [img, setImg] = useState({
+        mimetype: "",
+        blob: "",
+    });
 
     const [oldPassword, setOldPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
@@ -118,13 +121,13 @@ export default function EditPage() {
     if (isLoading) return <div>Loading...</div>;
 
     return (
-        <PageContainer>
+        <PageContainer key="editaccount" className="p-2">
             <main className="flex flex-col gap-4">
                 <h1 className="self-start text-2xl">Edit Profile</h1>
 
                 <section className="bg-gray-700 p-2 rounded-md flex gap-4 items-center">
                     <img
-                        src={`data:${img?.mymetype || data?.img.mimetype};base64,${ img?.blob || data?.img.blob}`}
+                        src={img.mimetype ? `data:${img?.mimetype};base64,${ img?.blob}` : `/api/media/${data?.img}`}
                         alt="Profile Picture"
                         className="w-16 h-16 rounded-full object-cover"
                     />
