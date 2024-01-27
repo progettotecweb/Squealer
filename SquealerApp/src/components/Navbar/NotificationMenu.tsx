@@ -68,7 +68,7 @@ export default function NotificationMenu() {
 
     return (
         <div className="flex flex-col">
-            <h1 className="text-xl my-2">Notifications</h1>
+            <h1 className="text-2xl mb-2">Notifications</h1>
             {today.length > 0 && (
                 <div className="flex flex-col">
                     <h2 className="text-md">Today</h2>
@@ -93,6 +93,14 @@ export default function NotificationMenu() {
                     ))}
                 </div>
             )}
+            {today.length === 0 &&
+                thisWeek.length === 0 &&
+                thisMonth.length === 0 && (
+                    <div className="text-md text-gray-400">
+                        You have no notifications!
+                    </div>
+                )
+            }
         </div>
     );
 }

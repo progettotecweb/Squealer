@@ -231,7 +231,7 @@ router.post("/post", auth, async (req, res) => {
 
     let privacy = 0;
 
-    if (recipients.length === 1 && recipients[0].type === "User") privacy = 1;
+    //if (recipients.length === 1 && recipients[0].type === "User") privacy = 1;
 
     const toBeRemoved = [];
 
@@ -249,7 +249,7 @@ router.post("/post", auth, async (req, res) => {
             if (channel) {
                 if (channel.visibility === "private") {
                     if (
-                        channel.administrators.includes(owner._id) ||
+                        channel?.administrators.includes(owner._id) ||
                         channel?.owner_id?.toString() === owner?._id?.toString()
                     ) {
                         privacy ||= 1;
@@ -259,7 +259,7 @@ router.post("/post", auth, async (req, res) => {
                 } else {
                     if (!channel.can_user_post && !squeal?.fromModerator) {
                         if (
-                            channel.administrators.includes(owner._id) ||
+                            channel?.administrators.includes(owner._id) ||
                             channel?.owner_id?.toString() === owner?._id?.toString()
                         ) {
                         } else {
@@ -282,6 +282,8 @@ router.post("/post", auth, async (req, res) => {
     const newRecipients = recipients.filter((recipient) => {
         return !toBeRemoved.includes(recipient);
     });
+
+    if (newRecipients.length === 1 && newRecipients[0].type === "User") privacy = 1;
 
     console.log("Computed privacy: " + (privacy ? "private" : "public"));
 
