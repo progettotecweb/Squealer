@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { getMyData } from './fetch';
 import squeal_box from './squeal_box.vue';
 import Geolocation from './Geolocation.vue';
+import BarChart from './BarChart.vue';
 
 const user = ref<any>(null);
 const id = defineProps(['id']);
@@ -22,6 +23,8 @@ const new_characters = ref(false);
 let daily_quota = 0;
 let weekly_quota = 0;
 let monthly_quota = 0;
+
+
 
 
 
@@ -188,6 +191,46 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
     markerPosition.value = newPosition;
 }
 
+
+const chartData = ref<any>({
+    labels: [],
+    datasets: [{
+        //impressions
+        label: 'impressions',
+        backgroundColor: '#0DCAF0',
+        data: []
+    },
+    {
+        //replies
+        label: 'replies',
+        backgroundColor: '#198754',
+        data: []
+    },
+    {
+        label: 'Data One',
+        backgroundColor: '#0d6efd',
+        data: []
+    },
+
+    ]
+});
+
+
+
+
+
+function updateChart(squealData: { datatime: any, impressions: any, replies: any, reactions: any }){
+    console.log(squealData)
+
+    const reactions = squealData.reactions.m2 + squealData.reactions.m1 + squealData.reactions.p1 + squealData.reactions.p2
+    chartData.value.labels.push(squealData.datatime)
+    chartData.value.datasets[0].data.push(squealData.impressions)
+    chartData.value.datasets[1].data.push(squealData.replies.length)
+    chartData.value.datasets[2].data.push(reactions)
+}
+
+
+
 </script>
 
 
@@ -304,10 +347,19 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
 
         </div>
 
+        <div><!-- chart -->
+            <BarChart :data="chartData"></BarChart>
+
+        </div>
+
 
 
         <div class="container d-flex flex-column-reverse ">
-            <squeal_box class="m-3" v-for="squeal in user_squeals" :id="squeal">
+            <squeal_box 
+                class="m-3" 
+                v-for="squeal in user_squeals" 
+                :id="squeal"
+                @squealData="updateChart">
             </squeal_box>
             <!--clicca uno squils per vedere le statistiche -->
             <!-- acuista caratteri-->

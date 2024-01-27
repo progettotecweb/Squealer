@@ -7,14 +7,21 @@ const squeal = ref<any>(null)
 const id = defineProps(['id'])
 const waiting = ref(true);
 
-
+const emits = defineEmits();
 
 squeal.value = getSquealData(id.id)
 squeal.value.then((data: any) => {
     squeal.value = data
     waiting.value = false
-
+    emitsData()
 })
+
+function emitsData() {
+    let     {datetime} = squeal.value 
+    const   {impressions , replies , reactions } = squeal.value
+    datetime = formatDate(datetime)
+    emits('squealData', {datetime , impressions , replies , reactions }); 
+}
 
 function pad(number: any) {
     return (number < 10 ? '0' : '') + number;
