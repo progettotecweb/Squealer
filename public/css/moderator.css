@@ -60,7 +60,7 @@
     overflow-y: auto;
     overflow-x: hidden;
 
-    padding: 1em;
+    padding: 1em 1.5em;
 
     /*background-color: #2E6079;*/
     background-color: var(--bg_section);
