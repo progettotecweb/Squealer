@@ -366,7 +366,7 @@ function updateChart(squealData: { datetime: any, impressions: any, replies: any
 
         <div v-if="new_characters"><!--buy new caracters-->
 
-            <button class="btn btn-outline-info" @click="add_characters()"> aggiungi 140 caratteri</button>
+            <button class="btn btn-outline-info" @click="add_characters()"> compra 140 caratteri</button>
             <div class="progress d-none" id="progressbarDiv" role="progressbar" aria-label="progress Bar" aria-valuenow="0"
                 aria-valuemin="0" aria-valuemax="100">
                 <div class="progress-bar progress-bar-striped bg-success" id="progressBar" style="width: 0%"></div>
