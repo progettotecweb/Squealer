@@ -60,6 +60,7 @@ function formatDate(date: any) {
                 <div class="row"> <!-- riga con il testo-->
                     <div v-if="squeal.type === 'text'" class="squealText">
                         <h6> {{ squeal.content.text }} </h6>
+                        <hr class="m-0 mt-2"/>
                     </div>
                     <div v-if="squeal.type === 'image'">
                         <img :src="`/api/media/${squeal.content.img}`" alt="user-img" class="img-fluid img-thumbnail" />
@@ -72,14 +73,18 @@ function formatDate(date: any) {
 
                     </div>
                 </div>
-                <div class="d-flex justify-content-end"> <!--riga delle reazioni (TODO)-->
-                    <div class="fs-4 p-2">😡{{ squeal.reactions.m2 }}  </div>
-                    <div class="fs-4 p-2">😒{{ squeal.reactions.m1 }}  </div>
-                    <div class="fs-4 p-2">😄{{ squeal.reactions.p1 }}  </div>
-                    <div class="fs-4 p-2">😝{{ squeal.reactions.p2 }}  </div>
-                </div>
-                <div>
-
+                
+                <div class="d-flex w-100">
+                    <div class="d-flex justify-content-start w-50"> <!--riga delle reazioni (TODO)-->
+                        <i class=" pt-2 pb-2 text-capitalize">{{ squeal.cm.label }}  </i>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end w-50"> <!--riga delle reazioni (TODO)-->
+                        <div class="fs-4 p-2">😡{{ squeal.reactions.m2 }}  </div>
+                        <div class="fs-4 p-2">😒{{ squeal.reactions.m1 }}  </div>
+                        <div class="fs-4 p-2">😄{{ squeal.reactions.p1 }}  </div>
+                        <div class="fs-4 p-2">😝{{ squeal.reactions.p2 }}  </div>
+                    </div>
                 </div>
             </div>
         </div>
