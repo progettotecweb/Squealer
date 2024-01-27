@@ -92,6 +92,8 @@ user.value.then((data: any) => {
 </template>
 
 <style>
+
+
 header{
     background-color: #1f2937;
     color: aliceblue;

@@ -44,6 +44,7 @@ const waiting = ref(true);
         justify-content: center;
         align-items: center;
         color: aliceblue;
+        cursor: pointer;
     }
 
     .user-img-box{

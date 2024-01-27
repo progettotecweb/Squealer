@@ -76,6 +76,7 @@ function formatDate(date: any) {
                             class="img-fluid img-thumbnail" />
                     </div>
                     <div v-if="squeal.type === 'video'">
+                        <video controls :src="`/api/media/${squeal.content.video}`" class="img-fluid img-thumbnail" ></video>
                     </div>
                     <div v-if="squeal.type === 'geolocation'">
                         <GeolocationSqueal  :geolocation="squeal.content.geolocation"></GeolocationSqueal> 

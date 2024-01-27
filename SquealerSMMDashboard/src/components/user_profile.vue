@@ -5,6 +5,7 @@ import squeal_box from './squeal_box.vue';
 import Geolocation from './Geolocation.vue';
 import BarChart from './BarChart.vue';
 
+
 const user = ref<any>(null);
 const id = defineProps(['id']);
 const user_squeals = ref<any>(null);
@@ -40,7 +41,7 @@ const update_user_value = () => {
         monthly_quota = user.value.msg_quota.monthly;
         waiting.value = false
     })
-    
+
 }
 
 
@@ -48,6 +49,17 @@ update_user_value();
 
 //add caracters and update user
 const add_characters = async () => {
+    let progress = 0;
+    const progressBar = document.getElementById("progressBar") as HTMLElement;
+    const progressBarDiv = document.getElementById("progressbarDiv") as HTMLElement;
+    progressBarDiv.classList.remove("d-none");
+    progressBar.style.width = progress + "%";
+
+    for (let i = 0; i < 100; i++) {
+        progress += 1;
+        progressBar.style.width = progress + "%";
+        await new Promise(r => setTimeout(r, i));
+    }
 
     let data = {
         msg_quota: {
@@ -57,7 +69,7 @@ const add_characters = async () => {
         }
     }
 
-    await fetch("/api/users/"+id.id, {
+    await fetch("/api/users/" + id.id, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -74,6 +86,9 @@ const add_characters = async () => {
         .catch(err => {
             console.log(err);
         });
+
+    progressBarDiv.classList.add("d-none");
+    progressBar.style.width = "0%";
 }
 
 
@@ -152,7 +167,7 @@ const create_new_squeal = async () => {
                 alert("Not enough quota")
                 return;
             }
-        break;
+            break;
     }
 
     let content = {
@@ -207,7 +222,7 @@ const chartData = ref<any>({
         data: []
     },
     {
-        label: 'Data One',
+        label: 'reactions',
         backgroundColor: '#0d6efd',
         data: []
     },
@@ -219,14 +234,29 @@ const chartData = ref<any>({
 
 
 
-function updateChart(squealData: { datatime: any, impressions: any, replies: any, reactions: any }){
-    console.log(squealData)
+function updateChart(squealData: { datetime: any, impressions: any, replies: any, reactions: any }) {
 
-    const reactions = squealData.reactions.m2 + squealData.reactions.m1 + squealData.reactions.p1 + squealData.reactions.p2
-    chartData.value.labels.push(squealData.datatime)
-    chartData.value.datasets[0].data.push(squealData.impressions)
-    chartData.value.datasets[1].data.push(squealData.replies.length)
-    chartData.value.datasets[2].data.push(reactions)
+    const newChartData = {
+        ...chartData.value,
+        labels: [...chartData.value.labels, squealData.datetime],
+        datasets: [
+            {
+                ...chartData.value.datasets[0],
+                data: [...chartData.value.datasets[0].data, squealData.impressions]
+            },
+            {
+                ...chartData.value.datasets[1],
+                data: [...chartData.value.datasets[1].data, squealData.replies.length]
+            },
+            {
+                ...chartData.value.datasets[2],
+                data: [...chartData.value.datasets[2].data, squealData.reactions.m2 + squealData.reactions.m1 + squealData.reactions.p1 + squealData.reactions.p2]
+            }
+        ]
+    };
+
+    chartData.value = newChartData;
+
 }
 
 
@@ -263,12 +293,10 @@ function updateChart(squealData: { datatime: any, impressions: any, replies: any
         </div>
 
         <div class="row">
-            <button class="btn btn-outline-info col-auto" 
-                @click="new_squeal = !new_squeal, new_characters = false">
+            <button class="btn btn-outline-info col-auto" @click="new_squeal = !new_squeal, new_characters = false">
                 create new post
             </button>
-            <button class="btn btn-outline-info col-auto" 
-                @click="new_characters = !new_characters, new_squeal = false">
+            <button class="btn btn-outline-info col-auto" @click="new_characters = !new_characters, new_squeal = false">
                 buy characters
             </button>
         </div>
@@ -287,12 +315,9 @@ function updateChart(squealData: { datatime: any, impressions: any, replies: any
                 <div class="row">
                     <div v-if="insert_new_text == true"> <!--inserimento testo-->
                         <div>
-                            <textarea class="form-control" 
-                                v-model="new_squeal_content" 
-                                @input="user.msg_quota.daily = daily_quota-new_squeal_content.length, user.msg_quota.weekly = weekly_quota-new_squeal_content.length, user.msg_quota.monthly = monthly_quota-new_squeal_content.length" 
-                                placeholder="What's happening?"
-                                id="new_squeal_text_input" 
-                                rows="4">
+                            <textarea class="form-control" v-model="new_squeal_content"
+                                @input="user.msg_quota.daily = daily_quota - new_squeal_content.length, user.msg_quota.weekly = weekly_quota - new_squeal_content.length, user.msg_quota.monthly = monthly_quota - new_squeal_content.length"
+                                placeholder="What's happening?" id="new_squeal_text_input" rows="4">
                             </textarea>
                         </div>
                         <div class="col-auto">
@@ -314,15 +339,14 @@ function updateChart(squealData: { datatime: any, impressions: any, replies: any
                         <label for="formFile1" class="form-label">select an image to squeal</label>
                         <input class="form-control" id="formFile1" @change="Handlecontent" accept="image/*" type="file" />
                         <div class="col-auto">
-                            <button class="btn btn-outline-info"
-                                @click=" new_squeal_type = 'image', 
+                            <button class="btn btn-outline-info" @click=" new_squeal_type = 'image',
                                 create_new_squeal(),
                                 new_squeal_content = null">post</button>
                         </div>
                     </div>
                     <div v-if="insert_new_pos == true"> <!--inserimento posizione-->
                         <div class="col-auto">
-                        <Geolocation  @markerPositionChanged="updateMarkerPosition"></Geolocation>
+                            <Geolocation @markerPositionChanged="updateMarkerPosition"></Geolocation>
                             <button class="btn btn-outline-info" @click="
                                 new_squeal_type = 'geolocation',
                                 new_squeal_content = {
@@ -334,7 +358,7 @@ function updateChart(squealData: { datatime: any, impressions: any, replies: any
                                 create_new_squeal(),
                                 new_squeal_content = null">post</button>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -342,8 +366,11 @@ function updateChart(squealData: { datatime: any, impressions: any, replies: any
 
         <div v-if="new_characters"><!--buy new caracters-->
 
-            <button class="btn btn-outline-info" @click="add_characters()" > aggiungi 140 caratteri</button>
-            
+            <button class="btn btn-outline-info" @click="add_characters()"> aggiungi 140 caratteri</button>
+            <div class="progress d-none" id="progressbarDiv" role="progressbar" aria-label="progress Bar" aria-valuenow="0"
+                aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped bg-success" id="progressBar" style="width: 0%"></div>
+            </div>
 
         </div>
 
@@ -355,11 +382,7 @@ function updateChart(squealData: { datatime: any, impressions: any, replies: any
 
 
         <div class="container d-flex flex-column-reverse ">
-            <squeal_box 
-                class="m-3" 
-                v-for="squeal in user_squeals" 
-                :id="squeal"
-                @squealData="updateChart">
+            <squeal_box class="m-3" v-for="squeal in user_squeals" :id="squeal" @squealData="updateChart">
             </squeal_box>
             <!--clicca uno squils per vedere le statistiche -->
             <!-- acuista caratteri-->
