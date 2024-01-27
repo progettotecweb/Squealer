@@ -868,7 +868,7 @@ window.onload = function () {
             inputRecipients.setAttribute("data-bs-ids-type", databs.idsType);
             impressions.innerHTML = databs.impressions + " impression(s)";
             datetime.innerHTML = formatDate(databs.datetime);
-            controversial.innerHTML = databs.controversial === 'true' ? '<i>Controversial</i>' : '<i>Not controversial</i>';
+            //controversial.innerHTML = databs.controversial === 'true' ? '<i>Controversial</i>' : '<i>Not controversial</i>';
             cm.innerHTML = "<b>CM</b>: " + databs.cm;
             automatic.innerHTML = databs.automatic === 'true' ? "<b>Automatic</b>" : "<b>Not automatic</b>";
 
@@ -1563,7 +1563,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
         + '</div>';
     let automatic = '';
     if (squeal.automatic === true) {
-        automatic += '<div class="squeal-automatic-div align-self-center text-center">' +
+        automatic += '<div class=" w-33 squeal-automatic-div">' +
             '<span class="squeal-automatic"><b>' + (squeal.automatic === true ? 'Automatic' : '') + '</b></span>' +
             '</div>';
     }
@@ -1580,10 +1580,10 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     const videoblobsrc = "/api/media/" + squeal.content.video;
     const alt = "Picture";
     let img = `<div class='d-flex justify-content-center'><img src=${imgblobsrc} alt=${alt} class='img-squeal'/></div>`;
-  
-    
+
+
     let video = `<div class='d-flex justify-content-center'><video controls src=${videoblobsrc} class='video-squeal' type="video/mp4" ></video></div>`;
-    
+
     let geolocation = `<div class="geo-squeal-container"><div class="geo-squeal" id=${"map-" + squeal._id}></div></div>`
     let replies = '<div class="squeal-replies">';
     replies += '</div>';
@@ -1605,18 +1605,17 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     content += '</div>';
 
     let footer = '<div class="squeal-footer">';
-    let reactions = '<div class="squeal-reactions squeal-footer-tl">'
-        + '<span>'
-        + '😡' + squeal.reactions.m2 + ' '
-        + '😒' + squeal.reactions.m1 + ' '
-        + '😄' + squeal.reactions.p1 + ' '
-        + '😝' + squeal.reactions.p2 + ' '
+    let reactions = '<div class="squeal-reactions flex-row-reverse d-flex justify-content-around">'
+        + '<div>😡 ' + squeal.reactions.m2 + '</div>'
+        + '<div>😒 ' + squeal.reactions.m1 + '</div>'
+        + '<div>😄 ' + squeal.reactions.p1 + '</div>'
+        + '<div>😝 ' + squeal.reactions.p2 + '</div>'
         + '</span>'
         + '</div>';
-    let CM = '<div class="squeal-cm squeal-footer-bl">'
+    let CM = '<div class="w-33 squeal-cm">'
         + '<span><b>CM</b>: ' + squeal.cm.label + '</span>'
         + '</div>';
-    let impressions = '<div class="squeal-impressions squeal-footer-tr">'
+    let impressions = '<div w-33 class="squeal-impressions">'
         + '<span>' + squeal.impressions + ' impression(s)</span>'
         + '</div>';
     let controversial = '<div class="squeal-controversial squeal-footer-br">'
@@ -1624,9 +1623,12 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
         + '</div>';
 
     footer += reactions;
+    footer += "<div class='d-flex justify-content-between'>";
     footer += CM;
+    footer += automatic
     footer += impressions;
-    footer += controversial;
+    footer += '</div>';
+    //footer += controversial;
     footer += '</div>';
     let btnDelete = '';
     if (del) {
@@ -1657,7 +1659,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     mycard += header;
     mycard += content;
     mycard += footer;
-    mycard += automatic;
+    //mycard += automatic;
     mycard += btnDelete;
     mycard += btnViewMore;
     mycard += '</div>'
