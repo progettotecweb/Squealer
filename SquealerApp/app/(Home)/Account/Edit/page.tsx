@@ -121,7 +121,7 @@ export default function EditPage() {
     if (isLoading) return <div>Loading...</div>;
 
     return (
-        <PageContainer>
+        <PageContainer key="editaccount" className="p-2">
             <main className="flex flex-col gap-4">
                 <h1 className="self-start text-2xl">Edit Profile</h1>
 

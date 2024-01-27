@@ -279,14 +279,14 @@ const Squeal: React.FC<SquealProps> = ({
             <div className="flex gap-2 items-center">
                 <Avatar
                     aria-label="recipe"
-                    className="bg-[#111B21] text-gray-50 border-solid border-2 border-gray-200"
+                    className="bg-[#111B21] text-gray-50"
                 >
                     <img
                         src={
                             owner ? `/api/media/${owner?.img}` : "/deleted.webp"
                         }
                         alt="Profile Picture"
-                        className="object-fit w-full h-full"
+                        className="object-cover w-full h-full"
                     />
                 </Avatar>
                 <div className="flex flex-col items-start">

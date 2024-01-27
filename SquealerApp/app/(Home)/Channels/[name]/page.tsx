@@ -73,8 +73,8 @@ export default function Page({ params }: { params: { name: string } }) {
         );
 
     return (
-        <PageContainer className="p-2" key="channel-page">
-            <div className="flex flex-col items-center mb-16">
+        <PageContainer className="p-4" key="channel-page">
+            <div className="flex flex-col items-center mb-16  sm:w-[60vw] w-full">
                 <section className="flex flex-col relative h-[15rem] w-full">
                     {data?.banner.mimetype ? (
                         <img

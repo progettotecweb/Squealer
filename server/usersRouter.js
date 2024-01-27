@@ -248,6 +248,11 @@ router.put("/:id/edit", async (req, res) => {
         return;
     }
 
+    if(req.body.img) {
+        const propic = await mediaDB.addNewMedia(req.body.img.mimetype, req.body.img.blob);
+        req.body.img = propic;
+    }
+
     const updatedUser = {
         img: req.body.img,
         bio: req.body.bio,

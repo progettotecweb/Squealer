@@ -108,7 +108,7 @@ const Header: React.FC = () => {
                     SQUEALER
                 </Link>
             </header>
-            <header className="sm:hidden z-[1100] flex flex-column items-center bg-[#111B21] sticky top-0  w-full text-center text-stone-50 h-16 p-2">
+            <header className="sm:hidden z-[1100] flex flex-column items-center bg-[#111B21] sticky top-0 left-0  p-2 w-full text-center text-stone-50 h-16">
                 <img src="/squealer.png" width={50} height={50} alt="logo" />
                 <section className="flex-1 flex items-center">
                     {pathname === "/" ? (

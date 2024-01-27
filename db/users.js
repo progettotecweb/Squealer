@@ -398,7 +398,8 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                         {
                             $project: {
                                 name: 1,
-                                id: 1,
+                                id: "$_id",
+                                _id: 0,
                                 type: "Keyword",
                             },
                         },
@@ -421,7 +422,8 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                         {
                             $project: {
                                 name: 1,
-                                id: 1,
+                                id: "$_id",
+                                _id: 0,
                                 type: "User",
                             },
                         },
@@ -444,7 +446,8 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                         {
                             $project: {
                                 name: 1,
-                                id: 1,
+                                id: "$_id",
+                                _id: 0,
                                 type: "Channel",
                             },
                         },
