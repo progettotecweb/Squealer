@@ -17,10 +17,10 @@ squeal.value.then((data: any) => {
 })
 
 function emitsData() {
-    let     {datetime} = squeal.value 
-    const   {impressions , replies , reactions } = squeal.value
+    let { datetime } = squeal.value
+    const { impressions, replies, reactions } = squeal.value
     datetime = formatDate(datetime)
-    emits('squealData', {datetime , impressions , replies , reactions }); 
+    emits('squealData', { datetime, impressions, replies, reactions });
 }
 
 function pad(number: any) {
@@ -44,12 +44,11 @@ function formatDate(date: any) {
 <template>
     <div v-if="waiting == false" class="squeal-box rounded-3 container w-auto text-start">
         <div class="row">
-            <div class="col-1 p-0">
-                <img :src="`/api/media/${squeal.ownerID.img}`" alt="user-img"
-                    class="img-fluid img-thumbnail" />
+            <div class="col-1 p-0 mt-2">
+                <img :src="`/api/media/${squeal.ownerID.img}`" alt="user-img" class="img-fluid img-thumbnail" />
             </div>
             <div class="col-11">
-                <div class="row"> <!-- riga con nome e data-->
+                <div class="row mt-2 mb-2"> <!-- riga con nome e data-->
                     <div class="col-6">
                         <h6> @{{ squeal.ownerID.name }} </h6>
                     </div>
@@ -57,34 +56,27 @@ function formatDate(date: any) {
                         <h6> {{ formatDate(squeal.datetime) }} </h6>
                     </div>
                 </div>
-                <div class="row"> <!-- riga con le citazioni-->
-                    <div v-if="squeal.mentions.length != 0" class="col-12">
-                        <h6>mentions: </h6>
-                        <div class="row">
-                            <div v-for="mention in squeal.mentions" class="col-auto">
-                                <h6> {{ mention.name }} </h6>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
                 <div class="row"> <!-- riga con il testo-->
-                    <div v-if="squeal.type === 'text'" class="squealText" >
+                    <div v-if="squeal.type === 'text'" class="squealText">
                         <h6> {{ squeal.content.text }} </h6>
                     </div>
                     <div v-if="squeal.type === 'image'">
-                        <img :src="`/api/media/${squeal.content.img}`" alt="user-img"
-                            class="img-fluid img-thumbnail" />
+                        <img :src="`/api/media/${squeal.content.img}`" alt="user-img" class="img-fluid img-thumbnail" />
                     </div>
                     <div v-if="squeal.type === 'video'">
-                        <video controls :src="`/api/media/${squeal.content.video}`" class="img-fluid img-thumbnail" ></video>
+                        <video controls :src="`/api/media/${squeal.content.video}`" class="img-fluid img-thumbnail"></video>
                     </div>
                     <div v-if="squeal.type === 'geolocation'">
-                        <GeolocationSqueal  :geolocation="squeal.content.geolocation"></GeolocationSqueal> 
+                        <GeolocationSqueal :geolocation="squeal.content.geolocation"></GeolocationSqueal>
 
-                    </div>       
+                    </div>
                 </div>
-                <div> <!--riga delle reazioni (TODO)-->
-
+                <div class="d-flex justify-content-end"> <!--riga delle reazioni (TODO)-->
+                    <div class="fs-4 p-2">😡{{ squeal.reactions.m2 }}  </div>
+                    <div class="fs-4 p-2">😒{{ squeal.reactions.m1 }}  </div>
+                    <div class="fs-4 p-2">😄{{ squeal.reactions.p1 }}  </div>
+                    <div class="fs-4 p-2">😝{{ squeal.reactions.p2 }}  </div>
                 </div>
                 <div>
 
@@ -100,7 +92,7 @@ function formatDate(date: any) {
     color: aliceblue;
 }
 
-.squealText{
+.squealText {
     overflow-y: auto;
     word-break: break-all;
 }

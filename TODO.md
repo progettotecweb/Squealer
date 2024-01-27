@@ -91,11 +91,11 @@
 
 - [x] sia VIP che SMM devono essere account pro
 - [x] <span class="orange">SMM può gestire diversi account VIP</span>
-- [ ] SMM posta squeal a nome e per conto del VIP.
-- [ ] Statistiche sugli squeal postati dal SMM (visualizzazioni, reazioni, squeal a rischio impopolarità/controversia, etc).
-- [ ] <span class="orange">SMM può acquistare caratteri extra per i VIP</span>
-- [ ] <span class="orange">Grafici con andamenti dei post dei VIP</span>
-- [ ] <span class="green">Geolocazione fittizia per i VIP ????????</span>
+- [X] SMM posta squeal a nome e per conto del VIP.
+- [X] Statistiche sugli squeal postati dal SMM (visualizzazioni, reazioni, squeal a rischio impopolarità/controversia, etc).
+- [X] <span class="orange">SMM può acquistare caratteri extra per i VIP</span>
+- [X] <span class="orange">Grafici con andamenti dei post dei VIP</span>
+- [X] <span class="green">Geolocazione fittizia per i VIP ????????</span>
 
 ## REQUISITI DI PROGETTO
 

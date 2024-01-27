@@ -265,7 +265,7 @@ function updateChart(squealData: { datetime: any, impressions: any, replies: any
 
 
 <template>
-    <div class="w-100 container  text-start">
+    <div class="w-100 container  text-start mt-5">
         <div class="row">
 
             <div class="col-3 ">
