@@ -56,6 +56,7 @@ async function getUserData() {
     document.getElementById("master-user-img").src = blobsrc;
     //add data-bs master user id
     document.getElementById("master-user-name").setAttribute("data-bs-master_user_id", userInfo._id);
+    document.getElementById("master-user-name").setAttribute("data-bs-master_user_blocked", userInfo.blocked);
 }
 
 getUserData();
@@ -532,6 +533,11 @@ window.onload = function () {
             }
 
             //blocked
+            //if it is me, disable the block button
+            if (databs.id === document.querySelector('#master-user-name').getAttribute("data-bs-master_user_id")) {
+                btnBlock.disabled = true;
+            }
+
             if (databs.blocked === "false") {
                 //modalBody.innerHTML += btnBlock;
                 btnBlock.classList.remove("btn-secondary");
@@ -772,8 +778,11 @@ window.onload = function () {
 
             modalTitle.textContent = databs.name
 
+            //get if current mod is blocked
+            const master_user_blocked = document.querySelector('#master-user-name').getAttribute("data-bs-master_user_blocked");
+
             const postBtn = channelSquealsModal.querySelector('#btn-savechanges');
-            if (databs.visibility === "private") {
+            if (databs.visibility === "private" || databs.blocked === "true" || master_user_blocked === "true") {
                 //mod cannot post in private channels
                 postBtn.setAttribute("disabled", "")
             } else {
