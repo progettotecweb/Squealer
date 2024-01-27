@@ -82,14 +82,14 @@ router.put("/:id", async (req, res) => {
         updatedRecipients.push({ id: id, type: "Keyword" });
     }
 
-    const updatedSqueal = {
+    const updatedSquealInfo = {
         recipients: updatedRecipients,
         reactions: req.body.reactions,
     };
     console.log("oldSqueal", req.body.recipients);
-    console.log("updatedSqueal", updatedSqueal);
+    console.log("updatedSquealInfo", updatedSquealInfo);
 
-    await squealsDB.updateSquealByID(squeal._id, updatedSqueal);
+    const updatedSqueal = await squealsDB.updateSquealByID(squeal._id, updatedSquealInfo);
 
     // Squeal distribution
     //first we have to remove the squeal from the old recipients
@@ -109,7 +109,7 @@ router.put("/:id", async (req, res) => {
     }
 
     //then we add the squeal to the new recipients
-    const recipients = updatedSqueal.recipients;
+    const recipients = updatedSquealInfo.recipients;
     for (const recipient of recipients) {
         if (recipient.type === "User") {
             const user = await usersDB.searchUserByID(recipient.id);
@@ -122,9 +122,11 @@ router.put("/:id", async (req, res) => {
         }
     }
 
-    const user = await usersDB.searchUserByID(squeal.ownerID);
+    console.log("updatedSqueal", updatedSqueal)
 
-    await squealsDB.updateSquealMetadata(squeal, user);
+    const user = await usersDB.searchUserByID(updatedSqueal.ownerID);
+
+    await squealsDB.updateSquealMetadata(updatedSqueal, user);
 
     res.status(200).json({ ok: true });
 });
