@@ -124,6 +124,7 @@ router.get("/media/:id", async (req, res) => {
     res.writeHead(200, {
         "Content-Type": media.mimetype,
         "Content-Length": img.length,
+        "Cache-Control": "must-revalidate",
     });
 
     res.end(img);

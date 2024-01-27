@@ -1067,7 +1067,6 @@ window.onload = function () {
                     data[key] = dataToUpdate[key];
                 });
 
-                console.log(data)
 
                 //update table
                 fetch("/api/" + table + "/" + id, {
