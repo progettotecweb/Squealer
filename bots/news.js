@@ -4,7 +4,7 @@ const usersDB = require("../db/users");
 const squealsDB = require("../db/squeals");
 const channelsDB = require("../db/channels");
 const bcrypt = require("bcrypt");
-const default_img = require("../utils/default_image.json");
+const mediaDB = require("../db/media");
 
 const API_KEY = "7938278ec45d452aa2566f2be746acf7";
 
@@ -25,7 +25,7 @@ exports.setupNewsBot = async () => {
         newsBot = await usersDB.createNewUser({
             name: "NewsBOT",
             password: hash,
-            img: default_img,
+            img: await mediaDB.getDefaultProfilePicture(),
             bio: "I am a bot that posts news articles to the News channel!",
             role: "Mod",
         });

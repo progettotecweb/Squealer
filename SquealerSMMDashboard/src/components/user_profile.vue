@@ -196,7 +196,7 @@ function updateMarkerPosition(newPosition: { lat: number; lng: number }) {
         <div class="row">
 
             <div class="col-3 ">
-                <img v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img"
+                <img v-if="waiting == false" :src="`/api/media/${user.img}`" alt="user-img"
                     style="width: 80px; height: 80px;" />
             </div>
 

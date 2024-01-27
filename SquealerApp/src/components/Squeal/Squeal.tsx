@@ -26,6 +26,7 @@ import Spinner from "../Spinner";
 
 import Geolocation from "../Navbar/Geolocation";
 import { Counter } from "../Navbar/SquealCreator";
+import Link from "next/link";
 
 function formatDate(date) {
     const d = new Date(date);
@@ -54,25 +55,16 @@ export interface SquealProps {
     type?: "text" | "image" | "video" | "geolocation";
     content: {
         text: string | null;
-        img: {
-            mimetype: string;
-            blob: string;
-        } | null;
+        img: string | null;
         geolocation: {
             latitude: number;
             longitude: number;
         };
-        video: {
-            mimetype: string;
-            blob: string;
-        } | null;
+        video: string | null;
     };
     owner?: {
         name: string;
-        img: {
-            mimetype: string;
-            blob: string;
-        };
+        img: string;
     };
     date: string;
     reactions: {
@@ -107,7 +99,11 @@ const SquealText = (props: { text: string }) => {
                         const displayText = text.replace(/[\[\]]/g, "");
 
                         return (
-                            <a href={url} rel="noopener" target="_blank" key={"url"+index}
+                            <a
+                                href={url}
+                                rel="noopener"
+                                target="_blank"
+                                key={"url" + index}
                                 className="text-blue-400 hover:text-blue-500"
                             >
                                 {displayText || "More"}
@@ -241,6 +237,19 @@ const Squeal: React.FC<SquealProps> = ({
             });
     };
 
+    const computeHref = (type, name) => {
+        switch (type) {
+            case "Channel":
+                return `/Channels/${name}`;
+            case "User":
+                return `/Users/${name}`;
+            case "Keyword":
+                return `/Channels/${name}`;
+            default:
+                return "";
+        }
+    };
+
     return (
         <motion.div
             className={`${className} flex flex-col bg-gray-800 text-gray-50 shadow-none mx-2 p-4 rounded-md gap-2 `}
@@ -250,9 +259,10 @@ const Squeal: React.FC<SquealProps> = ({
             <div className="flex flex-row gap-2 text-md flex-wrap">
                 {recipients?.map((recipient, index) => {
                     return (
-                        <span
+                        <Link
                             className="text-blue-400 bg-gray-700 py-1 px-4 rounded-xl "
                             key={index}
+                            href={computeHref(recipient.type, recipient.name)}
                         >
                             {recipient.type === "Channel"
                                 ? "§"
@@ -262,7 +272,7 @@ const Squeal: React.FC<SquealProps> = ({
                                 ? "#"
                                 : ""}
                             {recipient.name}
-                        </span>
+                        </Link>
                     );
                 })}
             </div>
@@ -273,9 +283,7 @@ const Squeal: React.FC<SquealProps> = ({
                 >
                     <img
                         src={
-                            owner
-                                ? `data:${owner?.img?.mimetype};base64,${owner?.img?.blob}`
-                                : "/deleted.webp"
+                            owner ? `/api/media/${owner?.img}` : "/deleted.webp"
                         }
                         alt="Profile Picture"
                         className="object-fit w-full h-full"
@@ -306,21 +314,21 @@ const Squeal: React.FC<SquealProps> = ({
                                 <SquealText text={content?.text as string} />
                             );
                         case "image":
-                            if (content?.img && content?.img.blob)
+                            if (content?.img)
                                 return (
                                     <img
-                                        src={`data:${content?.img.mimetype};base64,${content?.img.blob}`}
+                                        src={`/api/media/${content?.img}`}
                                         alt="FOTO"
                                         className="max-h-[25vw]"
                                     />
                                 );
                             else return;
                         case "video":
-                            if (content?.video && content?.video.blob)
+                            if (content?.video)
                                 return (
                                     <video
                                         controls
-                                        src={`data:${content?.video.mimetype};base64,${content?.video.blob}`}
+                                        src={`/api/media/${content?.video}`}
                                         className="video-squeal h-1/3 w-2/3"
                                     />
                                 );
@@ -439,6 +447,8 @@ const SquealReplyier = (props: { parent; session }) => {
         geolocation: null,
     });
 
+    const [error, setError] = useState("");
+
     const [loading, setLoading] = useState(false);
 
     const [type, setType] = useState<
@@ -468,12 +478,19 @@ const SquealReplyier = (props: { parent; session }) => {
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then((res) => {
-            mutate(`/api/squeals/${props.session.user.id}`);
-            mutate(`/api/squeals/${props.session.user.id}/feed`);
-            switchType("text");
-            setLoading(false);
-        });
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                if (res.error) {
+                    setError(res.error);
+                    return;
+                }
+
+                mutate(`/api/squeals/${props.session.user.id}`);
+                mutate(`/api/squeals/${props.session.user.id}/feed`);
+                switchType("text");
+                setLoading(false);
+            });
     };
 
     const handleContent = async (e: any) => {
@@ -680,6 +697,19 @@ const SquealReplyier = (props: { parent; session }) => {
                     </>
                 )}
             </AnimatePresence>
+            {error && (
+                <motion.div
+                    key="error"
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    variants={slideInFromRight}
+                    className="fixed top-[1rem] right-[1rem] p-4 rounded-lg bg-gray-800 text-slate-50 z-[1200] shadow-md shadow-gray-500"
+                >
+                    <h1 className="text-xl mb-4">Error</h1>
+                    <p>{error}</p>
+                </motion.div>
+            )}
             <div className="flex flex-1 bg-gray-700 rounded-md text-gray-50 items-center mr-2">
                 <div className="flex-1 flex items-center">
                     {type === "text" ? (

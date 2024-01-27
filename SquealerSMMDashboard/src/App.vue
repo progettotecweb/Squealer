@@ -55,7 +55,7 @@ user.value.then((data: any) => {
       
       <div class="col-md-3 col-xl-2 sidebar d-none d-lg-block  text-center"> <!--sidebar sinistra-->
         <div class="row justify-content-center p-0">
-          <img class="p-0" v-if="waiting == false" :src="`data:${user.img.mimetype};base64,${user.img.blob}`" alt="user-img" style="width: 120px; height: 120px;"/> 
+          <img class="p-0" v-if="waiting == false" :src="`/api/media/${user.img}`" alt="user-img" style="width: 120px; height: 120px;"/> 
         </div>
         <div class="row">
           <p>@{{ user.name }}</p>

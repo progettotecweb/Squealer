@@ -46,10 +46,7 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
-    img: {
-        mimetype: String,
-        blob: String,
-    },
+    img: String,
     following: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -83,6 +80,11 @@ const userSchema = new mongoose.Schema({
             createdAt: Date,
         },
     ],
+    metadata: {
+        popularCount: { type: Number, default: 0 },
+        impopularCount: { type: Number, default: 0 },
+        controversialCount: { type: Number, default: 0 },
+    }
 });
 
 const User = mongoose.model("User", userSchema);

@@ -52,7 +52,7 @@ async function getUserData() {
 
     //riempio i campi 
     document.getElementById("master-user-name").innerHTML = userInfo.name;
-    const blobsrc = "data:" + userInfo.img.mimetype + ";base64," + userInfo.img.blob;
+    const blobsrc = "/api/media/" + userInfo.img;
     document.getElementById("master-user-img").src = blobsrc;
     //add data-bs master user id
     document.getElementById("master-user-name").setAttribute("data-bs-master_user_id", userInfo._id);
@@ -172,7 +172,7 @@ window.onload = function () {
 
                     let mycard = "<div class='my-card my-card-grid-tl-tr-b'>";
 
-                    const blobsrc = "data:" + data[i].img.mimetype + ";base64," + data[i].img.blob;
+                    const blobsrc = "/api/media/" + data[i].img;
                     let img = "<img src='" + blobsrc + "' alt='" + data[i].name + "'s profile picture' class='user-pic my-card-grid-tl'/>";
                     mycard += img;
                     mycard += '<div class="user-content my-card-grid-tr">';
@@ -1044,13 +1044,15 @@ window.onload = function () {
                     data[key] = dataToUpdate[key];
                 });
 
+                console.log(data)
+
                 //update table
-                await fetch("/api/" + table + "/" + id, {
+                fetch("/api/" + table + "/" + id, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(dataToUpdate)
                 })
                     .then(res => {
                         if (res.ok) {
@@ -1488,6 +1490,7 @@ async function searchAndAddSqueals(squealsId, div) {
     }
 }
 
+
 function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     //create the card
     let recipientsDiv = '';
@@ -1525,7 +1528,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     }
     let header = '<div class="squeal-header d-flex justify-content-between">';
     let ownerDiv = squeal.ownerID ? '<div class="squeal-owner-div p-1 align-self-between">'
-        + '<img src="data:' + squeal.ownerID.img.mimetype + ';base64,' + squeal.ownerID.img.blob + '" alt="' + squeal.ownerID.name + '\'s propic" class="user-pic"/>'
+        + '<img src="/api/media/' + squeal.ownerID.img + '" alt="' + squeal.ownerID.name + '\'s propic" class="user-pic"/>'
         + '<span class="squeal-owner-name h6 m-2">' + squeal.ownerID.name + '</span>'
         + '</div>'
         :
@@ -1551,11 +1554,14 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
 
     let content = '<div class="squeal-content">';
     let text = '<p class="squeal-text">' + squeal.content.text + '</p>';
-    const imgblobsrc = "data:" + squeal.content.img.mimetype + ";base64," + squeal.content.img.blob;
-    const videoblobsrc = "data:" + squeal.content.video.mimetype + ";base64," + squeal.content.video.blob;
+    const imgblobsrc = "/api/media/" + squeal.content.img;
+    const videoblobsrc = "/api/media/" + squeal.content.video;
     const alt = "Picture";
     let img = `<div class='d-flex justify-content-center'><img src=${imgblobsrc} alt=${alt} class='img-squeal'/></div>`;
-    let video = `<div class='d-flex justify-content-center'><video class='video-squeal' controls><source src=${videoblobsrc} type=${squeal.content.video.mimetype}></video></div>`;
+  
+    
+    let video = `<div class='d-flex justify-content-center'><video controls src=${videoblobsrc} class='video-squeal' type="video/mp4" ></video></div>`;
+    
     let geolocation = `<div class="geo-squeal-container"><div class="geo-squeal" id=${"map-" + squeal._id}></div></div>`
     let replies = '<div class="squeal-replies">';
     replies += '</div>';

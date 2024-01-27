@@ -105,7 +105,7 @@ export default function CreatePrivateChannelPage() {
 
     return (
         <PageContainer key="shop" className="gap-4">
-            <form onSubmit={handleSubmit} className="flex flex-col w-[60vw]">
+            <form onSubmit={handleSubmit} className="flex flex-col w-full sm:w-[60vw]">
                 <section className="flex flex-col relative h-[20rem]">
                     {img.mimetype ? (
                         <img
