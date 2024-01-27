@@ -44,7 +44,9 @@ exports.setupNewsBot = async () => {
         });
     }
 
-    CronJob.from({
+    
+
+    const cronj = CronJob.from({
         cronTime: "0 * * * *",
         onTick: async () => {
             const articles = await getNews("general", "it");
@@ -53,6 +55,20 @@ exports.setupNewsBot = async () => {
         start: true,
         timeZone: "America/New_York",
     });
+
+    if(!newsChannel) {
+        console.log("Error with news channel")
+    }
+
+    if(!newsBot) {
+        console.log("Error with news bot")
+    }
+
+    if(!cronj) {
+        console.log("Error with cron job")
+    }
+
+    console.log("News bot setup successfully");
 };
 
 const createSquealFromNewsArticle = async (article, bot, channel) => {
