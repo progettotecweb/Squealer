@@ -55,7 +55,7 @@ export const UserCard = ({ id }) => {
                     <h1 className="flex">{data.squeals.length} Squeals</h1>
                     <h1 className="flex ">{data.following.length} Following</h1>
                 </div>
-                <div className="self-start h-full text-md max-w-full text-wrap overflow-x-auto">
+                <div className="self-start h-full text-md max-w-full text-wrap overflow-x-auto text-start">
                     {data.bio}
                 </div>
             </section>
@@ -130,7 +130,7 @@ export const AccountUserCard = ({ id }) => {
                             {data.following.length} Following
                         </h1>
                     </div>
-                    <div className="self-start h-full text-md max-w-full text-wrap overflow-x-auto">
+                    <div className="self-start h-full text-md max-w-full text-wrap overflow-x-auto text-start">
                         {data.bio}
                     </div>
                 </section>
