@@ -1591,7 +1591,7 @@ function addSquealCard(squeal, recipients, div, del = false, viewMore = false) {
     let img = `<div class='d-flex justify-content-center'><img src=${imgblobsrc} alt=${alt} class='img-squeal'/></div>`;
 
 
-    let video = `<div class='d-flex justify-content-center'><video controls src=${videoblobsrc} class='video-squeal' type="video/mp4" ></video></div>`;
+    let video = `<div class='d-flex justify-content-center'><video controls src=${videoblobsrc} class='video-squeal'></video></div>`;
 
     let geolocation = `<div class="geo-squeal-container"><div class="geo-squeal" id=${"map-" + squeal._id}></div></div>`
     let replies = '<div class="squeal-replies">';
