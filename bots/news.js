@@ -73,7 +73,7 @@ exports.setupNewsBot = async () => {
 
 const createSquealFromNewsArticle = async (article, bot, channel) => {
     console.log(article)
-    const body = `${article.title} ${article.description && `- ${article.description}`} \n $URL=${article.url}`;
+    const body = `${article.title} ${article.description ? `- ${article.description}` : ""}. [Read More]$URL=${article.url}`;
 
     console.log(body);
 

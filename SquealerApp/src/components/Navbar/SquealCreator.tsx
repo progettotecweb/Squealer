@@ -63,12 +63,12 @@ const SquealCreator = () => {
                 ) {
                     setError(
                         "You have a debt of " +
-                        -data.msg_quota.debt.daily +
-                        " daily, " +
-                        -data.msg_quota.debt.weekly +
-                        " weekly and " +
-                        -data.msg_quota.debt.monthly +
-                        " monthly characters"
+                            -data.msg_quota.debt.daily +
+                            " daily, " +
+                            -data.msg_quota.debt.weekly +
+                            " weekly and " +
+                            -data.msg_quota.debt.monthly +
+                            " monthly characters"
                     );
                     setDisabled(true);
                 }
@@ -108,7 +108,6 @@ const SquealCreator = () => {
             video: null,
             geolocation: null,
         });
-        
     };
 
     const [squealPostStatus, setSquealPostedLoading] =
@@ -339,9 +338,7 @@ const SquealCreator = () => {
     return (
         <>
             {error && <p className="text-red-500">{error}</p>}
-            <div
-                className="flex flex-col h-full w-full bg-gray-500 p-4 md:bg-[#111B21]"
-            >
+            <div className="flex flex-col h-full w-full bg-gray-500 p-4 md:bg-[#111B21]">
                 <div className="flex flex-col">
                     <Counter
                         quota={user?.msg_quota?.daily}
@@ -372,16 +369,27 @@ const SquealCreator = () => {
                     loadOptions={async (inputValue) => {
                         const res = await fetch(`/api/search?q=${inputValue}`);
                         const data = await res.json();
-                        console.log(inputValue)
+                        console.log(inputValue);
                         return data.results.map((res) => {
                             return {
                                 value: {
                                     type: inputValue.startsWith("@")
                                         ? "User"
-                                        : "Channel",
+                                        : inputValue.startsWith("§")
+                                        ? "Channel"
+                                        : inputValue.startsWith("#")
+                                        ? "Keyword"
+                                        : "",
                                     id: res.id,
                                 },
-                                label:  (inputValue.startsWith("@") ? "@" : "§") + res.name,
+                                label:
+                                    (inputValue.startsWith("@")
+                                        ? "@"
+                                        : inputValue.startsWith("§")
+                                        ? "§"
+                                        : inputValue.startsWith("#")
+                                        ? "#"
+                                        : "") + res.name,
                             };
                         });
                     }}
@@ -391,7 +399,11 @@ const SquealCreator = () => {
                         label="Text"
                         content={
                             <AnimatedTabContent>
-                                <form name="squeal-post" className="" id="squeal-post">
+                                <form
+                                    name="squeal-post"
+                                    className=""
+                                    id="squeal-post"
+                                >
                                     <input
                                         type="checkbox"
                                         id="repeat"
@@ -551,9 +563,7 @@ export const Counter = (props: {
     maxLength: number;
 }) => {
     return (
-        <div
-            className=" text-gray-50 flex justify-center gap-1"
-        >
+        <div className=" text-gray-50 flex justify-center gap-1">
             <motion.span
                 layout
                 className={`${props.length > 0 ? "text-gray-400" : ""}`}

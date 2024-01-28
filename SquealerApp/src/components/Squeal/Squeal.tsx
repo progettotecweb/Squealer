@@ -22,6 +22,7 @@ import regexifyString from "regexify-string";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import KeyboardAltOutlinedIcon from "@mui/icons-material/KeyboardAltOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import Spinner from "../Spinner";
 
 import Geolocation from "../Navbar/Geolocation";
@@ -88,7 +89,7 @@ export interface SquealProps {
 
 const SquealText = (props: { text: string }) => {
     return (
-        <p className="text-md ml-4 mt-2">
+        <pre className="text-md  mt-2 text-pretty">
             {regexifyString({
                 pattern: /@\w+|#\w+|(\[(.*?)\])?\$URL=(\S+)/g,
                 decorator: (match, index) => {
@@ -128,7 +129,80 @@ const SquealText = (props: { text: string }) => {
                 },
                 input: props.text,
             })}
-        </p>
+        </pre>
+    );
+};
+
+const SquealImage = (props: { img: string }) => {
+    const [isModalOpen, setModalOpen] = useState(false);
+
+    const handleImageClick = () => {
+        setModalOpen(true);
+    };
+
+    const handleModalClick = () => {
+        setModalOpen(false);
+    };
+
+    useEffect(() => {
+        if (isModalOpen) {
+            document.body.style.overflow = "hidden";
+            document.body.style.marginRight = "10px"; // Adjust as needed
+        } else {
+            document.body.style.overflow = "unset";
+            document.body.style.marginRight = "0px";
+        }
+    }, [isModalOpen]);
+
+    return (
+        <>
+            <motion.img
+                src={`/api/media/${props.img}`}
+                alt="FOTO"
+                className="max-h-[25vw] rounded-md cursor-pointer"
+                onClick={handleImageClick}
+            />
+            <AnimatePresence mode="wait">
+                {isModalOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, x: -5 }}
+                        style={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            zIndex: 9998,
+                            overflow: "hidden",
+                        }}
+                        onClick={handleModalClick}
+                        className="rounded-lg"
+                    >
+                        <div className="relative">
+                            <img
+                                src={`/api/media/${props.img}`}
+                                alt="FOTO"
+                                style={{ maxHeight: "90vh", maxWidth: "90vw" }}
+                                className="rounded-md"
+                            />
+                            <motion.button
+                                whileHover={{ scale: 1.5 }}
+                                className="absolute top-0 right-0 p-2 size-12 z-[9999] text-red-500"
+                                onClick={handleModalClick}
+                            >
+                                <CloseOutlinedIcon />
+                            </motion.button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
     );
 };
 
@@ -315,13 +389,7 @@ const Squeal: React.FC<SquealProps> = ({
                             );
                         case "image":
                             if (content?.img)
-                                return (
-                                    <img
-                                        src={`/api/media/${content?.img}`}
-                                        alt="FOTO"
-                                        className="max-h-[25vw]"
-                                    />
-                                );
+                                return <SquealImage img={content?.img} />;
                             else return;
                         case "video":
                             if (content?.video)
@@ -356,6 +424,7 @@ const Squeal: React.FC<SquealProps> = ({
                     onClick={() =>
                         updateSquealReaction(id, "m2", session?.user.id)
                     }
+                    name="Very Negative"
                 >
                     <img src="/m2.svg" alt="M2" className="size-12" />{" "}
                     <p>{reactions_.m2}</p>
@@ -365,6 +434,7 @@ const Squeal: React.FC<SquealProps> = ({
                     onClick={() =>
                         updateSquealReaction(id, "m1", session?.user.id)
                     }
+                    name="Negative"
                 >
                     <img src="/m1.svg" alt="M2" className="size-12" />{" "}
                     <p>{reactions_.m1}</p>
@@ -374,6 +444,7 @@ const Squeal: React.FC<SquealProps> = ({
                     onClick={() =>
                         updateSquealReaction(id, "p1", session?.user.id)
                     }
+                    name="Positive"
                 >
                     <img src="/p1.svg" alt="M2" className="size-12" />{" "}
                     <p>{reactions_.p1}</p>
@@ -383,16 +454,15 @@ const Squeal: React.FC<SquealProps> = ({
                     onClick={() =>
                         updateSquealReaction(id, "p2", session?.user.id)
                     }
+                    name="Very Positive"
                 >
-                   <img src="/p2.svg" alt="M2" className="size-12" />{" "}
+                    <img src="/p2.svg" alt="M2" className="size-12" />{" "}
                     <p>{reactions_.p2}</p>
                 </SquealButton>
 
                 <div className="ml-auto text-gray-400 flex items-center gap-1">
-                    <p>
-                        {squealData?.impressions} 
-                        </p>
-                        <RemoveRedEyeOutlinedIcon />
+                    <p>{squealData?.impressions}</p>
+                    <RemoveRedEyeOutlinedIcon />
                 </div>
             </div>
             {!squealData.isAReply && (
@@ -498,7 +568,8 @@ const SquealReplyier = (props: { parent; session }) => {
                 switchType("text");
                 setLoading(false);
             });
-    };20
+    };
+    20;
 
     const handleContent = async (e: any) => {
         console.log("Firing handleContent - " + type);
@@ -828,10 +899,12 @@ const SquealButton = (props: {
     onClick?: () => void;
     className?: string;
     disabled?: boolean;
+    name?: string;
 }) => {
     return (
         <motion.button
             type="button"
+            name={props.name}
             whileHover={{ scale: 1.1 }}
             className={`text-gray-50 disabled:text-gray-50 flex items-center ${props.className}`}
             onClick={props.onClick}

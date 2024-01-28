@@ -16,6 +16,8 @@ router.get("/search", async (req, res) => {
 
     const type = query[0];
 
+    console.log(type)
+
     switch (type) {
         case "@": {
             const users = await usersDB.searchUser("name", query.slice(1));
@@ -46,7 +48,7 @@ router.get("/search", async (req, res) => {
             res.json({
                 results: keywords.map((keyword) => {
                     return { name: keyword.name, id: keyword._id };
-                }),
+                }).concat({name: query.slice(1), id: null})
             });
             break;
         }

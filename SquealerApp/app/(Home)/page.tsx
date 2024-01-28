@@ -6,7 +6,7 @@ import Spinner from "@/components/Spinner";
 import Squeal, { SquealSkeleton } from "@/components/Squeal/Squeal";
 import Tabs, { Tab } from "@/components/Tabs/Tabs";
 import { AnimatePresence, motion } from "framer-motion";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useSWRInfinite from "swr/infinite";

@@ -11,13 +11,10 @@
     box-sizing: border-box;
 }
 
-
-@media screen and (max-width: 640px) {
-    body {
-        /* padding: 8px !important; */
-    }
+pre {
+    all: unset;
+    font-family: inherit;
 }
-
 
 .MuiCardHeader-content {
     text-align: start;

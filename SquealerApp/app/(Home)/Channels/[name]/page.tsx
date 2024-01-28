@@ -109,7 +109,7 @@ export default function Page({ params }: { params: { name: string } }) {
                     </div>
                     {(data?.owner_id === user?._id ||
                         data?.administrators.includes(user?._id)) && (
-                        <div className="absolute right-0 bottom-0 m-4 rounded-md text-lg flex flex-row gap-2">
+                        <div className="absolute top-0 right-0 sm:bottom-0 sm:top-[unset] m-4 rounded-md text-lg flex flex-row gap-2">
                             <CustomLink
                                 className="px-4 py-1 rounded-lg bg-gray-500 flex items-center shadow-neutral-600 shadow-md hover:bg-gray-600 hover:shadow-neutral-700 transition-colors"
                                 href={`/Channels/${data?.name}/Edit`}
@@ -119,14 +119,14 @@ export default function Page({ params }: { params: { name: string } }) {
                         </div>
                     )}
                 </section>
-                <div className="w-full sticky top-16 z-[200] flex-col drop-shadow-xl divide-red-100" onClick={() => window.scroll(0, 0)}>
+                <div className="w-full sticky top-16 z-[200] flex-col drop-shadow-xl divide-red-100 text-start" onClick={() => window.scroll(0, 0)}>
                     <AnimatePresence mode="wait">
                         {data ? (
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="flex gap-2 justify-start items-center p-4  bg-gray-800 rounded-b-md w-full"
+                                className="flex flex-col sm:flex-row gap-2 justify-start sm:items-center p-4  bg-gray-800 rounded-b-md w-full"
                                 key="data"
                             >
                                 <div className="flex flex-col gap-2">

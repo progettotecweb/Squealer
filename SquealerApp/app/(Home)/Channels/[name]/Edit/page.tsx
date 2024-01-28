@@ -218,26 +218,26 @@ export default function CreatePrivateChannelPage({
         );
 
     return (
-        <PageContainer key="shop" className="gap-4 mb-20">
-            <main className="flex flex-col md:flex-row  rounded-md bg-gray-800 md:w-[65vw]">
+        <PageContainer key="shop" className="gap-4 mb-20 p-4 rounded-t-xl sm:rounded-t-none">
+            <main className="flex flex-col md:flex-row  rounded-md bg-gray-800 md:w-[65vw] rounded-t-xl sm:rounded-t-none">
                 <form
                     onSubmit={handleSubmit}
-                    className="flex flex-col gap-4 w-full rounded-md"
+                    className="flex flex-col gap-4 w-full rounded-t-xl"
                 >
-                    <section className="flex flex-col relative h-[20rem]">
+                    <section className="flex flex-col relative h-[20rem] rounded-t-xl sm:rounded-t-none">
                         {img.mimetype ? (
                             <motion.img
                                 src={`data:${img.mimetype};base64,${img.blob}`}
                                 alt=""
-                                className="w-full h-full rounded-tl-md rounded-br-lg object-cover bg-slate-400"
+                                className="w-full h-full sm:rounded-tl-md sm:rounded-br-lg rounded-t-xl object-cover bg-slate-400 sm:rounded-t-none"
                             />
                         ) : (
-                            <div className="w-full h-full rounded-tl-md rounded-br-lg object-cover bg-slate-400"></div>
+                            <div className="w-full h-full rounded-tl-md rounded-br-lg object-cover bg-slate-400 rounded-t-xl sm:rounded-t-none"></div>
                         )}
                         <motion.label
                             whileHover={{ opacity: 1 }}
                             htmlFor="img"
-                            className="mb-2 font-bold text-lg absolute z-10 w-full h-full cursor-pointer opacity-60 grid place-content-center text-center bg-gray-800 bg-opacity-70"
+                            className="mb-2 font-bold text-lg absolute z-10 w-full h-full cursor-pointer opacity-60 grid place-content-center text-center bg-gray-800 bg-opacity-70 rounded-t-xl "
                         >
                             <div className="flex items-center ">
                                 <CameraAltOutlined className="w-10 h-10" />
@@ -254,7 +254,7 @@ export default function CreatePrivateChannelPage({
                             className="p-2 border rounded-md opacity-0 file:hidden hidden"
                         />
                     </section>
-                    <section className="rounded-b-md bg-gray-800 p-4 flex flex-col gap-4">
+                    <section className="rounded-b-md bg-gray-800 p-4 flex flex-col gap-4 text-start">
                         <div className="flex flex-col md:flex-row-reverse md:items-center md:self-start gap-2">
                             <label htmlFor="name" className="font-bold text-lg">
                                 Name
@@ -301,13 +301,13 @@ export default function CreatePrivateChannelPage({
                     </section>
                     <button
                 type="submit"
-                className="py-2 px-6 bg-blue-600 text-white rounded-md self-end"
+                className="py-2 px-6 mb-4 mr-4 sm:mr-0 bg-blue-600 text-white rounded-md self-end"
             >
                 Edit Channel
             </button>
                 </form>
                 <div className="flex flex-col gap-2 p-4">
-                    <h1>Administrators</h1>
+                    <h1 className="text-xl text-start font-bold">Administrators</h1>
                     {admins.map((adm, index) => {
                         return (
                             <motion.div
@@ -341,7 +341,7 @@ export default function CreatePrivateChannelPage({
                                     layout
                                     src={
                                         adm?.img
-                                            ? `data:${adm?.img?.mimetype};base64,${adm?.img?.blob}`
+                                            ? `/api/media/${adm?.img}`
                                             : "/deleted.webp"
                                     }
                                     alt="Profile Picture"
