@@ -18,9 +18,9 @@ squeal.value.then((data: any) => {
 
 function emitsData() {
     let { datetime } = squeal.value
-    const { impressions, replies, reactions } = squeal.value
+    const { impressions, replies, reactions, ownerID } = squeal.value
     datetime = formatDate(datetime)
-    emits('squealData', { datetime, impressions, replies, reactions });
+    emits('squealData', { datetime, impressions, replies, reactions, ownerID });
 }
 
 function pad(number: any) {
