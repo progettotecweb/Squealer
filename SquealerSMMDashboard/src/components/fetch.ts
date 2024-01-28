@@ -35,7 +35,7 @@ export async function getUserData() {
 
 
 export async function getMyData(url: string) {
-    const userInfo = await fetch("/api/users/" + url, {
+    const userInfo = await fetch("/api/users/distinctSqueals/" + url, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"

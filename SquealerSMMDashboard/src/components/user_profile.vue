@@ -34,8 +34,10 @@ const update_user_value = () => {
     waiting.value = true;
     user.value = getMyData(id.id)
     user.value.then((data: any) => {
+        
         user.value = data
         user_squeals.value = user.value.squeals
+        console.log(user_squeals.value)
         daily_quota = user.value.msg_quota.daily;
         weekly_quota = user.value.msg_quota.weekly;
         monthly_quota = user.value.msg_quota.monthly;
@@ -366,7 +368,7 @@ function updateChart(squealData: { datetime: any, impressions: any, replies: any
 
         <div v-if="new_characters"><!--buy new caracters-->
 
-            <button class="btn btn-outline-info" @click="add_characters()"> compra 140 caratteri</button>
+            <button class="btn btn-outline-info" @click="add_characters()"> buy 140 characters</button>
             <div class="progress d-none" id="progressbarDiv" role="progressbar" aria-label="progress Bar" aria-valuenow="0"
                 aria-valuemin="0" aria-valuemax="100">
                 <div class="progress-bar progress-bar-striped bg-success" id="progressBar" style="width: 0%"></div>
@@ -382,7 +384,7 @@ function updateChart(squealData: { datetime: any, impressions: any, replies: any
 
 
         <div class="container d-flex flex-column-reverse ">
-            <squeal_box class="m-3" v-for="squeal in user_squeals" :id="squeal" @squealData="updateChart">
+            <squeal_box class="m-3"  v-for="squeal in user_squeals" :squeal="squeal" :owner="id.id" @squealData="updateChart">
             </squeal_box>
             <!--clicca uno squils per vedere le statistiche -->
             <!-- acuista caratteri-->

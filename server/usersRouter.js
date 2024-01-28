@@ -185,6 +185,36 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(user);
 });
 
+//get user from id
+router.get("/distinctSqueals/:id", async (req, res) => {
+    const user = await usersDB.searchUserByID(req.params.id);
+
+    //check if user.8squeals contains duplicates squeals id
+    // Check for duplicate squeal IDs
+    const squealIdsSet = new Set();
+    const distinctSqueals = user.squeals.filter((squeal) => {
+        //squeal is a new ObjectID
+        if (squealIdsSet.has(squeal.toString())) {
+            return false;
+        }
+        squealIdsSet.add(squeal.toString());
+        return true;
+
+    });
+    // Update the user object with distinct squeals
+    user.squeals = distinctSqueals
+
+    if (!user) {
+        res.status(404).json({
+            ok: false,
+            error: "User not found",
+        });
+        return;
+    }
+
+    res.status(200).json(user);
+});
+
 //get user from name
 router.get("/name/:name", async (req, res) => {
     const user = await usersDB.searchUserByName(req.params.name);
@@ -248,7 +278,7 @@ router.put("/:id/edit", async (req, res) => {
         return;
     }
 
-    if(req.body.img) {
+    if (req.body.img) {
         const propic = await mediaDB.addNewMedia(req.body.img.mimetype, req.body.img.blob);
         req.body.img = propic;
     }
