@@ -26,12 +26,12 @@ user.value.then((data: any) => {
   <header class="navbar navbar-expand navbar-dark sticky-top ">
     <div class="d-flex flex-row justify-content-between align-items-center w-100">
       <div class="d-none d-lg-block w-25">
-        <p class="title"> SMM Dashboard</p>
+        <p class="title mb-0"> SMM Dashboard</p>
       </div>
 
       <div class="logo d-flex justify-content-center w-25">
           <img src="/public/squealer.png" alt="squealer-logo" class="img-fluid logo" />
-        <p class="title d-none d-lg-block">
+        <p class="title mb-0 d-none d-lg-block">
           Squealer
         </p>
       </div>

@@ -21,13 +21,15 @@ const waiting = ref(true);
 
 
 <template>
-    <div class="user-box">
-        <div class="user-img-box">
-            <img v-if="waiting == false"   :src="`/api/media/${user.img}`" alt="user-img" class="img-fluid img-thumbnail"/> 
+    
+
+    <div class="card m-5" style="width: 8rem">
+        <img v-if="waiting == false"   :src="`/api/media/${user.img}`" alt="user-img" class="card-img-top"/>
+        <div class="card-body">
+            <p class="card-text fs-3">{{ user.name }}</p>
         </div>
-        <h1>{{ user.name}}</h1>
-       
     </div>
+
 </template>
 
 <style>

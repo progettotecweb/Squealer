@@ -37,7 +37,6 @@ const update_user_value = () => {
         
         user.value = data
         user_squeals.value = user.value.squeals
-        console.log(user_squeals.value)
         daily_quota = user.value.msg_quota.daily;
         weekly_quota = user.value.msg_quota.weekly;
         monthly_quota = user.value.msg_quota.monthly;
@@ -236,7 +235,9 @@ const chartData = ref<any>({
 
 
 
-function updateChart(squealData: { datetime: any, impressions: any, replies: any, reactions: any }) {
+function updateChart(squealData: { datetime: any, impressions: any, replies: any, reactions: any, ownerID: any}) {
+
+    if (user.value._id != squealData.ownerID._id) return;
 
     const newChartData = {
         ...chartData.value,
