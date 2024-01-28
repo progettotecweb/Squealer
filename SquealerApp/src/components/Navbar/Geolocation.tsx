@@ -162,9 +162,9 @@ const Geolocation: React.FC<GeolocationProps> = ({ onLocation }) => {
     }
 
     return (
-        <div>
+        <div className="w-full rounded-md p-2">
             {geolocation[0] !== null && geolocation[1] !== null ? (
-                <div>
+                <div className="w-full">
                     <button
                         onClick={() => {
                             initGeolocation();
@@ -178,7 +178,7 @@ const Geolocation: React.FC<GeolocationProps> = ({ onLocation }) => {
                     <div
                         id="map"
                         style={{ height: "400px", width: "100%" }}
-                        className="mapSqueal"
+                        className="mapSqueal rounded-md"
                     ></div>
                 </div>
             ) : (

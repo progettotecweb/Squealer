@@ -218,7 +218,7 @@ router.post("/post", auth, async (req, res) => {
 
             const payload = JSON.stringify({
                 title: `@${owner.name} replied to your squeal`,
-                body: newSqueal.type === "text" ? `${truncate(newSqueal.content.text, 20)}` : "",
+                body: newSqueal.type === "text" ? `${truncate(newSqueal.content.text, 30)}` : "",
             });
 
             await notifications.sendNotification(parentOwner._id, payload);
@@ -345,7 +345,7 @@ router.post("/post", auth, async (req, res) => {
                 if (mentionUser) {
                     const payload = JSON.stringify({
                         title: `@${owner.name} mentioned you in a squeal`,
-                        body: `${truncate(message, 20)}`,
+                        body: `${truncate(message, 30)}`,
                     });
 
                     await notifications.sendNotification(mentionUser._id, payload);
@@ -403,7 +403,7 @@ router.post("/post", auth, async (req, res) => {
 
         const payload = JSON.stringify({
             title: `@${owner.name} sent you a private squeal`,
-            body: newSqueal.content.text && `${truncate(newSqueal.content.text, 20)}`,
+            body: newSqueal.content.text ? `${truncate(newSqueal.content.text, 30)}` : "",
         });
 
         await notifications.sendNotification(user._id, payload);

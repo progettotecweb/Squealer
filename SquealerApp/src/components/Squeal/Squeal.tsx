@@ -350,14 +350,15 @@ const Squeal: React.FC<SquealProps> = ({
                     }
                 })()}
             </div>
-            <div className="text-gray-50 flex items-center gap-2 ">
+            <div className="text-gray-50 flex items-center gap-4 ">
                 <SquealButton
                     disabled={status === "unauthenticated"}
                     onClick={() =>
                         updateSquealReaction(id, "m2", session?.user.id)
                     }
                 >
-                    😡 {reactions_.m2}
+                    <img src="/m2.svg" alt="M2" className="size-12" />{" "}
+                    <p>{reactions_.m2}</p>
                 </SquealButton>
                 <SquealButton
                     disabled={status === "unauthenticated"}
@@ -365,7 +366,8 @@ const Squeal: React.FC<SquealProps> = ({
                         updateSquealReaction(id, "m1", session?.user.id)
                     }
                 >
-                    😒 {reactions_.m1}
+                    <img src="/m1.svg" alt="M2" className="size-12" />{" "}
+                    <p>{reactions_.m1}</p>
                 </SquealButton>
                 <SquealButton
                     disabled={status === "unauthenticated"}
@@ -373,7 +375,8 @@ const Squeal: React.FC<SquealProps> = ({
                         updateSquealReaction(id, "p1", session?.user.id)
                     }
                 >
-                    😄 {reactions_.p1}
+                    <img src="/p1.svg" alt="M2" className="size-12" />{" "}
+                    <p>{reactions_.p1}</p>
                 </SquealButton>
                 <SquealButton
                     disabled={status === "unauthenticated"}
@@ -381,11 +384,15 @@ const Squeal: React.FC<SquealProps> = ({
                         updateSquealReaction(id, "p2", session?.user.id)
                     }
                 >
-                    😝 {reactions_.p2}
+                   <img src="/p2.svg" alt="M2" className="size-12" />{" "}
+                    <p>{reactions_.p2}</p>
                 </SquealButton>
 
-                <div className="ml-auto">
-                    {squealData?.impressions} <RemoveRedEyeOutlinedIcon />
+                <div className="ml-auto text-gray-400 flex items-center gap-1">
+                    <p>
+                        {squealData?.impressions} 
+                        </p>
+                        <RemoveRedEyeOutlinedIcon />
                 </div>
             </div>
             {!squealData.isAReply && (
@@ -491,7 +498,7 @@ const SquealReplyier = (props: { parent; session }) => {
                 switchType("text");
                 setLoading(false);
             });
-    };
+    };20
 
     const handleContent = async (e: any) => {
         console.log("Firing handleContent - " + type);
@@ -823,19 +830,15 @@ const SquealButton = (props: {
     disabled?: boolean;
 }) => {
     return (
-        <motion.div
+        <motion.button
+            type="button"
             whileHover={{ scale: 1.1 }}
-            className={`${props.className} flex items-center`}
+            className={`text-gray-50 disabled:text-gray-50 flex items-center ${props.className}`}
+            onClick={props.onClick}
+            disabled={props.disabled}
         >
-            <button
-                type="button"
-                className="text-gray-50 disabled:text-gray-50"
-                onClick={props.onClick}
-                disabled={props.disabled}
-            >
-                {props.children}
-            </button>
-        </motion.div>
+            {props.children}
+        </motion.button>
     );
 };
 
