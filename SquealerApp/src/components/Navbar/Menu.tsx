@@ -54,28 +54,6 @@ const secondaryMenus = {
     search: <SearchMenu />,
     default: <div>DEFAULT</div>,
     notifications: <NotificationMenu />,
-    more: (
-        <div className="p-2 rounded-md w-full text-gray-50 flex flex-col">
-            <MenuItem
-                text="Settings"
-                href="/Settings"
-                ignoreBreakpoint
-                icon={<SettingsRoundedIcon />}
-            />
-            <MenuItem
-                text="About"
-                href="/About"
-                ignoreBreakpoint
-                icon={<InfoRoundedIcon />}
-            />
-            <MenuItem
-                text="Contact"
-                href="/Contact"
-                ignoreBreakpoint
-                icon={<MailOutlineRoundedIcon />}
-            />
-        </div>
-    ),
 };
 
 const Menu = ({ onOpen }: { onOpen?: any }) => {
@@ -99,11 +77,11 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
     return (
         <div className="flex flex-row h-full z-[2067]">
             <AnimatePresence>
-                <motion.div
+            {user && (<motion.div
                     layout
                     key="primary-menu"
                     role="presentation"
-                    className="bg-gray-800 text-gray-50 h-full p-6 flex flex-col md:bg-[#111B21] border-r-slate-800 border-r-[1px]"
+                    className="bg-gray-800 text-gray-50 h-full p-6 flex flex-col md:bg-[#111B21] border-r-slate-800 border-r-[1px] items-center sm:items-start"
                 >
                     {/* <section className="m-3">
                 <h1>{user ? "@" + user.name : "Welcome guest!"}</h1>
@@ -121,6 +99,7 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                     <div>
                         {user ? (
                             <button
+                                className="bg-gray-700 px-8 py-2 rounded-md grid place-content-center hover:bg-gray-800 transition-colors"
                                 onClick={() =>
                                     signOut()
                                 }
@@ -128,7 +107,8 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 Sign Out
                             </button>
                         ) : (
-                            <CustomLink href="/Login">Sign In</CustomLink>
+                            <CustomLink href="/Login" className=" bg-gray-600 rounded-md grid place-content-center hover:bg-gray-700 transition-colors"
+                            innerClassName="py-2 px-8  ">Sign In</CustomLink>
                         )}
                     </div>
 
@@ -157,11 +137,13 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                             href="/Channels"
                             icon={<ForumIcon />}
                         />
+                        {user && (
                         <MenuItem
                             text="Shop"
                             href="/Shop"
                             icon={<StorefrontIcon className="w-8 h-8" />}
                         />
+                        )}
 
                         {user && user.role == "Mod" && (
                             <MenuItem
@@ -193,15 +175,7 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                             <SearchOutlined className="w-8 h-8" />
                             <span className="hidden xl:block">Search</span>
                         </button>
-                        <button
-                            onClick={() => {
-                                handleClickOpen();
-                            }}
-                            className="flex flex-row gap-1 items-center text-lg mt-5 cursor-pointer"
-                        >
-                            <AddBoxOutlinedIcon className="w-8 h-8" />
-                            <span className="hidden xl:block">New Squeal</span>
-                        </button>
+                        {user && (
                         <button
                             onClick={() => {
                                 setSecondaryMenuType("notifications");
@@ -214,23 +188,10 @@ const Menu = ({ onOpen }: { onOpen?: any }) => {
                                 Notifications
                             </span>
                         </button>
+                        )}
                     </section>
-                    <section className="flex flex-col mb-1">
-                        <div>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setSecondaryMenuType("more");
-                                    setSecondaryMenuOpen(!secondaryMenuOpen);
-                                }}
-                                className="flex flex-row items-center gap-1 text-lg"
-                            >
-                                <MenuIcon className="w-8 h-8" />
-                                <span className="hidden xl:block">More</span>
-                            </button>
-                        </div>
-                    </section>
-                </motion.div>
+                    
+                </motion.div>)}
                 {secondaryMenuOpen && (
                     <>
                         <motion.div

@@ -273,9 +273,12 @@ router.post("/post", auth, async (req, res) => {
             }
 
         } else if (recipient.type === "Keyword") {
-            const keyword = await keywordsDB.searchKeywordByID(recipient.id);
-            if (!keyword) toBeRemoved.push(recipient);
-            recipient.name = keyword.name;
+            if(!recipient.id && recipient.name) {
+                const newKey = await keywordsDB.addOrGet(recipient.name);
+                recipient.id = newKey;
+            } else {
+            toBeRemoved.push(recipient);
+            }
         }
     }
 
@@ -295,7 +298,7 @@ router.post("/post", auth, async (req, res) => {
 
         const classifier = await PipelineSingleton.getInstance();
         const sentiment = await classifier(message, { topk: null });
-        console.log("sentiment", sentiment);
+        //console.log("sentiment", sentiment);
 
         const labels = [];
 
@@ -315,7 +318,7 @@ router.post("/post", auth, async (req, res) => {
 
         // chars validation
         const len = message.length;
-        console.log("len", len);
+        //console.log("len", len);
 
         if (!privacy && !validateChars(len, owner) && squeal.fromModerator !== true) {
             res.status(400).json({

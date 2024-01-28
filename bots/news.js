@@ -47,7 +47,7 @@ exports.setupNewsBot = async () => {
     
 
     const cronj = CronJob.from({
-        cronTime: "0 * * * *",
+        cronTime: "0 */2 * * *",
         onTick: async () => {
             const articles = await getNews("general", "it");
             await createSquealFromNewsArticle(articles[0], newsBot, newsChannel);

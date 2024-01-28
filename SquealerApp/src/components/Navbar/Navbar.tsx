@@ -41,17 +41,19 @@ const Navbar = () => {
                     <CustomLink href="/">
                         {pathname === "/" ? <HomeIcon className="h-8 w-8" /> : <HomeOutlinedIcon className="h-8 w-8" />}
                     </CustomLink>
-
+                    {status === "authenticated" && 
                     <CustomLink href="/Channels">
                         {pathname?.startsWith("/Channels") ? <ForumIcon className="h-8 w-8 text-gray-50" /> : <ForumIconOutlined className="h-8 w-8" />}
-                    </CustomLink>
+                    </CustomLink>}
+                    {status === "authenticated" && 
                     <CustomIcon
                         icon={<IconAdd className="h-8 w-8 text-gray-50" />}
                         onClick={() => setOpenDialog(!openDialog)}
-                    />
+                    />}
+                    {status === "authenticated" && 
                     <CustomLink href="/Shop">
                         {pathname?.startsWith("/Shop") ? <ShoppingBagIcon className="h-8 w-8" /> : <ShoppingBagOutlinedIcon className="h-8 w-8" />}
-                    </CustomLink>
+                    </CustomLink>}
                     <CustomLink href="/Account">
                         {status === "authenticated" ? (
                             <img

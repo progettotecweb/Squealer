@@ -154,10 +154,10 @@ export const MobileAccountMenu = ({ id, name }) => {
                 anchor="left"
                 onClose={() => setOpen(false)}
                 classes={{
-                    paper: "w-[70vw] bg-gray-800 text-gray-50 p-4",
+                    paper: "",
                 }}
             >
-                <aside className="size-full flex flex-col gap-4 items-start text-lg">
+                <aside className="size-full flex flex-col gap-4 items-start text-lg w-[70vw] bg-gray-800 text-gray-50 p-4">
                     {status === "authenticated" &&
                         ["SMM", "Mod"].includes(session?.user?.role) && (
                             <>
@@ -165,7 +165,7 @@ export const MobileAccountMenu = ({ id, name }) => {
                                     Add Social Media Manager
                                 </CustomLink>
 
-                                <CustomLink href="/SMMDashboard" type="a">
+                                <CustomLink href="/SMM" type="a">
                                     Switch to SMM
                                 </CustomLink>
                             </>

@@ -103,7 +103,7 @@ const Tabs: React.FC<TabsProps> = ({
                 </div>
             </div>
             <div className={contentClasses}>
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="wait" initial={false}>
                     {children[activeTab].props.content &&
                         cloneElement(
                             children[activeTab].props

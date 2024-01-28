@@ -62,12 +62,11 @@ export default function SearchMenu() {
         fetch(...args).then((res) => res.json());
 
     const [query, setQuery] = useState<string>("");
-    const [debouncedQuery, setDebouncedQuery] = useState<string>("");
     const { data, isLoading, mutate, error } = useSWR<SearchResults>(
         () =>
-            debouncedQuery === ""
+        query === ""
                 ? null
-                : `/api/search?q=${debouncedQuery.replace(/#/g, "%23")}`,
+                : `/api/search?q=${query.replace(/#/g, "%23")}`,
         fetcher
     );
 
@@ -82,16 +81,6 @@ export default function SearchMenu() {
         setTrigger(true);
         mutate();
     };
-
-    useEffect(() => {
-        const timerId = setTimeout(() => {
-            setDebouncedQuery(query);
-        }, 500);
-
-        return () => {
-            clearTimeout(timerId);
-        };
-    }, [query]);
 
     const [recents, setRecents] = useState<any[]>([]);
     const [trigger, setTrigger] = useState<boolean>(false);

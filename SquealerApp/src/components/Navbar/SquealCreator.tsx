@@ -357,8 +357,9 @@ const SquealCreator = () => {
                     />
                 </div>
                 <AsyncSelect
-                    className="text-gray-700"
+                    className="text-gray-800"
                     isMulti
+                    placeholder="Select recipients..."
                     cacheOptions
                     value={selected}
                     onChange={onChange}
@@ -367,7 +368,7 @@ const SquealCreator = () => {
                     }}
                     isDisabled={disabled}
                     loadOptions={async (inputValue) => {
-                        const res = await fetch(`/api/search?q=${inputValue}`);
+                        const res = await fetch(`/api/search?q=${encodeURIComponent(inputValue)}`);
                         const data = await res.json();
                         console.log(inputValue);
                         return data.results.map((res) => {
@@ -380,7 +381,8 @@ const SquealCreator = () => {
                                         : inputValue.startsWith("#")
                                         ? "Keyword"
                                         : "",
-                                    id: res.id,
+                                    id: res._id,
+                                    name: inputValue.startsWith("#") ? inputValue.slice(1) : undefined
                                 },
                                 label:
                                     (inputValue.startsWith("@")

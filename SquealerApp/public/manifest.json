@@ -1,6 +1,7 @@
 {
     "name": "Squealer",
-    "short_name": "Hello motherfuckers!",
+    "short_name": "Squealer",
+    "description": "Twitter is dead, long live Squealer!",
     "start_url": ".",
     "icons": [
         {

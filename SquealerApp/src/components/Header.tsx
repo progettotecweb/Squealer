@@ -80,7 +80,7 @@ const Header: React.FC = () => {
 
     const [isSearching, setIsSearching] = useState(false);
 
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
 
     const [search, setSearch] = useState("");
 
@@ -107,6 +107,11 @@ const Header: React.FC = () => {
                     />
                     SQUEALER
                 </Link>
+                {status === "unauthenticated" && (
+                    <Link href="/Login" className="absolute top-2 right-2 text-xl bg-gray-800 px-9 py-2 rounded-md">
+                        Login
+                    </Link>
+                )}
             </header>
             <header className="sm:hidden z-[1100] flex flex-column items-center bg-[#111B21] sticky top-0 left-0  p-2 w-full text-center text-stone-50 h-16">
                 <img src="/squealer.png" width={50} height={50} alt="logo" />
@@ -154,7 +159,7 @@ const Header: React.FC = () => {
                                     exit="exit"
                                     key="search"
                                     transition={{ duration: 0.15 }}
-                                    className=" rounded-md bg-gray-800 flex flex-row items-center px-2 mx-2"
+                                    className=" rounded-md bg-gray-800 flex flex-row items-center px-2 mx-2 w-full"
                                 >
                                     <motion.input
                                         type="text"
@@ -197,7 +202,7 @@ const Header: React.FC = () => {
 
                 <nav className="flex flex-row gap-2 items-center">
                     <AnimatePresence mode="wait">
-                        {pathname === "/" ? (
+                        {(pathname === "/" && status==="authenticated") ? (
                             <motion.button
                                 variants={variants}
                                 initial="initial"
