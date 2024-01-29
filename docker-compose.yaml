@@ -1,0 +1,61 @@
+services:
+  squealer:
+    image: node:20-bookworm
+    container_name: squealer
+    networks:
+      - squealer
+    volumes:
+      - ./:/app
+    ports:
+      - 8000:8000
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - MONGO_SITE=mongo
+      - MONGO_USER=site222303
+      - MONGO_PASSWORD=beiG5iNg
+      - NEXTAUTH_URL=https://squealer.ddns.net/Home/api/auth
+      - NEXTAUTH_SECRET=asdrubale
+      - NEXT_TELEMETRY_DISABLED=1
+
+
+    restart: unless-stopped
+    command: ["node", "/app/index.js"]
+
+  mongo:
+    container_name: mongo
+    image: mongo:4.4.18
+    restart: always
+    networks:
+      - squealer
+    volumes:
+      - /usr/mongodb:/data/db
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: site222303
+      MONGO_INITDB_ROOT_PASSWORD: beiG5iNg
+
+  nginx:
+    user: root
+    container_name: nginx
+    image: nginx
+    networks:
+      - squealer
+    volumes:
+      - ./nginx/default_https.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt/:/etc/letsencrypt/
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  squealer:
+    driver: bridge

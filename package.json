@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "@xenova/transformers": "^2.12.1",
+    "bcrypt": "^5.1.1",
+    "bootstrap": "^5.3.2",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "cron": "^3.1.6",
+    "dotenv": "^16.3.1",
+    "esprima": "^4.0.1",
+    "estraverse": "^5.3.0",
+    "express": "^4.18.0",
+    "handlebars": "^4.7.7",
+    "jsonwebtoken": "^9.0.2",
+    "leaflet": "^1.9.4",
+    "mongodb": "^4.5.0",
+    "mongoose": "^7.1.0",
+    "next": "^13.5.4",
+    "nodemon": "^3.0.1",
+    "npm": "^9.6.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1",
+    "web-push": "^3.6.6",
+    "whatwg-url": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.8",
+    "@types/react": "18.2.22",
+    "typescript": "5.2.2"
+  }
+}

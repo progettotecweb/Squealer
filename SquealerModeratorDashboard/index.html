@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Moderator Dashboard</title>
+    <!--
+        <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    -->
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.css">
+    <script src="/bootstrap/js/bootstrap.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/leaflet/leaflet.css">
+    <script src="/leaflet/leaflet.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/moderator.css">
+
+
+
+    <script src="/js/moderator/moderator.js"></script>
+
+</head>
+
+<body>
+    <div class="hero">
+        <nav class="navbar border-bottom border-body" data-bs-theme="dark">
+            <div class="container-fluid mx-5 d-flex justify-content-between ">
+                <div class="navbar-info navbar-div">
+                    <img id="master-user-img" alt="Your profile picture" class="text-light" />
+                    <a class="navbar-brand" id="master-user-name">Nome</a>
+                </div>
+
+                <form class="d-flex navbar-div justify-content-center" role="search" id="searchDiv">
+                    <input id="searchInput" class="form-control me-2 w-75" type="search" placeholder="@user or §channel"
+                        aria-label="Search">
+                    <button id="searchBtn" class="btn btn-outline-info" type="submit">Search</button>
+                </form>
+
+                <div class="navbar-div text-end">
+                    <a href="/">Home</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content d-flex justify-content-center">
+            <div id="box" class="mt-3">
+                <div class="section-header d-flex ">
+                    <ul class=" section-list list-group list-group-horizontal d-flex justify-content-center mt-2 mb-2">
+                        <li tabindex="0" role="tab" aria-selected="true"
+                            class="text-light box-section active-section active-section-not-scrolled" id="userSection">
+                            Users</li>
+                        <li tabindex="0" role="tab" aria-selected="false" class="text-light box-section"
+                            id="channelSection">Channels</li>
+                        <li tabindex="0" role="tab" aria-selected="false" class="text-light box-section"
+                            id="squealSection">Squeals</li>
+                    </ul>
+                    <div class="select-container d-flex">
+                        <div class="btn-filter-container align-self-center">
+                            <button type="button" class="btn btn-success" id="btn-filter" data-bs-toggle="modal"
+                                data-bs-target="#userFilterModal"><label id="filterLabel">Filter</label> <svg
+                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-funnel-fill" viewBox="0 0 16 16">
+                                    <path
+                                        d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5z" />
+                                </svg></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="box-content" class="">
+                    <div class="my-card">
+                        <img src="" alt="foto" class="user-pic" />
+                        <div class="user-content">
+                            <p class="user-name">@username</p>
+                            <p class="user-popularity">0</p>
+                        </div>
+                        <div class="card-user-footer">
+                            <input type="button" class="btn btn-primary" value="View more" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modals -->
+                <!-- USER MODAL -->
+                <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true"
+                    role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <img src="" alt="Selected user's profile picture" class="modal-img" />
+                                <h1 class="modal-title fs-5" id="userModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="selected-user-info">
+                                <div class="divRole d-flex">
+                                    <label for="user-role" class="h6 align-self-center role-text">Role</label>
+                                    <select class="form-select w-25" id="user-role">
+                                        <option value="User">User</option>
+                                        <option value="Pro">Pro</option>
+                                        <option value="SMM">SMM</option>
+                                        <option value="Mod">Mod</option>
+                                    </select>
+                                </div>
+                                <span class="h6">Message quota</span><br>
+                                <label for="user-quota-daily" class="label">Daily</label>
+                                <input type="number" class="form-number" id="user-quota-daily"
+                                    data-bs-value_quota_daily="0"><br>
+
+                                <label for="user-quota-weekly" class="label">Weekly</label>
+                                <input type="number" class="form-number" id="user-quota-weekly"
+                                    data-bs-value_quota_weekly="0"><br>
+
+                                <label for="user-quota-monthly" class="label">Monthly</label>
+                                <input type="number" class="form-number" id="user-quota-monthly"
+                                    data-bs-value_quota_monthly="0"><br>
+
+                                <label for="user-quota-extra" class="label">Extra</label>
+                                <input type="number" class="form-number" id="user-quota-extra"
+                                    data-bs-value_quota_extra="0"><br>
+                                </p>
+
+                                <span class="blocked-desc">User is <span id="blocked-text" class="h6"></span></span>
+                                <button type="button" class="btn btn-block" id="btn-blockuser"
+                                    data-bs-value_block="false">Block/Unblock</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USERS FILTER MODAL-->
+                <div class="modal fade" id="userFilterModal" tabindex="-1" aria-labelledby="userFilterModalLabel"
+                    aria-hidden="true" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 w-100 text-center" id="userFilterModalLabel">Filter users
+                                </h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <label for="filterUsers-select-orderby" class="h6">Choose the order</label>
+                                <select class="form-select sort-select" id="filterUsers-select-orderby">
+                                    <option value="alphabetical" selected>Alphabetical</option>
+                                    <option value="popularity">Popularity</option>
+                                </select>
+
+                                <label for="filterUsers-select-type" class="h6">Choose the type of user to show</label>
+                                <select class="form-select sort-select" id="filterUsers-select-type">
+                                    <option value="All" selected>All</option>
+                                    <option value="User">User</option>
+                                    <option value="Pro">Pro</option>
+                                    <option value="SMM">SMM</option>
+                                    <option value="Mod">Mod</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- CHANNEL MODAL -->
+                <div class="modal fade" id="channelModal" tabindex="-1" aria-labelledby="channelModalLabel"
+                    aria-hidden="true" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 w-100 text-center" id="channelModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="selected-channel-info">
+                                    <span class="h6" id="channel-official">Official</span><br>
+                                    <label for="channel-name" class="h6">Name: </label>
+                                    <input type="text" class="form-text" id="channel-name"
+                                        data-bs-value_name="name"><br>
+
+                                    <label for="channel-description" class="h6">Description: </label>
+                                    <input type="text" class="form-text" id="channel-description"
+                                        data-bs-value_description="description"><br>
+
+                                    <label for="channel-administrators" class="h6 ">Administrators: </label>
+                                    <input type="text" class="form-text " id="channel-administrators"
+                                        data-bs-value_administrators="administrators">
+                                    <input type="button" class="btn btn-warning btn-check-input"
+                                        id="channel-administrators-checkbox" value="Check admins" /><br>
+                                    <span class="label" id="channel-administrators-label">Insert @username(s)
+                                        separated
+                                        by a comma</span>
+                                </p>
+                                <span class="blocked-desc">Channel is <span id="blocked-text" class="h6"></span></span>
+                                <button type="button" class="btn btn-block" id="btn-blockChannel"
+                                    data-bs-value_block="false">Block/Unblock</button><br>
+                                <span class="visible-desc">Channel is <span id="visibility-text"
+                                        class="h6"></span></span>
+                                <button type="button" class="btn btn-block" id="btn-visibilityChannel"
+                                    data-bs-value_visibility="false">Visibile/Private</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHANNEL SQUEALS MODAL -->
+                <div class="modal fade" id="channelSquealsModal" tabindex="-1"
+                    aria-labelledby="channelSquealsModalLabel" aria-hidden="true" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 w-100 text-center" id="channelSquealsModalLabel ">Modal
+                                    title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                    id="close-channel-squeal-modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="channel-post-squeal d-flex flex-column">
+                                    <textarea class="form-control" id="channel-post-squeal-textarea" rows="3"
+                                        placeholder="Write here..."></textarea>
+                                    <button class="btn btn-success btn-savechanges channel-squeal-post-btn"
+                                        id="btn-savechanges" data-bs-dismiss="modal">
+                                        Post squeal
+                                    </button>
+                                </div>
+                                <hr>
+                                <div class="channel-view-squeals">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHANNELS FILTER MODAL-->
+                <div class="modal fade" id="channelFilterModal" tabindex="-1" aria-labelledby="channelFilterModalLabel"
+                    aria-hidden="true" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 w-100 text-center" id="channelFilterModalLabel">Filter
+                                    channels</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <label for="filterChannels-select-orderby" class="h6">Choose the order</label>
+                                <select class="form-select sort-select" id="filterChannels-select-orderby">
+                                    <option value="alphabetical" selected>Alphabetical</option>
+                                    <option value="owner">Owner name</option>
+                                    <option value="popularity">Popularity</option>
+                                    <option value="squeal-number">Squeal number</option>
+                                </select>
+
+                                <label for="filterChannels-select-type" class="h6">Choose the type</label>
+                                <select class="form-select sort-select" id="filterChannels-select-type">
+                                    <option value="All" selected>All</option>
+                                    <option value="Official">Official</option>
+                                    <option value="Unofficial">Unofficial</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- SQUEALS MODAL -->
+                <div class="modal fade" id="squealModal" tabindex="-1" aria-labelledby="squealModalLabel"
+                    aria-hidden="true" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 w-100 text-center" id="squealModalLabel">Squeal details</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-flex justify-content-between">
+                                    <p class="h6">Original owner:
+                                        <span id="squeal-owner"></span>
+                                    </p> <br>
+                                    <p id="squeal-modal-datetime"></p>
+                                </div>
+                                <hr>
+                                <label for="squeal-recipients" class="h6 ">Recipients: </label>
+                                <input type="text" class="form-text " id="squeal-recipients"
+                                    data-bs-value_recipients="recipients">
+                                <input type="button" class="btn btn-warning btn-check-input"
+                                    id="channel-recipients-checkbox" value="Check recipients"><br>
+                                <span class="label" id="channel-recipients-label">
+                                    Insert @usernames, §channels and #keywords names separated by a comma
+                                </span><br><br>
+
+                                <label for="squeal-reactions-m2" class="h6">Reactions</label><br>
+                                <span class="label">😡</span>
+                                <input type="number" min="0" class="form-number w-25" id="squeal-reactions-m2"
+                                    data-bs-value_reactions_m2="0"><br>
+                                <label for="squeal-reactions-m1" class="label">😒</label>
+                                <input type="number" min="0" class="form-number w-25" id="squeal-reactions-m1"
+                                    data-bs-value_reactions_m1="0"><br>
+                                <label for="squeal-reactions-p1" class="label">😄</label>
+                                <input type="number" min="0" class="form-number w-25" id="squeal-reactions-p1"
+                                    data-bs-value_reactions_p1="0"><br>
+                                <label for="squeal-reactions-p2" class="label">😝</label>
+                                <input type="number" min="0" class="form-number w-25" id="squeal-reactions-p2"
+                                    data-bs-value_reactions_p2="0"><br>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <p class="w-33 text-center" id="squeal-modal-cm"></p>
+                                    <p class="w-33 text-center" id="squeal-modal-impressions"></p>
+                                    <!-- <p class="w-33 text-center" id="squeal-modal-controversial"></p>-->
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    <p class="w-33 text-center" id="squeal-modal-automatic"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SQUEALS FILTER MODAL-->
+                <div class="modal fade" id="squealFilterModal" tabindex="-1" aria-labelledby="squealFilterModalLabel"
+                    aria-hidden="true" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 w-100 text-center" id="squealFilterModalLabel">Filter
+                                    squeals</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <label for="filterSqueal-select-orderby" class="h6">Choose the order</label>
+                                <select class="form-select sort-select" id="filterSqueal-select-orderby">
+                                    <option value="date-newer" selected>Date newer</option>
+                                    <option value="date-older">Date older</option>
+                                    <option value="owner">Owner name</option>
+                                    <option value="recipient">Recipient name</option>
+                                </select>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-savechanges" data-bs-dismiss="modal"
+                                    id="btn-savechanges">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+</body>
+
+</html>
