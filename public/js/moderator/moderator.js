@@ -456,7 +456,6 @@ window.onload = function () {
                 }
 
                 //create the cards for every squeal
-                //console.log(data)
                 let squealShownCount = 0
                 let geoSqueals = [];
                 for (let i = 0; i < data.length; i++) {
@@ -875,6 +874,8 @@ window.onload = function () {
             squealId = databs.id;
             inputRecipients.setAttribute("data-bs-recipients-id", databs.recipientsId);
             inputRecipients.setAttribute("data-bs-ids-type", databs.idsType);
+            inputRecipients.setAttribute("data-bs-recipients-nameKeywords", databs.recipients);
+            inputRecipients.setAttribute("data-bs-recipients-checked", "false");
             impressions.innerHTML = databs.impressions + " impression(s)";
             datetime.innerHTML = formatDate(databs.datetime);
             //controversial.innerHTML = databs.controversial === 'true' ? '<i>Controversial</i>' : '<i>Not controversial</i>';
@@ -894,7 +895,7 @@ window.onload = function () {
             //const checkRecipients = squealsModal.querySelector("#squeal-recipients-checkbox");
             checkRecipients.addEventListener("click", async (e) => {
                 const correctLabel = document.querySelector("#channel-recipients-label");
-                checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true, keyword: true }, "data-bs-ids-type", squealId);
+                checkIfExistsAndSet(inputRecipients.value, inputRecipients, correctLabel, true, "data-bs-recipients-id", { user: true, channel: true, keyword: true }, "data-bs-ids-type", squealId, inputRecipients);
 
                 if (inputRecipients.value === "") {
                     //reset check admins label and checkbox
@@ -936,7 +937,6 @@ window.onload = function () {
     const btnSave = document.getElementsByClassName("btn-savechanges");
     for (let i = 0; i < btnSave.length; i++) {
         btnSave[i].addEventListener("click", async (e) => {
-            //console.log(e.target)
             await updateDBandSection(e.target);
         });
     }
@@ -1055,7 +1055,8 @@ window.onload = function () {
                             visibility: document.querySelector("#btn-visibilityChannel").getAttribute("data-bs-value_visibility") === "true" ? data.visibility === "public" ? "private" : "public" : data.visibility,
                             name: document.querySelector("#channel-name").value,
                             description: document.querySelector("#channel-description").value,
-                            administrators: document.querySelector("#channel-administrators").value != '' ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null,
+                            administrators: getAdminsFromModal()
+                            //administrators: document.querySelector("#channel-administrators").value != '' ? document.querySelector("#channel-administrators").getAttribute("data-bs-administrators-id").replace('\n', '').split(',') : null
                         }
                         break;
 
@@ -1144,7 +1145,6 @@ window.onload = function () {
             case "channels":
             case "channel-squeal-create":
                 //case "channel-squeal-delete":
-                //console.log("newId: " + newId);
                 await loadChannels();
                 break;
             case "squeals":
@@ -1295,7 +1295,7 @@ async function usersIdToName(usersId, channelId, dataBsName) {
     }
 }
 
-async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: true, channel: true, keyword: true }, squealId) {
+async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: true, channel: true, keyword: true }, squealId, inputRecipients) {
     // normalize the string for our purpose
     let namesArray = names.trim();//remove spaces
     //namesArray = namesArray.replace(/\s+/g, '');// remove spaces
@@ -1359,29 +1359,6 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
             }
         }
 
-        /*if (todo.keyword && squealId != null) {
-            if (namesArray[i].charAt(0) === "#") {
-                //Keywords are created on the fly, so we nee do create them via the API
-                const keywordId = await fetch("/api/squeals/addKeywordToSqueal/" + squealId, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ keyword: namesArray[i] })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        return data.keywordId;
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
-
-                ids.push({ type: "Keyword", id: keywordId });
-                found = true;
-            }
-        }*/
-
         if (todo.keyword) {
             if (namesArray[i].charAt(0) === "#") {
                 ids.push({ type: "Keyword", id: namesArray[i].split('#')[1] });
@@ -1399,6 +1376,7 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
             correctLabel.classList.add("text-danger");
             correctLabel.classList.remove("text-success");
             correctLabel.innerHTML = "Wrong name(s)!";
+            //inputRecipients.setAttribute("data-bs-recipients-checked", "false");
 
             return;
         }
@@ -1419,7 +1397,6 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
         return false;
     });
 
-    //console.log(usersId);
     //update data in input div
     div.setAttribute(dataBsId, formatIdsToAttribute(ids));
 
@@ -1427,14 +1404,17 @@ async function namesToIds(names, div, correctLabel, dataBsId, todo = { user: tru
     correctLabel.classList.add("text-success");
     correctLabel.classList.remove("text-danger");
     correctLabel.innerHTML = "Correct name(s)!";
+    if (inputRecipients != null) {
+        inputRecipients.setAttribute("data-bs-recipients-checked", "true");
+    }
 
     return ids;
 }
 
-async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dataBsId, todo = { user: true, channel: true, keyword: true }, dataBsType, squealId = null) {
+async function checkIfExistsAndSet(value, input, correctLabel, toId = false, dataBsId, todo = { user: true, channel: true, keyword: true }, dataBsType, squealId = null, inputRecipients = null) {
     let ids = [];
     if (toId) {
-        ids = await namesToIds(value, input, correctLabel, dataBsId, todo, squealId);
+        ids = await namesToIds(value, input, correctLabel, dataBsId, todo, squealId, inputRecipients);
     }
     input.value = value;
     if (todo.user && !todo.channel && !todo.keyword) {
@@ -1453,7 +1433,6 @@ async function searchAndAddSqueals(squealsId, div) {
     let squealIdArray = squealsId.split(",");
     let geoSqueals = [];
 
-    //console.log(squealIdArray);
     for (let i = 0; i < squealIdArray.length; i++) {
         if (squealIdArray[i] === "") continue;
         const squeal = await fetch("/api/squeals/search/" + squealIdArray[i], {
@@ -1497,7 +1476,6 @@ async function searchAndAddSqueals(squealsId, div) {
     return geoSqueals;
 
     async function deleteSqueal(squealId, btn) {
-        //console.log(squealId);
         //first, we remove the squeal from the db
         await fetch("/api/squeals/" + squealId, {
             method: "DELETE",
@@ -1805,13 +1783,34 @@ function getRecipientsFromModal() {
     let recipients = [];
     const ids = document.querySelector("#squeal-recipients").getAttribute("data-bs-recipients-id").replace('\n', '').split(',');
     const types = document.querySelector("#squeal-recipients").getAttribute("data-bs-ids-type").replace('\n', '').split(',');
+    const namesForKeywords = document.querySelector("#squeal-recipients").getAttribute("data-bs-recipients-nameKeywords").replace('\n', '').split(',');
+    const recipientChecked = document.querySelector("#squeal-recipients").getAttribute("data-bs-recipients-checked");
 
     for (let i = 0; i < ids.length; i++) {
         if (ids[i] === "") continue;
-        recipients.push({ id: ids[i], type: types[i] });
+        if (recipientChecked == "false" && types[i] === "Keyword") {
+            recipients.push({ id: namesForKeywords[i].split("#")[1], type: types[i] });
+        } else {
+            recipients.push({ id: ids[i], type: types[i] });
+        }
+    }
+    return recipients;
+}
+
+function getAdminsFromModal() {
+    const adminsInput = document.querySelector("#channel-administrators");
+    let ids = adminsInput.getAttribute("data-bs-administrators-id");
+
+    let admins = [];
+    if (ids != null) {
+        ids = ids.replace('\n', '').split(',');
+        for (let i = 0; i < ids.length; i++) {
+            if (ids[i] === "") continue;
+            admins.push(ids[i]);
+        }
     }
 
-    return recipients;
+    return admins;
 }
 
 function getSquealContent(value, type) {
