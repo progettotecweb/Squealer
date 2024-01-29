@@ -108,7 +108,7 @@ export default function Page({ params }: { params: { name: string } }) {
                         </div>
                     </div>
                     {(data?.owner_id === user?._id ||
-                        data?.administrators.includes(user?._id)) && (
+                        data?.administrators?.includes(user?._id)) && (
                         <div className="absolute top-0 right-0 sm:bottom-0 sm:top-[unset] m-4 rounded-md text-lg flex flex-row gap-2">
                             <CustomLink
                                 className="px-4 py-1 rounded-lg bg-gray-500 flex items-center shadow-neutral-600 shadow-md hover:bg-gray-600 hover:shadow-neutral-700 transition-colors"
@@ -158,7 +158,7 @@ export default function Page({ params }: { params: { name: string } }) {
                                     <button
                                         onClick={() =>
                                             followOrUnfollow(
-                                                user.following.includes(
+                                                user?.following?.includes(
                                                     data._id
                                                 ),
                                                 session?.user.id,
@@ -167,7 +167,7 @@ export default function Page({ params }: { params: { name: string } }) {
                                         }
                                         className="rounded-md px-4 py-1 bg-gray-700 hover:bg-gray-600 transition-colors ml-auto"
                                     >
-                                        {!user?.following.includes(data._id)
+                                        {!user?.following?.includes(data._id)
                                             ? "Follow"
                                             : "Unfollow"}
                                     </button>

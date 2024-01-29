@@ -38,7 +38,7 @@ user.value.then((data: any) => {
 
       <div class="w-25 d-flex justify-content-end" v-if="active_name == null">
         
-          <a href="/home"><button class="btn btn-outline-info ">Back</button></a>
+          <a href="/"><button class="btn btn-outline-info ">Back</button></a>
         
       </div>
       <div class="w-25 d-flex justify-content-end" v-if="active_name != null">

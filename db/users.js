@@ -171,26 +171,30 @@ exports.updateUser = async function (id, updatedUserData) {
         });
 };
 
-const dailyJob = CronJob.from({
-    cronTime: "0 0 0 * * *",
-    onTick: this.resetMsgQuotaDaily,
-    start: true,
-    timeZone: "Europe/Bucharest",
-});
+exports.initUserJobs = function () {
+    const dailyJob = CronJob.from({
+        cronTime: "0 0 0 * * *",
+        onTick: this.resetMsgQuotaDaily,
+        start: true,
+        timeZone: "Europe/Bucharest",
+    });
+    
+    const weeklyJob = CronJob.from({
+        cronTime: "0 0 0 * * 1",
+        onTick: this.resetMsgQuotaWeekly,
+        start: true,
+        timeZone: "Europe/Bucharest",
+    });
+    
+    const monthlyJob = CronJob.from({
+        cronTime: "0 0 0 1 * *",
+        onTick: this.resetMsgQuotaMonthly,
+        start: true,
+        timeZone: "Europe/Bucharest",
+    });
 
-const weeklyJob = CronJob.from({
-    cronTime: "0 0 0 * * 1",
-    onTick: this.resetMsgQuotaWeekly,
-    start: true,
-    timeZone: "Europe/Bucharest",
-});
-
-const monthlyJob = CronJob.from({
-    cronTime: "0 0 0 1 * *",
-    onTick: this.resetMsgQuotaMonthly,
-    start: true,
-    timeZone: "Europe/Bucharest",
-});
+    return [dailyJob, weeklyJob, monthlyJob];
+}
 
 exports.resetMsgQuotaDaily = async function () {
     const users = await User.find();

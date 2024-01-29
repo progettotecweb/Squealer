@@ -8,7 +8,10 @@ import { Button } from "@mui/material";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 
-import { SquealsSection, AccountUserCard } from "@/components/Accounts/AccountsSections";
+import {
+    SquealsSection,
+    AccountUserCard,
+} from "@/components/Accounts/AccountsSections";
 import Spinner from "@/components/Spinner";
 
 interface Squeal {
@@ -35,7 +38,7 @@ interface Squeal {
     reactions: any;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const ScheduledSquealsSection = ({ session }) => {
     const {
@@ -89,19 +92,24 @@ const ScheduledSquealsSection = ({ session }) => {
 const AccountPage = () => {
     const { data: session, status } = useSession();
 
-    if (status === "loading") return <PageContainer key="loading"><Spinner /></PageContainer>;
+    if (status === "loading")
+        return (
+            <PageContainer key="loading">
+                <Spinner />
+            </PageContainer>
+        );
 
     if (status === "authenticated")
         return (
             <PageContainer key="account" className="">
                 <AccountUserCard id={session?.user.id} />
-                {/* <Tabs>
+                <Tabs>
                     <Tab
                         label="Squeals"
                         content={
-                            <AnimatedTabContent> */}
+                            <AnimatedTabContent>
                                 <SquealsSection id={session?.user.id} />
-                            {/* </AnimatedTabContent>
+                            </AnimatedTabContent>
                         }
                     />
                     <Tab
@@ -112,7 +120,7 @@ const AccountPage = () => {
                             </AnimatedTabContent>
                         }
                     />
-                </Tabs> */}
+                </Tabs>
             </PageContainer>
         );
 };
