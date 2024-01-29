@@ -15,14 +15,15 @@ const authOptions: NextAuthOptions = {
         async jwt({ token, user, trigger }) {
             // the processing of JWT occurs before handling sessions.
             if (trigger === "update") {
-                const ORIGIN = window.location.origin;
-                const updatedUser = await fetch(`${ORIGIN}/api/users/${token.id}`)
+                console.log("Updating JWT")
+                const updatedUser = await fetch(`${process.env.BASE_URL}/api/users/${token.id}`)
                 const updatedUserData = await updatedUser.json()
 
                 token.role = updatedUserData.role;
                 token.id = updatedUserData._id;
                 token.name = updatedUserData.name;
 
+                console.log("Updated JWT", token)
                 return token;
             }
 
