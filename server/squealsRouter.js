@@ -31,12 +31,13 @@ router.get("/filter", async (req, res) => {
     return res.json(squeals)
 })
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
+    const requestingUser = req.user.id;
 
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 10;
 
-    const squeals = await squealsDB.getAllSquealsByOwnerIDAggr(req.params.id, page, limit);
+    const squeals = await squealsDB.getAllSquealsByOwnerIDAggr(req.params.id,requestingUser.toString() === req.params.id, page, limit);
     res.json(squeals);
 });
 

@@ -54,8 +54,8 @@ const Map: React.FunctionComponent<
         });
     }, [geolocation]);
     return (
-        <div>
-            <div id={mapId} style={{ height: "400px", width: "100%" }} className="mapSqueal"></div>
+        <div className="rounded-md">
+            <div id={mapId} className="w-full h-[30vh] mapSqueal rounded-md"></div>
         </div>
     );
 }

@@ -442,9 +442,15 @@ exports.scheduleSqueal = async function (id, cronJobExpr, ownerID) {
 
             newSqueal._id = undefined;
             newSqueal.datetime = Date.now();
-            newSqueal.reactions = undefined;
+            newSqueal.reactions = {
+                m2: 0,
+                m1: 0,
+                p1: 0,
+                p2: 0,
+                usersReactions: [],
+            };
             newSqueal.cm = undefined;
-            newSqueal.impressions = undefined;
+            newSqueal.impressions = 0;
             newSqueal.controversial = undefined;
             newSqueal.automatic = false;
             newSqueal.cronJobExpr = null;
@@ -695,6 +701,7 @@ const populateSquealAggregation = [
 
 exports.getAllSquealsByOwnerIDAggr = async function (
     ownerID,
+    all = false,
     page = 0,
     limit = 10
 ) {
@@ -704,6 +711,7 @@ exports.getAllSquealsByOwnerIDAggr = async function (
         {
             $match: {
                 ownerID: new mongoose.Types.ObjectId(ownerID),
+                visibility: all ? { $in: ["public", "private"] } : "public",
             },
         },
         ...populateSquealAggregation,
@@ -785,10 +793,17 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
             $lookup: {
                 from: "users",
                 // Assuming the users collection contains the user data
-                localField: "squeals.ownerID",
-                foreignField: "_id",
                 as: "squeals.ownerID",
+                let: { temp: "$squeals.ownerID" },
+
                 pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ["$_id", "$$temp"],
+                            },
+                        },
+                    },
                     {
                         $project: {
                             name: 1,
@@ -813,16 +828,21 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
             $lookup: {
                 from: "squeals",
                 // Assuming the replies collection contains the reply data
-                localField: "squeals.replies",
-                foreignField: "_id",
+                let: { temp: "$squeals.replies" },
                 as: "squeals.replies",
                 pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $in: ["$_id", "$$temp"],
+                            },
+                        },
+                    },
                     {
                         $project: {
                             type: 1,
                             content: 1,
                             ownerID: 1,
-                            createdAt: 1,
                             datetime: 1,
                             _id: 1,
                             reactions: 1,
@@ -833,10 +853,16 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
                     {
                         $lookup: {
                             from: "users",
-                            localField: "ownerID",
-                            foreignField: "_id",
+                            let: { ownerID: "$ownerID" },
                             as: "ownerID",
                             pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $eq: ["$_id", "$$ownerID"],
+                                        },
+                                    },
+                                },
                                 {
                                     $project: {
                                         name: 1,
@@ -854,20 +880,70 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
         },
         {
             $lookup: {
-                from: "channels",
-                localField: "squeals.recipients.id",
-                foreignField: "_id",
-                as: "squeals.recipientsFromCollection3",
+                from: "keywords",
+                let: { temp: "$squeals.recipients.id" },
+                as: "squeals.recipientsFromCollection1",
                 pipeline: [
                     {
                         $match: {
-                            official: true,
+                            $expr: {
+                                $in: ["$_id", "$$temp"],
+                            },
                         },
                     },
                     {
                         $project: {
                             name: 1,
-                            id: "$id",
+                            id: "$_id",
+                            _id: 0,
+                            type: "Keyword",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                let: { temp: "$squeals.recipients.id" },
+                as: "squeals.recipientsFromCollection2",
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $in: ["$_id", "$$temp"],
+                            },
+                        },
+                    },
+                    {
+                        $project: {
+                            name: 1,
+                            id: "$_id",
+                            _id: 0,
+                            type: "User",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "channels",
+                let: { temp: "$squeals.recipients.id" },
+                as: "squeals.recipientsFromCollection3",
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $in: ["$_id", "$$temp"],
+                            },
+                        },
+                    },
+                    {
+                        $project: {
+                            name: 1,
+                            id: "$_id",
+                            _id: 0,
                             type: "Channel",
                         },
                     },
@@ -877,12 +953,18 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
         {
             $addFields: {
                 "squeals.recipients": {
-                    $setUnion: ["$squeals.recipientsFromCollection3"],
+                    $setUnion: [
+                        "$squeals.recipientsFromCollection1",
+                        "$squeals.recipientsFromCollection2",
+                        "$squeals.recipientsFromCollection3",
+                    ],
                 },
             },
         },
         {
             $project: {
+                "squeals.recipientsFromCollection1": 0,
+                "squeals.recipientsFromCollection2": 0,
                 "squeals.recipientsFromCollection3": 0,
             },
         },
@@ -894,6 +976,7 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
         {
             $skip: skip,
         },
+
         {
             $limit: limit,
         },
@@ -918,10 +1001,10 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
                         input: "$squeals",
                         as: "squeal",
                         cond: {
-                            $or: [
-                                { $eq: ["$$squeal.isAReply", false] },
-                                {
-                                    $not: {
+                            $not: {
+                                $and: [
+                                    { $eq: ["$$squeal.isAReply", true] },
+                                    {
                                         $in: [
                                             "$$squeal.replyingTo",
                                             {
@@ -933,8 +1016,8 @@ exports.getGlobalFeed = async function (page = 0, limit = 10) {
                                             },
                                         ],
                                     },
-                                },
-                            ],
+                                ],
+                            },
                         },
                     },
                 },

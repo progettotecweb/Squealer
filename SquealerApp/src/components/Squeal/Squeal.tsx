@@ -418,7 +418,7 @@ const Squeal: React.FC<SquealProps> = ({
                     }
                 })()}
             </div>
-            <div className="text-gray-50 flex items-center gap-4 ">
+            <div className="text-gray-50 flex items-center gap-4 text-lg">
                 <SquealButton
                     disabled={status === "unauthenticated"}
                     onClick={() =>
@@ -426,8 +426,8 @@ const Squeal: React.FC<SquealProps> = ({
                     }
                     name="Very Negative"
                 >
-                    <img src="/m2.svg" alt="M2" className="size-12" />{" "}
-                    <p>{reactions_.m2}</p>
+                    😡 {" "}
+                    <span className="ml-1"> {reactions_.m2}</span>
                 </SquealButton>
                 <SquealButton
                     disabled={status === "unauthenticated"}
@@ -436,8 +436,8 @@ const Squeal: React.FC<SquealProps> = ({
                     }
                     name="Negative"
                 >
-                    <img src="/m1.svg" alt="M2" className="size-12" />{" "}
-                    <p>{reactions_.m1}</p>
+                    😒
+                    <span className="ml-1">{reactions_.m1}</span>
                 </SquealButton>
                 <SquealButton
                     disabled={status === "unauthenticated"}
@@ -446,8 +446,8 @@ const Squeal: React.FC<SquealProps> = ({
                     }
                     name="Positive"
                 >
-                    <img src="/p1.svg" alt="M2" className="size-12" />{" "}
-                    <p>{reactions_.p1}</p>
+                    😄{" "}
+                    <span className="ml-1">{reactions_.p1}</span>
                 </SquealButton>
                 <SquealButton
                     disabled={status === "unauthenticated"}
@@ -456,8 +456,8 @@ const Squeal: React.FC<SquealProps> = ({
                     }
                     name="Very Positive"
                 >
-                    <img src="/p2.svg" alt="M2" className="size-12" />{" "}
-                    <p>{reactions_.p2}</p>
+                    😝{" "}
+                    <span className="ml-1">{reactions_.p2}</span>
                 </SquealButton>
 
                 <div className="ml-auto text-gray-400 flex items-center gap-1">

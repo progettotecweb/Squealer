@@ -505,10 +505,10 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                             input: "$squeals",
                             as: "squeal",
                             cond: {
-                                $or: [
-                                    { $eq: ["$$squeal.isAReply", false] },
-                                    {
-                                        $not: {
+                                $not: {
+                                    $and: [
+                                        { $eq: ["$$squeal.isAReply", true] },
+                                        {
                                             $in: [
                                                 "$$squeal.replyingTo",
                                                 {
@@ -520,8 +520,8 @@ exports.getFeed = async function (user, page = 0, limit = 10) {
                                                 },
                                             ],
                                         },
-                                    },
-                                ],
+                                    ],
+                                },
                             },
                         },
                     },

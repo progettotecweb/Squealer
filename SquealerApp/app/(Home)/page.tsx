@@ -6,9 +6,10 @@ import Spinner from "@/components/Spinner";
 import Squeal, { SquealSkeleton } from "@/components/Squeal/Squeal";
 import Tabs, { Tab } from "@/components/Tabs/Tabs";
 import { AnimatePresence, motion } from "framer-motion";
+import { set } from "mongoose";
 import { signOut, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useSWRInfinite from "swr/infinite";
 
 //fade in fade out
@@ -27,17 +28,19 @@ const variants = {
 const Homepage = () => {
     const { data: session, status } = useSession();
     const contentFinished = useRef<boolean>(false);
+    const [contentFinished2, setContentFinished2] = useState<boolean>(false);
 
     const getKey = (pageIndex: any, previousPageData: string | any[]) => {
         if (previousPageData && !previousPageData.length) {
             contentFinished.current = true;
+            setContentFinished2(true);
             return null;
         } // reached the end
 
         return status === "authenticated"
             ? `/api/users/${session?.user?.id}/feed?page=${pageIndex}&limit=10`
             : status === "unauthenticated"
-            ? "/api/globalFeed"
+            ? `/api/globalFeed?page=${pageIndex}&limit=10`
             : null; // SWR key
     };
 
@@ -46,6 +49,7 @@ const Homepage = () => {
             .then((res) => res.json())
             .then((data) => {
                 if (data.length === 0) {
+                    setContentFinished2(true);
                     contentFinished.current = true;
                 }
 
@@ -59,26 +63,29 @@ const Homepage = () => {
 
     const searchParams = useSearchParams();
 
+
+    const handleScroll = useCallback((e) => {
+        const scrollHeight = e.target.documentElement.scrollHeight;
+        const currentHeight =
+            e.target.documentElement.scrollTop + window.innerHeight;
+        if (currentHeight + 1 >= scrollHeight && !contentFinished2) {
+            console.log(`Requesting next page (${contentFinished2 ? "finished" : "not finished"})`)
+            setSize(size + 1);
+        }
+    }, [contentFinished2]);
+
     useEffect(() => {
-        const handleScroll = (e) => {
-            const scrollHeight = e.target.documentElement.scrollHeight;
-            const currentHeight =
-                e.target.documentElement.scrollTop + window.innerHeight;
-            if (currentHeight + 1 >= scrollHeight && !contentFinished.current) {
-                //console.log(`Requesting next page (${contentFinished.current ? "finished" : "not finished"})`)
-                setSize(size + 1);
-            }
-        };
+        window.removeEventListener("scroll", handleScroll);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+    }, [contentFinished2]);
 
     const getKeyForFiltered = (
         pageIndex: any,
         previousPageData: string | any[]
     ) => {
         if (previousPageData && !previousPageData.length) {
-            contentFinished.current = true;
+            setContentFinished2(true)
             return null;
         } // reached the end
 
