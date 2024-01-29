@@ -23,7 +23,7 @@ user.value.then((data: any) => {
 </script>
 
 <template >
-  <header class="navbar navbar-expand navbar-dark sticky-top ">
+  <header class=" sticky-top ">
     <div class="d-flex flex-row justify-content-between align-items-center w-100">
       <div class="d-none d-lg-block w-25">
         <p class="title mb-0"> SMM Dashboard</p>
@@ -55,10 +55,10 @@ user.value.then((data: any) => {
       
       <div class="col-md-3 col-xl-2 sidebar d-none d-lg-block  text-center mt-5"> <!--sidebar sinistra-->
         <div class="row justify-content-center p-0">
-          <img class="p-0" v-if="waiting == false" :src="`/api/media/${user.img}`" alt="user-img" style="width: 120px; height: 120px;"/> 
+          <img class="rounded p-0" v-if="waiting == false" :src="`/api/media/${user.img}`" alt="user-img" style="width: 120px; height: 120px;"/> 
         </div>
         <div class="row">
-          <p>@{{ user.name }}</p>
+          <p class="m-2">@{{ user.name }}</p>
         </div>
         <div class="row">
           <a href="/home"><button class="btn btn-outline-info ">Home</button></a>
