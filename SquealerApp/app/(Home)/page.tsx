@@ -27,12 +27,10 @@ const variants = {
 
 const Homepage = () => {
     const { data: session, status } = useSession();
-    const contentFinished = useRef<boolean>(false);
     const [contentFinished2, setContentFinished2] = useState<boolean>(false);
 
     const getKey = (pageIndex: any, previousPageData: string | any[]) => {
         if (previousPageData && !previousPageData.length) {
-            contentFinished.current = true;
             setContentFinished2(true);
             return null;
         } // reached the end
@@ -50,8 +48,8 @@ const Homepage = () => {
             .then((data) => {
                 if (data.length === 0) {
                     setContentFinished2(true);
-                    contentFinished.current = true;
                 }
+                if(data.length < 10) setContentFinished2(true);
 
                 return data;
             });
@@ -64,21 +62,21 @@ const Homepage = () => {
     const searchParams = useSearchParams();
 
 
-    const handleScroll = useCallback((e) => {
-        const scrollHeight = e.target.documentElement.scrollHeight;
-        const currentHeight =
-            e.target.documentElement.scrollTop + window.innerHeight;
-        if (currentHeight + 1 >= scrollHeight && !contentFinished2) {
-            console.log(`Requesting next page (${contentFinished2 ? "finished" : "not finished"})`)
-            setSize(size + 1);
-        }
-    }, [contentFinished2]);
+    // const handleScroll = useCallback((e) => {
+    //     const scrollHeight = e.target.documentElement.scrollHeight;
+    //     const currentHeight =
+    //         e.target.documentElement.scrollTop + window.innerHeight;
+    //     if (currentHeight + 1 >= scrollHeight && !contentFinished2) {
+    //         console.log(`Requesting next page (${contentFinished2 ? "finished" : "not finished"})`)
+    //         setSize(size + 1);
+    //     }
+    // }, [contentFinished2]);
 
-    useEffect(() => {
-        window.removeEventListener("scroll", handleScroll);
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [contentFinished2]);
+    // useEffect(() => {
+    //     window.removeEventListener("scroll", handleScroll);
+    //     window.addEventListener("scroll", handleScroll);
+    //     return () => window.removeEventListener("scroll", handleScroll);
+    // }, [contentFinished2]);
 
     const getKeyForFiltered = (
         pageIndex: any,
@@ -175,6 +173,8 @@ const Homepage = () => {
                                           </div>
                                       ))}
                                 {isValidating || (isLoading && <Spinner />)}
+                                {!contentFinished2 ? <button onClick={() => setSize(size + 1)}>Load more</button> : <button onClick={() => window.scroll(0,0)}>Go back</button>}
+
                             </section>
                         </motion.div>
                     )}

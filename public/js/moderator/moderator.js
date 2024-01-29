@@ -45,7 +45,7 @@ async function getUserData() {
         });
 
 
-    //se userinfo non è valido dell'user non è stato trovato lo sloggo
+    //se userinfo dell'user non è valido non è stato trovato lo sloggo
     if (!userInfo) {
         signout();
     }

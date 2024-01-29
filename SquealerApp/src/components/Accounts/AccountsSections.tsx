@@ -288,11 +288,11 @@ export const SquealsSection = ({ id }) => {
     //     mutate: mutateSqueals,
     // } = useSWR(`/api/squeals/${id}`, fetcher);
 
-    const contentFinished = useRef<boolean>(false);
+    const [contentFinished, setContentFinished] = useState(false);
 
     const getKey = (pageIndex: any, previousPageData: string | any[]) => {
         if (previousPageData && !previousPageData.length) {
-            contentFinished.current = true;
+            setContentFinished(true);
             return null;
         } // reached the end
 
@@ -304,7 +304,11 @@ export const SquealsSection = ({ id }) => {
             .then((res) => res.json())
             .then((data) => {
                 if (data.length === 0) {
-                    contentFinished.current = true;
+                    setContentFinished(true)
+                }
+
+                if(data.length < 10) {
+                    setContentFinished(true)
                 }
 
                 return data;
@@ -319,19 +323,24 @@ export const SquealsSection = ({ id }) => {
         mutate: mutateSqueals,
     } = useSWRInfinite(getKey, fetcher);
 
+    // useEffect(() => {
+    //     const handleScroll = (e) => {
+    //         const scrollHeight = e.target.documentElement.scrollHeight;
+    //         const currentHeight =
+    //             e.target.documentElement.scrollTop + window.innerHeight;
+    //         if (currentHeight + 1 >= scrollHeight && !contentFinished) {
+    //             console.log(`Requesting next page (${contentFinished ? "finished" : "not finished"})`)
+    //             setSize(size + 1);
+    //         }
+    //     };
+    //     window.addEventListener("scroll", handleScroll);
+    //     return () => window.removeEventListener("scroll", handleScroll);
+    // }, []);
+
+
     useEffect(() => {
-        const handleScroll = (e) => {
-            const scrollHeight = e.target.documentElement.scrollHeight;
-            const currentHeight =
-                e.target.documentElement.scrollTop + window.innerHeight;
-            if (currentHeight + 1 >= scrollHeight && !contentFinished.current) {
-                //console.log(`Requesting next page (${contentFinished.current ? "finished" : "not finished"})`)
-                setSize(size + 1);
-            }
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+        console.log(`Content is ${contentFinished ? "finished" : "not finished"}, size is ${size}`)
+    }, [contentFinished, size])
 
     return (
         <section className="mt-2 flex flex-col gap-2 w-full md:w-[60vw] mb-16">
@@ -357,6 +366,7 @@ export const SquealsSection = ({ id }) => {
                       </div>
                   ))}
             {isValidating || (squealsLoading && <Spinner />)}
+                    {!contentFinished ? <button onClick={() => setSize(size + 1)}>Load more</button> : <button onClick={() => window.scroll(0,0)}>Go back</button>}
         </section>
     );
 };
