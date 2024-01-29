@@ -133,6 +133,9 @@ const SquealCreator = () => {
         }
         setSquealPostedLoading("posting");
 
+
+        console.log(selected.map((res) => res.value));
+
         fetch("/api/squeals/post", {
             method: "POST",
             body: JSON.stringify({
@@ -372,6 +375,7 @@ const SquealCreator = () => {
                         const data = await res.json();
                         console.log(inputValue);
                         return data.results.map((res) => {
+                            console.log(res);
                             return {
                                 value: {
                                     type: inputValue.startsWith("@")
@@ -381,7 +385,7 @@ const SquealCreator = () => {
                                         : inputValue.startsWith("#")
                                         ? "Keyword"
                                         : "",
-                                    id: res._id,
+                                    id: res.id,
                                     name: inputValue.startsWith("#") ? inputValue.slice(1) : undefined
                                 },
                                 label:

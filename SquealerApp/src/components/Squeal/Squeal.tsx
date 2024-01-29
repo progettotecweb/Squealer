@@ -858,6 +858,7 @@ const SquealReplyier = (props: { parent; session }) => {
                             accept="image/*"
                             id={`icon-button-file imginputref ${props.parent._id}`}
                             type="file"
+                            disabled={!props.session}
                             className="hidden"
                             onChange={(e) => {
                                 handleImg(e.target, true);

@@ -15,6 +15,6 @@ self.addEventListener('push', async (event) => {
   self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     event.waitUntil(
-      clients.openWindow('localhost:8000/Home/')
+      clients.openWindow('https://site222303.tw.cs.unibo.it/Home/')
     );
   })

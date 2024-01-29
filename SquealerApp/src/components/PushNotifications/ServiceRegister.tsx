@@ -62,11 +62,14 @@ const ServiceRegister = () => {
     const { data: session, status } = useSession();
 
     useEffect(() => {
-        (async () => {
+        
             if (status !== "authenticated") return;
             if (!notificationsSupported()) return;
-            subscribe(session.user.name);
-        })();
+            
+            if(status === "authenticated"){
+                registerServiceWorker().then(() => subscribe(session.user.name));
+        
+            }
     }, [status]);
 
     return <></>;
